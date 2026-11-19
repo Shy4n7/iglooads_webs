@@ -1,4 +1,5 @@
-import { EMAIL_LABEL, EMAIL_URL, INSTAGRAM_URL } from "@/lib/content";
+import { EMAIL_LABEL, EMAIL_URL, INSTAGRAM_HANDLE, INSTAGRAM_URL } from "@/lib/content";
+import Year from "./Year";
 
 export default function Footer() {
   return (
@@ -7,7 +8,7 @@ export default function Footer() {
         <span className="font-bebas text-[22px] tracking-[0.35em] text-cream">IGLOO ADS</span>
         <div className="flex flex-wrap gap-6 text-[13px]">
           <a href={INSTAGRAM_URL} className="text-cream-soft hover:text-cream">
-            [@instagram]
+            {INSTAGRAM_HANDLE}
           </a>
           <a href={EMAIL_URL} className="text-cream-soft hover:text-cream">
             {EMAIL_LABEL}
@@ -16,7 +17,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="wrap mt-6 text-xs text-cream-mute">
-        &copy; {new Date().getFullYear()} Igloo Ads. Instagram reels, UGC ads and brand shoots.
+        &copy; <Year /> Igloo Ads. Instagram reels, UGC ads and brand shoots.
       </div>
     </footer>
   );

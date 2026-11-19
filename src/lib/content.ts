@@ -3,6 +3,7 @@
 
 export const INSTAGRAM_URL = "#"; // [INSTAGRAM LINK]
 export const INSTAGRAM_LABEL = "[INSTAGRAM LINK]";
+export const INSTAGRAM_HANDLE = "[@instagram]"; // e.g. @iglooads
 export const EMAIL_LABEL = "[email]";
 export const EMAIL_URL = "#"; // [email] e.g. mailto:hello@example.com
 
