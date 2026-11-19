@@ -139,3 +139,5 @@ All in `src/lib/content.ts` unless noted.
 - Testimonial and attribution: `TESTIMONIAL`
 - `[Shoot name]`, `[Location]` and `[PHOTO]` stills: `src/components/OnSet.tsx`
 - `[PHOTO]` stills in What we do: `src/components/Services.tsx`
+- Websites card artwork (a drawn browser window stand-in) and copy: `src/components/Services.tsx`
+- Intro paragraph under the hero: `src/components/Intro.tsx`
