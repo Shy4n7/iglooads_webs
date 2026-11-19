@@ -35,7 +35,7 @@ export default function Header() {
       <div className="wrap flex h-[68px] items-center justify-between">
         <a
           href="#top"
-          className="font-bebas text-[22px] tracking-[0.35em] text-indigo no-underline"
+          className="site-logo font-bebas text-[22px] tracking-[0.35em] text-indigo no-underline"
           aria-label="Igloo Ads, back to top"
         >
           IGLOO ADS
@@ -50,7 +50,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <a
             href="#book"
-            className="btn inline-flex min-h-11 items-center rounded-full bg-amber px-5 py-3 font-bebas text-[17px] tracking-[0.08em] text-indigo no-underline"
+            className="btn frost frost-amber inline-flex min-h-11 items-center rounded-full px-5 py-3 font-bebas text-[17px] tracking-[0.08em] no-underline"
           >
             BOOK A CALL
           </a>

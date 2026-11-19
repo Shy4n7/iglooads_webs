@@ -80,7 +80,7 @@ export default function Services() {
               <p className="mb-[18px] text-sm leading-[1.65] text-ink-soft">{s.body}</p>
               <a
                 href="#book"
-                className="btn btn-skew mt-auto inline-flex min-h-11 items-center rounded-[9px] bg-indigo px-[18px] py-2.5 font-bebas text-[17px] tracking-[0.06em] text-cream no-underline"
+                className="btn btn-skew frost frost-ink mt-auto inline-flex min-h-11 items-center rounded-[9px] px-[18px] py-2.5 font-bebas text-[17px] tracking-[0.06em] no-underline"
                 aria-label={`Know more about ${s.title.join(" ").toLowerCase()}`}
               >
                 KNOW MORE <span aria-hidden="true">&nbsp;&rarr;</span>

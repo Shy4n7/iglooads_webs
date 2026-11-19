@@ -50,37 +50,43 @@ function ReelCard({
   }, [inView, paused, reduced]);
 
   return (
-    <button
-      type="button"
-      className="reel lift rv"
-      aria-label={`Play ${reel.client} reel`}
-      aria-haspopup="dialog"
-      onClick={(e) => onOpen(index, e)}
-    >
-      <video
-        ref={ref}
-        src={media.card}
-        poster={near ? media.poster : undefined}
-        muted
-        loop
-        playsInline
-        preload="none"
-        disablePictureInPicture
-        aria-hidden="true"
-        tabIndex={-1}
-      />
-      <span className="reel-play" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
-          <path d="M3 1.5v11l9.5-5.5z" />
-        </svg>
-      </span>
-      <span
-        className="absolute inset-x-0 bottom-0 px-4 pt-9 pb-3.5 text-xs font-medium text-cream"
-        style={{ background: "linear-gradient(to top, rgba(29,31,56,0.8), transparent)" }}
+    <div className="rv">
+      <button
+        type="button"
+        className="reel lift"
+        aria-label={`Play ${reel.client} reel`}
+        aria-haspopup="dialog"
+        onClick={(e) => onOpen(index, e)}
       >
-        {reel.client}
-      </span>
-    </button>
+        <video
+          ref={ref}
+          src={media.card}
+          poster={near ? media.poster : undefined}
+          muted
+          loop
+          playsInline
+          preload="none"
+          disablePictureInPicture
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+        <span className="reel-play frost frost-cream" aria-hidden="true">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+            <path d="M3 1.5v11l9.5-5.5z" />
+          </svg>
+        </span>
+      </button>
+      <a
+        href={reel.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="reel-link"
+        aria-label={`${reel.client} on Instagram (opens in a new tab)`}
+      >
+        <span>{reel.client}</span>
+        <span aria-hidden="true">&#8599;</span>
+      </a>
+    </div>
   );
 }
 
@@ -154,7 +160,7 @@ export default function Reels() {
       } else if (e.key === "Tab") {
         // Keep focus cycling inside the dialog.
         const items = Array.from(
-          dialogRef.current?.querySelectorAll<HTMLElement>("button:not([tabindex='-1'])") ?? [],
+          dialogRef.current?.querySelectorAll<HTMLElement>("button:not([tabindex='-1']), a[href]") ?? [],
         );
         if (items.length === 0) return;
         const i = items.indexOf(document.activeElement as HTMLElement);
@@ -222,13 +228,13 @@ export default function Reels() {
             controlsList="nodownload nofullscreen noremoteplayback"
             onContextMenu={(e) => e.preventDefault()}
           />
-          <button ref={closeRef} type="button" className="lb-close" aria-label="Close video" onClick={close}>
+          <button ref={closeRef} type="button" className="lb-close frost frost-cream" aria-label="Close video" onClick={close}>
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
           {muted && visible ? (
-            <button type="button" className="lb-sound" onClick={unmute}>
+            <button type="button" className="lb-sound frost frost-amber" onClick={unmute}>
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
                 <path d="M2 6h3l4-3v10l-4-3H2z" />
                 <path
@@ -242,9 +248,17 @@ export default function Reels() {
               Tap for sound
             </button>
           ) : (
-            <p className="lb-label m-0" aria-hidden="true">
-              {current >= 0 ? REELS[current].client : ""}
-            </p>
+            current >= 0 && (
+              <a
+                href={REELS[current].instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lb-label"
+                aria-label={`${REELS[current].client} on Instagram (opens in a new tab)`}
+              >
+                {REELS[current].client} <span aria-hidden="true">&#8599;</span>
+              </a>
+            )
           )}
         </div>
       </div>

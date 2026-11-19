@@ -13,20 +13,20 @@ export default function Intro() {
         </h2>
         <div className="rv flex flex-col gap-6">
           <p className="m-0 max-w-[480px] text-base leading-[1.75] text-ink-soft">
-            Igloo Ads is a Coimbatore studio for Instagram reels, UGC ads, brand shoots and Meta ad
-            campaigns. We script, shoot, edit and post short-form video, then build the fast, mobile-first
+            Igloo Ads is a Coimbatore studio for Instagram reels, UGC ads, brand shoots and
+            websites. We script, shoot, edit and post short-form video, then build the fast, mobile-first
             website your new customers land on. One team, from the first hook to the booking.
           </p>
           <div className="flex flex-wrap gap-3">
             <a
               href="#book"
-              className="btn inline-flex min-h-12 items-center rounded-xl bg-indigo px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] text-cream no-underline"
+              className="btn frost frost-ink inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               GET IN TOUCH <span aria-hidden="true">&nbsp;&rarr;</span>
             </a>
             <a
               href="#work"
-              className="btn inline-flex min-h-12 items-center rounded-xl bg-line px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] text-indigo no-underline"
+              className="btn frost frost-cream inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               SEE OUR WORK
             </a>

@@ -88,13 +88,13 @@ export default function Booking() {
             </div>
             <div role="group" aria-label="Choose a time, IST" className="grid grid-cols-3 gap-2">
               {SLOTS.map((t, i) => (
-                <button key={t} type="button" className="slot" aria-pressed={i === slot} onClick={() => setSlot(i)}>
+                <button key={t} type="button" className="slot frost frost-clear" aria-pressed={i === slot} onClick={() => setSlot(i)}>
                   {t}
                 </button>
               ))}
             </div>
             <a
-              className="btn mt-[18px] flex min-h-[52px] items-center justify-between gap-3 rounded-full bg-amber px-[22px] py-2 font-anton text-[15px] tracking-[0.06em] text-indigo no-underline"
+              className="btn frost frost-amber mt-[18px] flex min-h-[52px] items-center justify-between gap-3 rounded-full px-[22px] py-2 font-anton text-[15px] tracking-[0.06em] no-underline"
               href={hasLink ? BOOKING_URL : "#book"}
               {...(hasLink ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               data-placeholder={hasLink ? undefined : BOOKING_PLACEHOLDER}

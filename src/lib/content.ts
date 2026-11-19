@@ -17,15 +17,15 @@ export const NAV = [
   { href: "#book", label: "Contact" },
 ];
 
-export type Reel = { id: string; client: string };
+export type Reel = { id: string; client: string; instagram: string };
 
 export const REELS: Reel[] = [
-  { id: "IMG_7724", client: "[Client 1]" },
-  { id: "IMG_7725", client: "[Client 2]" },
-  { id: "IMG_7728", client: "[Client 3]" },
-  { id: "IMG_7729", client: "[Client 4]" },
-  { id: "IMG_7730", client: "[Client 5]" },
-  { id: "IMG_7733", client: "Havells" },
+  { id: "IMG_7724", client: "Audi Coimbatore", instagram: "https://www.instagram.com/audicoimbatore/" },
+  { id: "IMG_7725", client: "Kun Kia Coimbatore", instagram: "https://www.instagram.com/kunkiacoimbatore/" },
+  { id: "IMG_7728", client: "Lotus Hyundai", instagram: "https://www.instagram.com/lotushyundai.in/" },
+  { id: "IMG_7729", client: "Royal Enfield Pollachi", instagram: "https://www.instagram.com/royalenfieldpollachi/" },
+  { id: "IMG_7730", client: "Aura Contrivers", instagram: "https://www.instagram.com/aura_contrivers/" },
+  { id: "IMG_7733", client: "Havells India", instagram: "https://www.instagram.com/havells__india/" },
 ];
 
 export const reelMedia = (id: string) => ({
@@ -35,9 +35,24 @@ export const reelMedia = (id: string) => ({
 });
 
 export const STEPS = [
-  { n: "01", title: "Discovery call", body: "We learn your brand, audience and what you want people to do." },
-  { n: "02", title: "Shoot and edit", body: "Scripts, a planned shoot day and fast, thumb-stopping edits." },
-  { n: "03", title: "Post and grow", body: "We post, track views and leads, and double down on what works." },
+  {
+    n: "01",
+    kicker: "TALK",
+    title: "Discovery call",
+    body: "We learn your brand, audience and what you want people to do.",
+  },
+  {
+    n: "02",
+    kicker: "CREATE",
+    title: "Shoot and edit",
+    body: "Scripts, a planned shoot day and fast, thumb-stopping edits.",
+  },
+  {
+    n: "03",
+    kicker: "GROW",
+    title: "Post and grow",
+    body: "We post, track views and leads, and double down on what works.",
+  },
 ];
 
 export const RESULTS = [
