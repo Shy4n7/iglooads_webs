@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Bebas_Neue, Bricolage_Grotesque, Fraunces, Poppins } from "next/font/google";
 import RevealFallback from "@/components/RevealFallback";
+import ScrollManager from "@/components/ScrollManager";
 import "./globals.css";
 
 const bebas = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-bebas-neue", display: "swap" });
@@ -56,12 +57,22 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       lang="en"
       className={`${bebas.variable} ${anton.variable} ${bricolage.variable} ${fraunces.variable} ${poppins.variable}`}
     >
+      <head>
+        {/* Runs before the page paints: always start at the top on load or refresh. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if('scrollRestoration' in history)history.scrollRestoration='manual';if(location.hash)history.replaceState(null,'',location.pathname+location.search);",
+          }}
+        />
+      </head>
       <body>
         <a className="skip-link" href="#main">
           Skip to content
         </a>
         {children}
         <RevealFallback />
+        <ScrollManager />
       </body>
     </html>
   );
