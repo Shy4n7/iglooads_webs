@@ -25,7 +25,6 @@ const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-GB
 const wk = fmt({ weekday: "short" });
 const monthLong = fmt({ month: "long" });
 const monthShort = fmt({ month: "short" });
-const full = fmt({ weekday: "long", day: "numeric", month: "long" });
 const short = fmt({ weekday: "short", day: "numeric", month: "short" });
 
 export default function Booking() {
@@ -70,12 +69,12 @@ export default function Booking() {
                   type="button"
                   className="day max-[420px]:min-w-[38px]"
                   aria-pressed={i === day}
-                  aria-label={dt ? full.format(dt) : "Loading day"}
                   disabled={!dt}
                   onClick={() => setDay(i)}
                 >
-                  <span className="text-[11px]">{dt ? wk.format(dt) : " "}</span>
+                  <span className="text-[11px]">{dt ? wk.format(dt) : " "}</span>{" "}
                   <span className="text-[15px] font-medium">{dt ? dt.getUTCDate() : " "}</span>
+                  {dt ? <span className="sr-only"> {monthLong.format(dt)}</span> : null}
                 </button>
               ))}
             </div>
