@@ -1,11 +1,13 @@
 import Image, { type StaticImageData } from "next/image";
-import reels from "../../public/media/still-service-reels.jpg";
-import ugc from "../../public/media/still-service-ugc.jpg";
-import shoots from "../../public/media/still-service-shoots.jpg";
+// Unsplash License stock photos, credits in assets/stock/CREDITS.md.
+import reels from "../../public/media/service-reels.jpg";
+import ugc from "../../public/media/service-ugc.jpg";
+import shoots from "../../public/media/service-shoots.jpg";
+import websites from "../../public/media/service-websites.jpg";
 
 type Service = {
-  img?: StaticImageData;
-  pos?: string;
+  img: StaticImageData;
+  pos: string;
   tag: string;
   title: [string, string];
   body: string;
@@ -14,53 +16,33 @@ type Service = {
 const SERVICES: Service[] = [
   {
     img: reels,
-    pos: "50% 30%",
+    pos: "50% 40%",
     tag: "REELS",
     title: ["REELS THAT", "GO VIRAL"],
     body: "Hooks, scripts, shoots and edits built for the first three seconds.",
   },
   {
     img: ugc,
-    pos: "50% 40%",
+    pos: "50% 45%",
     tag: "UGC ADS",
     title: ["UGC ADS", "THAT SELL"],
     body: "Creator-style ads that feel like a customer talking, not a brand.",
   },
   {
     img: shoots,
-    pos: "50% 35%",
+    pos: "50% 55%",
     tag: "SHOOTS",
     title: ["BRAND", "SHOOTS"],
     body: "Photos and B-roll for your feed, website and ads in one shoot day.",
   },
   {
+    img: websites,
+    pos: "50% 45%",
     tag: "WEBSITES",
     title: ["WEBSITES THAT", "CONVERT"],
     body: "Fast, mobile-first sites that turn reel views into calls, bookings and sales.",
   },
 ];
-
-// Stand-in artwork for the websites card until a real project screenshot exists.
-function BrowserMock() {
-  return (
-    <div aria-hidden="true" className="absolute inset-0 bg-mid2 p-5 pb-0">
-      <div className="h-full overflow-hidden rounded-t-xl bg-cream shadow-[0_18px_40px_rgba(29,31,56,0.35)]">
-        <div className="flex items-center gap-1.5 bg-line px-3 py-2">
-          <span className="h-2 w-2 rounded-full bg-orange" />
-          <span className="h-2 w-2 rounded-full bg-amber" />
-          <span className="h-2 w-2 rounded-full bg-mid" />
-          <span className="ml-2 h-2 flex-1 rounded-full bg-card" />
-        </div>
-        <div className="space-y-2.5 p-4">
-          <div className="font-bebas text-[26px] leading-none tracking-[0.2em] text-indigo">YOUR BRAND</div>
-          <div className="h-2 w-4/5 rounded-full bg-line" />
-          <div className="h-2 w-3/5 rounded-full bg-line" />
-          <div className="mt-3 h-6 w-24 rounded-full bg-amber" />
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function Services() {
   return (
@@ -77,19 +59,14 @@ export default function Services() {
         {SERVICES.map((s) => (
           <article key={s.tag} className="lift rv flex flex-col overflow-hidden rounded-[26px] border border-line bg-card">
             <div className="cut relative h-[240px] bg-mid">
-              {s.img ? (
-                <Image
-                  src={s.img}
-                  alt=""
-                  fill
-                  sizes="(max-width: 560px) 260px, (max-width: 1100px) 50vw, 320px"
-                  className="object-cover"
-                  style={{ objectPosition: s.pos }}
-                />
-              ) : (
-                <BrowserMock />
-              )}
-              <span className="photo-tag">[PHOTO]</span>
+              <Image
+                src={s.img}
+                alt=""
+                fill
+                sizes="(max-width: 560px) 260px, (max-width: 1100px) 50vw, 320px"
+                className="object-cover"
+                style={{ objectPosition: s.pos }}
+              />
             </div>
             <div className="flex flex-1 flex-col items-start px-[26px] pt-2 pb-7">
               <span className="rounded-[5px] bg-indigo px-2.5 py-1 font-bebas text-sm tracking-[0.08em] text-cream">
