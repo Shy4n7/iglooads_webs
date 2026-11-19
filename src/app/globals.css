@@ -84,24 +84,40 @@
     padding-inline: 40px;
   }
   /* Phones: the intro is pulled up under the opening screen so there is less
-     to scroll through, but stays hidden until scrolling starts, so the first
-     screen still shows only the wordmark. */
+     to scroll through. It stays hidden until the wordmark has started to
+     shrink, then the heading, paragraph and buttons rise in one after another
+     (--d on each step). The scroll-linked reveal is switched off here so the
+     sequence is not tied to scroll position. */
   @media (max-width: 600px) {
     .intro {
       position: relative;
       z-index: 21;
       margin-top: -28svh;
-      opacity: 0;
-      translate: 0 32px;
       pointer-events: none;
-      transition:
-        opacity 0.6s var(--ease-out-soft),
-        translate 0.8s var(--ease-out-soft);
     }
     html[data-scrolled] .intro {
+      pointer-events: auto;
+    }
+    html .intro .rv {
+      animation: none;
+    }
+    /* Safari and Firefox use the script fallback (.rv-io); keep the wrapper
+       plain there too, so only the steps animate. */
+    html.rv-io .intro .rv:not(.intro-step) {
+      opacity: 1;
+      translate: none;
+    }
+    /* Doubled class: must beat the fallback's ".rv-io .rv.is-in". */
+    html .intro .intro-step.intro-step {
+      opacity: 0;
+      translate: 0 28px;
+      transition:
+        opacity 0.55s var(--ease-out-soft) var(--d, 0s),
+        translate 0.7s var(--ease-out-soft) var(--d, 0s);
+    }
+    html[data-scrolled] .intro .intro-step.intro-step {
       opacity: 1;
       translate: 0 0;
-      pointer-events: auto;
     }
   }
   .intro-grid {
@@ -1476,7 +1492,7 @@
     .cal-confirm {
       animation: none;
     }
-    .intro {
+    html .intro .intro-step.intro-step {
       transition: none;
     }
     .rv-io .rv {

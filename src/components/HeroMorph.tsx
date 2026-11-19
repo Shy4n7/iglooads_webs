@@ -11,12 +11,17 @@ const morphDistance = () => (isPhone() ? 0.4 : 0.7);
 // Phones only: a small dead zone at the top, so a light touch does not start
 // the hand-off or bring the intro in.
 const deadZone = () => (isPhone() ? 48 : 0);
-// The intro shows past the dead zone and hides again only near the very top,
-// so it does not flicker while hovering around the threshold.
-const INTRO_HIDE_BELOW = 12;
+// Phones: the intro comes in once the wordmark is about 20% into its glide,
+// so the heading never crowds the full-size wordmark. Scrolling back up, it
+// hides 20px before that point, early enough to clear the growing wordmark
+// and far enough apart not to flicker around the threshold.
+const INTRO_AT = 0.2;
+const introShowAt = () => (isPhone() ? deadZone() + INTRO_AT * window.innerHeight * morphDistance() : 4);
+const introHideBelow = () => (isPhone() ? introShowAt() - 20 : 2);
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const smooth = (a: number, b: number, t: number) => {
   const x = clamp((t - a) / (b - a));
   return x * x * (3 - 2 * x);
@@ -35,8 +40,8 @@ export default function HeroMorph() {
     const onScroll = () => {
       const y = window.scrollY;
       const shown = root.hasAttribute("data-scrolled");
-      if (!shown && y > Math.max(deadZone(), 4)) root.setAttribute("data-scrolled", "");
-      else if (shown && y < INTRO_HIDE_BELOW) root.removeAttribute("data-scrolled");
+      if (!shown && y > introShowAt()) root.setAttribute("data-scrolled", "");
+      else if (shown && y < introHideBelow()) root.removeAttribute("data-scrolled");
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -99,7 +104,9 @@ export default function HeroMorph() {
       // Once the hand-off is done there is nothing left to move.
       if (p === 1 && lastP === 1) return;
       lastP = p;
-      const e = easeInOut(p);
+      // Phones shrink straight away once past the dead zone (ease-out), so the
+      // rising intro never meets the wordmark. Desktop keeps the slow-in glide.
+      const e = isPhone() ? easeOut(p) : easeInOut(p);
       const mx = e * (target.x - base.x);
       // Start from where the wordmark sits after scrolling through the dead zone.
       const my = y - dz + e * (target.y - base.y + dz);
