@@ -106,7 +106,7 @@ Per reel it creates:
 
 It also resizes the stock photos in `assets/stock/` to `service-*.jpg` for the What we do cards, copies
 the Open Graph image and makes `icon-192.png`. Which videos are reels is set at the top of
-`scripts/optimize_media.sh`. The reel list and labels are in `src/lib/content.ts`.
+`scripts/optimize_media.sh`. The reel list, brand names and Instagram links are in `REELS` in `src/lib/content.ts`.
 
 The What we do photos are from Unsplash, free for commercial use under the Unsplash License.
 Photographer credits are in `assets/stock/CREDITS.md`. To swap one, replace the file in `assets/stock/`
@@ -138,7 +138,6 @@ All in `src/lib/content.ts` unless noted.
 - `[INSTAGRAM LINK]` and `[@instagram]`: `INSTAGRAM_URL`, `INSTAGRAM_LABEL`, `INSTAGRAM_HANDLE`
 - `[email]`: `EMAIL_URL`, `EMAIL_LABEL`
 - `[YOUR GOOGLE CALENDAR BOOKING LINK]`: `NEXT_PUBLIC_BOOKING_URL` env var
-- `[Client 1]` to `[Client 5]`: reel labels in `REELS`
 - Results `[00M]`, `[0X]`, `[00+]` and their labels: `RESULTS`. Only publish real, verifiable numbers.
 - Testimonial and attribution: `TESTIMONIAL`
 - Intro paragraph under the hero: `src/components/Intro.tsx`
