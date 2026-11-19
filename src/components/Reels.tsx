@@ -88,8 +88,10 @@ export default function Reels() {
   const reduced = useReducedMotion();
   const [current, setCurrent] = useState(-1);
   const [visible, setVisible] = useState(false);
+  const [muted, setMuted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLElement | null>(null);
   const timerRef = useRef<number | undefined>(undefined);
 
@@ -107,8 +109,11 @@ export default function Reels() {
       v.currentTime = 0;
       // Play inside the click handler so the user gesture allows sound.
       v.muted = false;
+      setMuted(false);
       v.play().catch(() => {
+        // Sound was blocked: play muted and offer a tap to unmute.
         v.muted = true;
+        setMuted(true);
         v.play().catch(() => {});
       });
     }
@@ -147,9 +152,15 @@ export default function Reels() {
         e.preventDefault();
         close();
       } else if (e.key === "Tab") {
-        // The close button is the only focusable control in the dialog.
+        // Keep focus cycling inside the dialog.
+        const items = Array.from(
+          dialogRef.current?.querySelectorAll<HTMLElement>("button:not([tabindex='-1'])") ?? [],
+        );
+        if (items.length === 0) return;
+        const i = items.indexOf(document.activeElement as HTMLElement);
+        const next = e.shiftKey ? (i <= 0 ? items.length - 1 : i - 1) : i === items.length - 1 ? 0 : i + 1;
         e.preventDefault();
-        closeRef.current?.focus();
+        items[next].focus();
       }
     };
     document.addEventListener("keydown", onKey);
@@ -158,6 +169,17 @@ export default function Reels() {
       document.body.style.overflow = overflow;
     };
   }, [visible, close]);
+
+  const unmute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = false;
+    setMuted(false);
+    v.play().catch(() => {
+      v.muted = true;
+      setMuted(true);
+    });
+  };
 
   const label = current >= 0 ? `${REELS[current].client} reel` : "Reel";
 
@@ -181,6 +203,7 @@ export default function Reels() {
 
       <div
         className={`lb ${visible ? "open" : ""}`}
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={label}
@@ -204,9 +227,25 @@ export default function Reels() {
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
-          <p className="lb-label m-0" aria-hidden="true">
-            {current >= 0 ? REELS[current].client : ""}
-          </p>
+          {muted && visible ? (
+            <button type="button" className="lb-sound" onClick={unmute}>
+              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
+                <path d="M2 6h3l4-3v10l-4-3H2z" />
+                <path
+                  d="M11 5.5a3.5 3.5 0 0 1 0 5M12.8 3.6a6 6 0 0 1 0 8.8"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              Tap for sound
+            </button>
+          ) : (
+            <p className="lb-label m-0" aria-hidden="true">
+              {current >= 0 ? REELS[current].client : ""}
+            </p>
+          )}
         </div>
       </div>
     </section>
