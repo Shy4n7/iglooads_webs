@@ -6,7 +6,14 @@ const QUERY = "(prefers-reduced-motion: reduce)";
 // Fraction of the screen height scrolled before the hand-off to the header is
 // complete: shorter on phones, where the page should move on quickly.
 const PHONE = "(max-width: 600px)";
-const morphDistance = () => (window.matchMedia(PHONE).matches ? 0.25 : 0.7);
+const isPhone = () => window.matchMedia(PHONE).matches;
+const morphDistance = () => (isPhone() ? 0.4 : 0.7);
+// Phones only: a small dead zone at the top, so a light touch does not start
+// the hand-off or bring the intro in.
+const deadZone = () => (isPhone() ? 48 : 0);
+// The intro shows past the dead zone and hides again only near the very top,
+// so it does not flicker while hovering around the threshold.
+const INTRO_HIDE_BELOW = 12;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -25,7 +32,12 @@ export default function HeroMorph() {
   // Flags <html> once the page has scrolled, so the phone intro can rise in.
   useEffect(() => {
     const root = document.documentElement;
-    const onScroll = () => root.toggleAttribute("data-scrolled", window.scrollY > 4);
+    const onScroll = () => {
+      const y = window.scrollY;
+      const shown = root.hasAttribute("data-scrolled");
+      if (!shown && y > Math.max(deadZone(), 4)) root.setAttribute("data-scrolled", "");
+      else if (shown && y < INTRO_HIDE_BELOW) root.removeAttribute("data-scrolled");
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -75,7 +87,8 @@ export default function HeroMorph() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
-      const p = clamp(y / (height * morphDistance()));
+      const dz = deadZone();
+      const p = clamp((y - dz) / (height * morphDistance()));
       if (p === 0) {
         if (lastP !== 0) {
           reset();
@@ -88,7 +101,8 @@ export default function HeroMorph() {
       lastP = p;
       const e = easeInOut(p);
       const mx = e * (target.x - base.x);
-      const my = y + e * (target.y - base.y);
+      // Start from where the wordmark sits after scrolling through the dead zone.
+      const my = y - dz + e * (target.y - base.y + dz);
       const ms = 1 + e * (target.s - 1);
       const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
       const opacity = (1 - smooth(0.8, 1, p)).toFixed(3);
