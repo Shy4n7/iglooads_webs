@@ -68,6 +68,11 @@ changing them.
 
 ## Booking link
 
+The booking card shows a week strip with arrows. The month button above it opens a full calendar
+(`src/components/DatePicker.tsx`) with month and year dropdowns. Calls can be picked from tomorrow
+up to 12 months ahead (`MONTHS_AHEAD` in `src/components/Booking.tsx`). Slot times are in
+`SLOTS` in `src/lib/content.ts`.
+
 The CONFIRM ON GOOGLE CALENDAR button opens your Google Calendar appointment schedule.
 
 1. In Google Calendar, create an appointment schedule and copy its booking page link.
@@ -90,8 +95,8 @@ sequence" in `src/app/globals.css`):
 2. Each letter of IGLOO ADS spins through a blurred strip of other letters and locks in place.
 3. The REC dot grows into a circle that wipes in the cream page, led by an amber ring.
 4. On scroll, the wordmark shrinks into the header logo, and the header slides in.
-5. From the opening screen, the first downward swipe, wheel scroll or arrow key glides straight to
-   the intro (`src/components/HeroSkip.tsx`). Scrolling up and everything further down are normal.
+5. On phones the intro is pulled up under the opening (hidden until scrolling starts) and the
+   hand-off to the header happens sooner, so there is less to scroll through.
 
 On phones the wordmark sits on two full-width lines. With reduced motion turned on, the final
 cream page shows straight away with no spin, wipe or morph.
@@ -133,8 +138,7 @@ Logos are imported straight from `assets/logos/wall/` by `next/image` (files are
 
 - `src/app/` : layout (fonts, metadata), global styles and design tokens, home page
 - `src/components/` : one component per section, plus `SplitLetters` (per-letter type with hover pops
-  and the letter spin), `HeroMorph` (wordmark shrinks into the header logo on scroll), `HeroSkip` (one-swipe skip past
-  the opening) and
+  and the letter spin), `HeroMorph` (wordmark shrinks into the header logo on scroll) and
   `RevealFallback` (scroll reveal for browsers without `animation-timeline`)
 - `src/lib/content.ts` : copy, links, reel list and placeholders in one place
 - `scripts/optimize_media.sh` : media pipeline

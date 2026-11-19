@@ -39,7 +39,7 @@ export default function MobileMenu() {
       <button
         ref={buttonRef}
         type="button"
-        className={`menu-btn frost frost-ink ${open ? "is-open" : ""}`}
+        className={`menu-btn ${open ? "is-open" : ""}`}
         aria-expanded={open}
         aria-controls="mobile-menu"
         aria-label={open ? "Close menu" : "Open menu"}

@@ -1,41 +1,63 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useCallback, useRef, useState, useSyncExternalStore } from "react";
+import DatePicker from "./DatePicker";
 import { BOOKING_PLACEHOLDER, BOOKING_URL, SLOTS } from "@/lib/content";
+import {
+  MONTHS,
+  addDays,
+  addMonths,
+  fmtFull,
+  fmtMonthShort,
+  fmtShort,
+  fmtWeekday,
+  fromKey,
+  sameDay,
+  todayIST,
+  toKey,
+  weekStart,
+} from "@/lib/dates";
 
-const TZ = "Asia/Kolkata";
-const DAY_MS = 86_400_000;
-
-// Today's date in IST as YYYY-MM-DD. Stable between renders within a day.
-function todayIST() {
-  return new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" }).format(
-    new Date(),
-  );
-}
 const noop = () => () => {};
+// How far ahead calls can be booked.
+const MONTHS_AHEAD = 12;
 
-function buildWeek(today: string) {
-  const [y, m, d] = today.split("-").map(Number);
-  const base = Date.UTC(y, m - 1, d);
-  // Next seven days, starting tomorrow.
-  return Array.from({ length: 7 }, (_, i) => new Date(base + (i + 1) * DAY_MS));
-}
-
-const fmt = (opts: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-GB", { ...opts, timeZone: "UTC" });
-const wk = fmt({ weekday: "short" });
-const monthLong = fmt({ month: "long" });
-const monthShort = fmt({ month: "short" });
-const short = fmt({ weekday: "short", day: "numeric", month: "short" });
+const Chevron = ({ dir }: { dir: "left" | "right" | "down" }) => (
+  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+    <path
+      d={dir === "left" ? "M10 3 5 8l5 5" : dir === "right" ? "M6 3l5 5-5 5" : "M3 6l5 5 5-5"}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
 
 export default function Booking() {
   const today = useSyncExternalStore(noop, todayIST, () => "");
-  const [day, setDay] = useState(0);
+  const [picked, setPicked] = useState<string | null>(null);
   const [slot, setSlot] = useState(2);
+  const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const week = today ? buildWeek(today) : null;
-  const sel = week?.[day];
-  const prev = sel ? new Date(Date.UTC(sel.getUTCFullYear(), sel.getUTCMonth() - 1, 1)) : null;
-  const next = sel ? new Date(Date.UTC(sel.getUTCFullYear(), sel.getUTCMonth() + 1, 1)) : null;
+  // Bookable range: tomorrow to twelve months ahead.
+  const min = today ? addDays(fromKey(today), 1) : null;
+  const max = min ? addMonths(min, MONTHS_AHEAD) : null;
+  const sel = picked ? fromKey(picked) : min;
+  const week = sel ? Array.from({ length: 7 }, (_, i) => addDays(weekStart(sel), i)) : null;
+  const canPrevWeek = !!(week && min && week[0] > min);
+  const canNextWeek = !!(week && max && addDays(week[6], 1) <= max);
+
+  const pick = (d: Date) => setPicked(toKey(d));
+  const shiftWeek = (n: number) => {
+    if (!sel || !min || !max) return;
+    const d = addDays(sel, n * 7);
+    pick(d < min ? min : d > max ? max : d);
+  };
+  const closePicker = useCallback(() => setOpen(false), []);
+  const focusTrigger = useCallback(() => triggerRef.current?.focus(), []);
 
   const hasLink = BOOKING_URL.length > 0;
   const slotLabel = SLOTS[slot].toUpperCase();
@@ -55,46 +77,99 @@ export default function Booking() {
           </p>
         </div>
 
-        <div className="rv w-full max-w-[460px] justify-self-end overflow-hidden rounded-[30px] bg-deep max-[900px]:justify-self-stretch max-[900px]:mx-auto">
-          <div className="rounded-b-[28px] bg-[#E4E0CB] px-[22px] pt-[22px] pb-[18px]">
-            <div className="flex items-baseline justify-between font-brico font-extrabold" aria-hidden="true">
-              <span className="text-base text-[#5F5C48]">{prev ? monthShort.format(prev) : " "}</span>
-              <span className="text-[28px] text-indigo">{sel ? monthLong.format(sel) : " "}</span>
-              <span className="text-base text-[#5F5C48]">{next ? monthShort.format(next) : " "}</span>
+        <div className="rv relative w-full max-w-[460px] justify-self-end rounded-[30px] bg-deep max-[900px]:mx-auto max-[900px]:justify-self-stretch">
+          <div className="book-card-top rounded-[28px] rounded-t-[30px] bg-[#E4E0CB] px-[22px] pt-[18px] pb-[18px]">
+            <div className="flex items-center justify-between gap-2">
+              <button
+                type="button"
+                className="cal-arrow"
+                aria-label="Previous week"
+                disabled={!canPrevWeek}
+                onClick={() => shiftWeek(-1)}
+              >
+                <Chevron dir="left" />
+              </button>
+              <button
+                ref={triggerRef}
+                type="button"
+                className="cal-trigger"
+                data-picker-trigger
+                aria-haspopup="dialog"
+                aria-expanded={open}
+                disabled={!sel}
+                onClick={() => setOpen((o) => !o)}
+              >
+                <span>{sel ? `${MONTHS[sel.getUTCMonth()]} ${sel.getUTCFullYear()}` : " "}</span>
+                <span className={`cal-trigger-icon ${open ? "is-open" : ""}`}>
+                  <Chevron dir="down" />
+                </span>
+                <span className="sr-only">, open calendar</span>
+              </button>
+              <button
+                type="button"
+                className="cal-arrow"
+                aria-label="Next week"
+                disabled={!canNextWeek}
+                onClick={() => shiftWeek(1)}
+              >
+                <Chevron dir="right" />
+              </button>
             </div>
-            <div role="group" aria-label="Choose a day" className="mt-3.5 flex justify-between gap-1">
-              {(week ?? Array.from({ length: 7 }, () => null)).map((dt, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  className="day max-[420px]:min-w-[38px]"
-                  aria-pressed={i === day}
-                  disabled={!dt}
-                  onClick={() => setDay(i)}
-                >
-                  <span className="text-[11px]">{dt ? wk.format(dt) : " "}</span>{" "}
-                  <span className="text-[15px] font-medium">{dt ? dt.getUTCDate() : " "}</span>
-                  {dt ? <span className="sr-only"> {monthLong.format(dt)}</span> : null}
-                </button>
-              ))}
+
+            <div role="group" aria-label="Choose a day" className="mt-3 flex justify-between gap-1">
+              {(week ?? Array.from({ length: 7 }, () => null)).map((dt, i) => {
+                const enabled = !!(dt && min && max && dt >= min && dt <= max);
+                return (
+                  <button
+                    key={dt ? toKey(dt) : i}
+                    type="button"
+                    className="day max-[420px]:min-w-[38px]"
+                    aria-pressed={!!(dt && sel && sameDay(dt, sel))}
+                    disabled={!enabled}
+                    onClick={() => dt && pick(dt)}
+                  >
+                    <span className="text-[11px]">{dt ? fmtWeekday.format(dt) : " "}</span>{" "}
+                    <span className="text-[15px] font-medium">{dt ? dt.getUTCDate() : " "}</span>
+                    {dt ? <span className="sr-only"> {MONTHS[dt.getUTCMonth()]}</span> : null}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
-          <div className="p-[22px]">
+          {open && sel && min && max && (
+            <DatePicker
+              value={sel}
+              min={min}
+              max={max}
+              onChange={pick}
+              onClose={closePicker}
+              returnFocus={focusTrigger}
+            />
+          )}
+
+          <div className="book-card-body p-[22px]">
             <div className="text-base font-medium text-cream">Discovery call, 30 min</div>
             <div className="mt-0.5 mb-3.5 text-xs text-cream-mute" aria-live="polite">
-              Google Meet &middot; {sel ? `${monthShort.format(sel)} ${sel.getUTCDate()}` : " "} &middot; {SLOTS[slot]}{" "}
-              &middot; IST
+              Google Meet &middot; {sel ? `${fmtMonthShort.format(sel)} ${sel.getUTCDate()}` : " "} &middot;{" "}
+              {SLOTS[slot]} &middot; IST
+              <span className="sr-only">{sel ? `, ${fmtFull.format(sel)}` : ""}</span>
             </div>
             <div role="group" aria-label="Choose a time, IST" className="grid grid-cols-3 gap-2">
               {SLOTS.map((t, i) => (
-                <button key={t} type="button" className="slot frost frost-clear" aria-pressed={i === slot} onClick={() => setSlot(i)}>
+                <button
+                  key={t}
+                  type="button"
+                  className="slot frost frost-clear"
+                  aria-pressed={i === slot}
+                  onClick={() => setSlot(i)}
+                >
                   {t}
                 </button>
               ))}
             </div>
             <a
-              className="btn frost frost-amber mt-[18px] flex min-h-[52px] items-center justify-between gap-3 rounded-full px-[22px] py-2 font-anton text-[15px] tracking-[0.06em] no-underline"
+              className="btn btn-amber mt-[18px] flex min-h-[52px] items-center justify-between gap-3 rounded-full px-[22px] py-2 font-anton text-[15px] tracking-[0.06em] no-underline"
               href={hasLink ? BOOKING_URL : "#book"}
               {...(hasLink ? { target: "_blank", rel: "noopener noreferrer" } : {})}
               data-placeholder={hasLink ? undefined : BOOKING_PLACEHOLDER}
@@ -103,7 +178,7 @@ export default function Booking() {
               <span aria-hidden="true">&rarr;</span>
             </a>
             <p className="mt-3 mb-0 text-center text-xs leading-relaxed text-cream-mute">
-              {sel ? `${short.format(sel)}, ${SLOTS[slot]} IST. ` : ""}
+              {sel ? `${fmtShort.format(sel)}, ${SLOTS[slot]} IST. ` : ""}
               Google Calendar opens next, where you pick and confirm this slot.
             </p>
             {!hasLink && (

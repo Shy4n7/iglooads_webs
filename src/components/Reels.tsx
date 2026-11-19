@@ -228,13 +228,13 @@ export default function Reels() {
             controlsList="nodownload nofullscreen noremoteplayback"
             onContextMenu={(e) => e.preventDefault()}
           />
-          <button ref={closeRef} type="button" className="lb-close frost frost-cream" aria-label="Close video" onClick={close}>
+          <button ref={closeRef} type="button" className="lb-close" aria-label="Close video" onClick={close}>
             <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
               <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
           </button>
           {muted && visible ? (
-            <button type="button" className="lb-sound frost frost-amber" onClick={unmute}>
+            <button type="button" className="lb-sound" onClick={unmute}>
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor">
                 <path d="M2 6h3l4-3v10l-4-3H2z" />
                 <path

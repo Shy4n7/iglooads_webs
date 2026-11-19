@@ -2,7 +2,7 @@
 // and reveals on scroll.
 export default function Intro() {
   return (
-    <section aria-labelledby="intro-title" className="on-light wrap pt-24 pb-20 max-[900px]:pt-8 max-[900px]:pb-14">
+    <section aria-labelledby="intro-title" className="intro on-light wrap pt-24 pb-20 max-[900px]:pt-8 max-[900px]:pb-14">
       <div className="intro-grid">
         <h2
           id="intro-title"
@@ -20,19 +20,23 @@ export default function Intro() {
           <div className="flex flex-wrap gap-3">
             <a
               href="#book"
-              className="btn frost frost-ink inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
+              className="btn btn-ink inline-flex min-h-12 items-center rounded-full px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               GET IN TOUCH <span aria-hidden="true">&nbsp;&rarr;</span>
             </a>
             <a
               href="#work"
-              className="btn frost frost-cream inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
+              className="btn btn-glass inline-flex min-h-12 items-center rounded-full px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               SEE OUR WORK
             </a>
           </div>
         </div>
       </div>
+      {/* Without JavaScript the phone intro must not wait for a scroll flag. */}
+      <noscript>
+        <style>{`.intro{opacity:1!important;translate:none!important;pointer-events:auto!important}`}</style>
+      </noscript>
     </section>
   );
 }
