@@ -20,13 +20,13 @@ export default function Intro() {
           <div className="flex flex-wrap gap-3">
             <a
               href="#book"
-              className="btn frost frost-ink inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
+              className="btn btn-ink inline-flex min-h-12 items-center rounded-full px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               GET IN TOUCH <span aria-hidden="true">&nbsp;&rarr;</span>
             </a>
             <a
               href="#work"
-              className="btn frost frost-cream inline-flex min-h-12 items-center rounded-xl px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
+              className="btn btn-glass inline-flex min-h-12 items-center rounded-full px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               SEE OUR WORK
             </a>
