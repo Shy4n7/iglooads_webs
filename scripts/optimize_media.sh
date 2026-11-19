@@ -7,7 +7,7 @@
 #   <name>-1080.mp4      up to 1080px wide, with audio, H.264 crf 24, faststart (lightbox)
 #   <name>-poster.jpg    poster frame, 480px wide
 # Per stock photo in assets/stock/ (Unsplash License, see assets/stock/CREDITS.md):
-#   service-<name>.jpg   900px wide, used on the What we do cards
+#   service-<name>.jpg   900px wide, black and white, used on the What we do cards
 # Brand:
 #   igloo-ads-pfp-1080.png  Open Graph image (copy)
 #   icon-192.png            favicon / touch icon
@@ -72,7 +72,7 @@ for photo in "$ROOT"/assets/stock/*.jpg; do
   if need "$out"; then
     echo "stock   $name"
     ffmpeg -hide_banner -loglevel error -y -i "$photo" \
-      -vf "scale='min(900,iw)':-2:flags=lanczos" -q:v 4 "$out"
+      -vf "scale='min(900,iw)':-2:flags=lanczos,hue=s=0,eq=contrast=1.08" -q:v 4 "$out"
   fi
 done
 
