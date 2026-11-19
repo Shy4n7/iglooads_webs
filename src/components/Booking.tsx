@@ -26,6 +26,7 @@ const wk = fmt({ weekday: "short" });
 const monthLong = fmt({ month: "long" });
 const monthShort = fmt({ month: "short" });
 const full = fmt({ weekday: "long", day: "numeric", month: "long" });
+const short = fmt({ weekday: "short", day: "numeric", month: "short" });
 
 export default function Booking() {
   const today = useSyncExternalStore(noop, todayIST, () => "");
@@ -102,8 +103,12 @@ export default function Booking() {
               <span>CONFIRM {slotLabel} ON GOOGLE CALENDAR</span>
               <span aria-hidden="true">&rarr;</span>
             </a>
+            <p className="mt-3 mb-0 text-center text-xs leading-relaxed text-cream-mute">
+              {sel ? `${short.format(sel)}, ${SLOTS[slot]} IST. ` : ""}
+              Google Calendar opens next, where you pick and confirm this slot.
+            </p>
             {!hasLink && (
-              <p className="mt-3 mb-0 text-center text-xs text-cream-mute">
+              <p className="mt-2 mb-0 text-center text-xs text-cream-mute">
                 {BOOKING_PLACEHOLDER}: set NEXT_PUBLIC_BOOKING_URL
               </p>
             )}
