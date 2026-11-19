@@ -2,7 +2,7 @@
 // and reveals on scroll.
 export default function Intro() {
   return (
-    <section aria-labelledby="intro-title" className="on-light wrap pt-24 pb-20 max-[900px]:pt-8 max-[900px]:pb-14">
+    <section aria-labelledby="intro-title" className="intro on-light wrap pt-24 pb-20 max-[900px]:pt-8 max-[900px]:pb-14">
       <div className="intro-grid">
         <h2
           id="intro-title"
@@ -33,6 +33,10 @@ export default function Intro() {
           </div>
         </div>
       </div>
+      {/* Without JavaScript the phone intro must not wait for a scroll flag. */}
+      <noscript>
+        <style>{`.intro{opacity:1!important;translate:none!important;pointer-events:auto!important}`}</style>
+      </noscript>
     </section>
   );
 }

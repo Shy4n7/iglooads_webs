@@ -3,8 +3,10 @@
 import { useEffect } from "react";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
-// Fraction of the screen height scrolled before the hand-off to the header is complete.
-const MORPH_DISTANCE = 0.35;
+// Fraction of the screen height scrolled before the hand-off to the header is
+// complete: shorter on phones, where the page should move on quickly.
+const PHONE = "(max-width: 600px)";
+const morphDistance = () => (window.matchMedia(PHONE).matches ? 0.25 : 0.7);
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -20,6 +22,15 @@ const smooth = (a: number, b: number, t: number) => {
  * --logo-o on <html>. Off for reduced motion.
  */
 export default function HeroMorph() {
+  // Flags <html> once the page has scrolled, so the phone intro can rise in.
+  useEffect(() => {
+    const root = document.documentElement;
+    const onScroll = () => root.toggleAttribute("data-scrolled", window.scrollY > 4);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   useEffect(() => {
     const mq = window.matchMedia(QUERY);
     const stage = document.querySelector<HTMLElement>(".hero-stage");
@@ -53,8 +64,7 @@ export default function HeroMorph() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
-      // Done after a third of a screen of scrolling, so the page moves on quickly.
-      const p = clamp(y / (window.innerHeight * MORPH_DISTANCE));
+      const p = clamp(y / (window.innerHeight * morphDistance()));
       if (p === 0) {
         reset();
         return;
