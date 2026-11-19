@@ -1,4 +1,5 @@
 import { NAV } from "@/lib/content";
+import MobileMenu from "./MobileMenu";
 
 export default function Header() {
   return (
@@ -21,12 +22,15 @@ export default function Header() {
             </a>
           ))}
         </nav>
-        <a
-          href="#book"
-          className="btn inline-flex min-h-11 items-center rounded-full bg-amber px-5 py-3 font-bebas text-[17px] tracking-[0.08em] text-indigo no-underline"
-        >
-          BOOK A CALL
-        </a>
+        <div className="flex items-center gap-2">
+          <a
+            href="#book"
+            className="btn inline-flex min-h-11 items-center rounded-full bg-amber px-5 py-3 font-bebas text-[17px] tracking-[0.08em] text-indigo no-underline"
+          >
+            BOOK A CALL
+          </a>
+          <MobileMenu />
+        </div>
       </div>
     </header>
   );
