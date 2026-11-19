@@ -99,8 +99,11 @@ sequence" in `src/app/globals.css`):
 2. Each letter of IGLOO ADS spins through a blurred strip of other letters and locks in place.
 3. The REC dot grows into a circle that wipes in the cream page, led by an amber ring.
 4. On scroll, the wordmark shrinks into the header logo, and the header slides in.
-5. On phones the intro is pulled up under the opening (hidden until scrolling starts) and the
-   hand-off to the header happens sooner, so there is less to scroll through.
+5. On phones: nothing moves for the first 48px of scroll, then the wordmark shrinks into the
+   header straight away (ease-out). The intro sits just under the opening and comes in once the
+   wordmark is 20% into its glide: heading, then paragraph, then buttons. It hides again a little
+   before that point when scrolling back up. Settings are at the top of
+   `src/components/HeroMorph.tsx`.
 
 On phones the wordmark sits on two full-width lines. With reduced motion turned on, the final
 cream page shows straight away with no spin, wipe or morph.
