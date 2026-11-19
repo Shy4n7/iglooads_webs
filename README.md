@@ -52,9 +52,19 @@ script), and the cache headers in `next.config.ts` are not applied.
 
 ## Deploy (Vercel)
 
-Import the repository in Vercel and keep the defaults (framework: Next.js). Do not set `STATIC_EXPORT`
-on Vercel, so `next/image` can optimize stills and logos. Add the environment variables below in
-Project Settings, Environment Variables.
+1. Merge this work into the branch you want live (usually `main`) and push it to GitHub.
+2. Go to vercel.com, sign in with GitHub, choose Add New, Project, and import `iglooads_webs`.
+   If the repository is not listed, use Adjust GitHub App Permissions to give Vercel access to it.
+3. Keep the detected settings: Framework Preset Next.js, Root Directory `./`, default build and
+   output commands. Do not set `STATIC_EXPORT`, so `next/image` can optimize stills and logos.
+4. Under Environment Variables add `NEXT_PUBLIC_BOOKING_URL` (and optionally `NEXT_PUBLIC_SITE_URL`).
+5. Click Deploy. You get a `*.vercel.app` URL in about a minute.
+6. Custom domain: Project Settings, Domains, add your domain and create the DNS records Vercel shows
+   at your domain registrar. Then set `NEXT_PUBLIC_SITE_URL` to that domain and redeploy.
+
+After that, every push to the production branch deploys automatically, and other branches get preview
+URLs. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy (Deployments, Redeploy) after
+changing them.
 
 ## Booking link
 
@@ -121,8 +131,7 @@ Logos are imported straight from `assets/logos/wall/` by `next/image` (files are
 
 All in `src/lib/content.ts` unless noted.
 
-- `[INSTAGRAM LINK]` and `[@instagram]`: `INSTAGRAM_URL`, `INSTAGRAM_LABEL` (footer text in
-  `src/components/Footer.tsx`)
+- `[INSTAGRAM LINK]` and `[@instagram]`: `INSTAGRAM_URL`, `INSTAGRAM_LABEL`, `INSTAGRAM_HANDLE`
 - `[email]`: `EMAIL_URL`, `EMAIL_LABEL`
 - `[YOUR GOOGLE CALENDAR BOOKING LINK]`: `NEXT_PUBLIC_BOOKING_URL` env var
 - `[Client 1]` to `[Client 5]`: reel labels in `REELS`
