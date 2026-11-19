@@ -15,6 +15,11 @@ const deadZone = () => (isPhone() ? 48 : 0);
 // backward movement smaller than this, so the wordmark does not dip down.
 // Kept no larger than the dead zone, so the wordmark still restores fully at the top.
 const backSlack = () => (isPhone() ? 48 : 0);
+// Phones: how far toward the header logo the wordmark travels (0 to 1), when
+// it fades out, and when the header logo fades in (as fractions of the morph).
+const PHONE_TRAVEL = 0.4;
+const PHONE_FADE = [0.15, 0.45];
+const PHONE_LOGO = [0.25, 0.5];
 // Phones: the intro comes in once the wordmark is about 20% into its glide,
 // so the heading never crowds the full-size wordmark. Scrolling back up, it
 // hides 20px before that point, early enough to clear the growing wordmark
@@ -137,9 +142,11 @@ export default function HeroMorph() {
       // Once the hand-off is done there is nothing left to move.
       if (p === 1 && lastP === 1) return;
       lastP = p;
-      // Phones shrink straight away once past the dead zone (ease-out), so the
-      // rising intro never meets the wordmark. Desktop keeps the slow-in glide.
-      const e = isPhone() ? easeOut(p) : easeInOut(p);
+      // Phones shrink straight away once past the dead zone (ease-out) but only
+      // travel part of the way, then fade out instead of flying into the
+      // header. Desktop keeps the slow-in glide all the way to the logo.
+      const phone = isPhone();
+      const e = phone ? easeOut(p) * PHONE_TRAVEL : easeInOut(p);
       const mx = e * (target.x - base.x);
       // Start from where the wordmark naturally sits: scrolled with the page
       // inside the dead zone, held at the dead zone's end beyond it.
@@ -147,10 +154,9 @@ export default function HeroMorph() {
       const my = y - start + e * (target.y - base.y + start);
       const ms = 1 + e * (target.s - 1);
       const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
-      // Hand over to the header logo. Phones arrive early on the ease-out
-      // curve, so they hand over as soon as they arrive instead of waiting.
-      const phone = isPhone();
-      const fade = phone ? [0.5, 0.7] : [0.8, 1];
+      // Hand over to the header logo: phones fade out part-way, desktop fades
+      // as it lands on the logo.
+      const fade = phone ? PHONE_FADE : [0.8, 1];
       const opacity = (1 - smooth(fade[0], fade[1], p)).toFixed(3);
       const visibility = p >= fade[1] ? "hidden" : "visible";
       words.forEach((el) => {
@@ -159,7 +165,7 @@ export default function HeroMorph() {
         el.style.opacity = opacity;
         el.style.visibility = visibility;
       });
-      logo.style.opacity = (phone ? smooth(0.55, 0.72, p) : smooth(0.85, 1, p)).toFixed(3);
+      logo.style.opacity = (phone ? smooth(PHONE_LOGO[0], PHONE_LOGO[1], p) : smooth(0.85, 1, p)).toFixed(3);
     };
 
     const onScroll = () => {
