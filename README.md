@@ -47,7 +47,7 @@ The site is fully static. To produce plain HTML in `out/` for any static host:
 STATIC_EXPORT=1 npm run build
 ```
 
-In export mode `next/image` serves the images as they are (the stills are already resized by the media
+In export mode `next/image` serves the images as they are (the photos are already resized by the media
 script), and the cache headers in `next.config.ts` are not applied.
 
 ## Deploy (Vercel)
@@ -56,7 +56,7 @@ script), and the cache headers in `next.config.ts` are not applied.
 2. Go to vercel.com, sign in with GitHub, choose Add New, Project, and import `iglooads_webs`.
    If the repository is not listed, use Adjust GitHub App Permissions to give Vercel access to it.
 3. Keep the detected settings: Framework Preset Next.js, Root Directory `./`, default build and
-   output commands. Do not set `STATIC_EXPORT`, so `next/image` can optimize stills and logos.
+   output commands. Do not set `STATIC_EXPORT`, so `next/image` can optimize photos and logos.
 4. Under Environment Variables add `NEXT_PUBLIC_BOOKING_URL` (and optionally `NEXT_PUBLIC_SITE_URL`).
 5. Click Deploy. You get a `*.vercel.app` URL in about a minute.
 6. Custom domain: Project Settings, Domains, add your domain and create the DNS records Vercel shows
@@ -104,9 +104,13 @@ Per reel it creates:
 | `<name>-1080.mp4` | Up to 1080px, with audio, crf 24, faststart. Lightbox. |
 | `<name>-poster.jpg` | 480px poster frame. |
 
-It also grabs `still-*.jpg` frames used as placeholder photos in What we do and On the set, copies the
-Open Graph image and makes `icon-192.png`. Which videos are reels and which frames become stills is
-set at the top of `scripts/optimize_media.sh`. The reel list and labels are in `src/lib/content.ts`.
+It also resizes the stock photos in `assets/stock/` to `service-*.jpg` for the What we do cards, copies
+the Open Graph image and makes `icon-192.png`. Which videos are reels is set at the top of
+`scripts/optimize_media.sh`. The reel list and labels are in `src/lib/content.ts`.
+
+The What we do photos are from Unsplash, free for commercial use under the Unsplash License.
+Photographer credits are in `assets/stock/CREDITS.md`. To swap one, replace the file in `assets/stock/`
+(same name) and run `bash scripts/optimize_media.sh --force`.
 
 Logos are imported straight from `assets/logos/wall/` by `next/image` (files are 2x, shown at half size).
 
@@ -137,7 +141,4 @@ All in `src/lib/content.ts` unless noted.
 - `[Client 1]` to `[Client 5]`: reel labels in `REELS`
 - Results `[00M]`, `[0X]`, `[00+]` and their labels: `RESULTS`. Only publish real, verifiable numbers.
 - Testimonial and attribution: `TESTIMONIAL`
-- `[Shoot name]`, `[Location]` and `[PHOTO]` stills: `src/components/OnSet.tsx`
-- `[PHOTO]` stills in What we do: `src/components/Services.tsx`
-- Websites card artwork (a drawn browser window stand-in) and copy: `src/components/Services.tsx`
 - Intro paragraph under the hero: `src/components/Intro.tsx`

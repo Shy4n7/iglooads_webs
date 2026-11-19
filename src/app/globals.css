@@ -109,11 +109,6 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
-  .g4 {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 16px;
-  }
   .g2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -656,20 +651,9 @@
     }
   }
 
-  /* ---------- Service + set cards ---------- */
+  /* ---------- Service cards ---------- */
   .cut {
     clip-path: polygon(0 0, 100% 0, 100% 62%, 55% 100%, 0 74%);
-  }
-  .photo-tag {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--color-cream);
-    background: rgba(29, 31, 56, 0.7);
-    padding: 3px 8px;
-    border-radius: 6px;
   }
   .glass {
     background: rgba(29, 31, 56, 0.62);
@@ -756,8 +740,7 @@
       grid-template-columns: minmax(0, 1fr);
       gap: 28px;
     }
-    .g3,
-    .g4 {
+    .g3 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .g6 {
@@ -785,7 +768,6 @@
   }
   @media (max-width: 560px) {
     .g3,
-    .g4,
     .gsvc {
       display: flex;
       overflow-x: auto;
@@ -796,17 +778,12 @@
       scrollbar-width: none;
     }
     .g3::-webkit-scrollbar,
-    .g4::-webkit-scrollbar,
     .gsvc::-webkit-scrollbar {
       display: none;
     }
     .g3 > *,
     .gsvc > * {
       flex: 0 0 260px;
-      scroll-snap-align: start;
-    }
-    .g4 > * {
-      flex: 0 0 190px;
       scroll-snap-align: start;
     }
     .g3.stack {

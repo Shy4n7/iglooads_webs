@@ -6,8 +6,8 @@
 #   <name>-card.mp4      640px wide, muted, H.264 crf 26, faststart (grid cards)
 #   <name>-1080.mp4      up to 1080px wide, with audio, H.264 crf 24, faststart (lightbox)
 #   <name>-poster.jpg    poster frame, 480px wide
-# Per still source:
-#   still-<name>.jpg     frame grab used for photo placeholders
+# Per stock photo in assets/stock/ (Unsplash License, see assets/stock/CREDITS.md):
+#   service-<name>.jpg   900px wide, used on the What we do cards
 # Brand:
 #   igloo-ads-pfp-1080.png  Open Graph image (copy)
 #   icon-192.png            favicon / touch icon
@@ -29,17 +29,6 @@ mkdir -p "$OUT"
 
 # Videos shown as reels (portrait 9:16).
 REELS=(IMG_7724 IMG_7725 IMG_7728 IMG_7729 IMG_7730 IMG_7733)
-
-# Frame grabs for photo placeholders: "<video>:<seconds>:<output name>"
-STILLS=(
-  "IMG_7731:8.0:set-1"
-  "IMG_7731:9.5:set-2"
-  "IMG_7725:9.0:set-3"
-  "IMG_7730:7.0:set-4"
-  "IMG_7729:2.0:service-reels"
-  "IMG_7731:3.5:service-ugc"
-  "IMG_7733:3.0:service-shoots"
-)
 
 need() { [[ $FORCE == 1 || ! -s "$1" ]]; }
 
@@ -77,13 +66,13 @@ for name in "${REELS[@]}"; do
   fi
 done
 
-for spec in "${STILLS[@]}"; do
-  IFS=: read -r vid t outname <<<"$spec"
-  out="$OUT/still-$outname.jpg"
+for photo in "$ROOT"/assets/stock/*.jpg; do
+  name="$(basename "$photo" .jpg)"
+  out="$OUT/service-$name.jpg"
   if need "$out"; then
-    echo "still   $outname"
-    ffmpeg -hide_banner -loglevel error -y -ss "$t" -i "$SRC/$vid.mp4" -frames:v 1 \
-      -vf "scale='if(gt(iw,ih),min(1200,iw),min(800,iw))':-2:flags=lanczos" -q:v 5 "$out"
+    echo "stock   $name"
+    ffmpeg -hide_banner -loglevel error -y -i "$photo" \
+      -vf "scale='min(900,iw)':-2:flags=lanczos" -q:v 4 "$out"
   fi
 done
 
