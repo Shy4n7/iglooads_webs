@@ -4,8 +4,8 @@ type Line = { text: string; className?: string; style?: CSSProperties };
 
 type Props = {
   lines: Line[];
-  /** Mask-rise entrance on load (hero). */
-  enter?: boolean;
+  /** Entrance on load: "rise" slides letters up from a mask, "blur" fades them in from a blur. */
+  enter?: false | "rise" | "blur";
   /** Base delay in seconds and per-letter stagger. */
   delay?: number;
   stagger?: number;
@@ -33,7 +33,7 @@ export default function SplitLetters({ lines, enter = false, delay = 0, stagger 
                 return (
                   <span className="cell" key={ci}>
                     {enter ? (
-                      <span className="enter inline-block" style={{ animationDelay: `${d.toFixed(3)}s` }}>
+                      <span className={`${enter === "blur" ? "blur-in" : "enter"} inline-block`} style={{ animationDelay: `${d.toFixed(3)}s` }}>
                         {letter}
                       </span>
                     ) : (
@@ -51,7 +51,7 @@ export default function SplitLetters({ lines, enter = false, delay = 0, stagger 
             {content}
           </span>
         );
-        return enter ? (
+        return enter === "rise" ? (
           <span className="mask" aria-hidden="true" key={li}>
             {inner}
           </span>
