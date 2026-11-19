@@ -15,11 +15,10 @@ const deadZone = () => (isPhone() ? 48 : 0);
 // backward movement smaller than this, so the wordmark does not dip down.
 // Kept no larger than the dead zone, so the wordmark still restores fully at the top.
 const backSlack = () => (isPhone() ? 48 : 0);
-// Phones: how far toward the header logo the wordmark travels (0 to 1), when
-// it fades out, and when the header logo fades in (as fractions of the morph).
-const PHONE_TRAVEL = 0.4;
-const PHONE_FADE = [0.15, 0.45];
-const PHONE_LOGO = [0.25, 0.5];
+// Phones: the wordmark fades out over this share of the screen height past
+// the dead zone, rising PHONE_RISE extra pixels per pixel scrolled.
+const PHONE_FADE = 0.11;
+const PHONE_RISE = 0.4;
 // Phones: the intro comes in once the wordmark is about 20% into its glide,
 // so the heading never crowds the full-size wordmark. Scrolling back up, it
 // hides 20px before that point, early enough to clear the growing wordmark
@@ -30,7 +29,6 @@ const introHideBelow = () => (isPhone() ? introShowAt() - 20 : 2);
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
-const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
 const smooth = (a: number, b: number, t: number) => {
   const x = clamp((t - a) / (b - a));
   return x * x * (3 - 2 * x);
@@ -39,6 +37,7 @@ const smooth = (a: number, b: number, t: number) => {
 /**
  * As the page scrolls away from the top, the giant wordmark shrinks and
  * glides up into the header logo's spot, then hands over to the real logo.
+ * On phones it scrolls away with the page instead, rising a little and fading.
  * Writes inline styles on the wordmark layers and the header logo only.
  * Off for reduced motion.
  */
@@ -131,7 +130,8 @@ export default function HeroMorph() {
       const y = window.scrollY;
       const dz = deadZone();
       follow = Math.min(Math.max(follow, y), y + backSlack());
-      const p = clamp((follow - dz) / (height * morphDistance()));
+      const phone = isPhone();
+      const p = clamp((follow - dz) / (height * (phone ? PHONE_FADE : morphDistance())));
       if (p === 0) {
         if (lastP !== 0) {
           reset();
@@ -142,30 +142,34 @@ export default function HeroMorph() {
       // Once the hand-off is done there is nothing left to move.
       if (p === 1 && lastP === 1) return;
       lastP = p;
-      // Phones shrink straight away once past the dead zone (ease-out) but only
-      // travel part of the way, then fade out instead of flying into the
-      // header. Desktop keeps the slow-in glide all the way to the logo.
-      const phone = isPhone();
-      const e = phone ? easeOut(p) * PHONE_TRAVEL : easeInOut(p);
-      const mx = e * (target.x - base.x);
-      // Start from where the wordmark naturally sits: scrolled with the page
-      // inside the dead zone, held at the dead zone's end beyond it.
-      const start = Math.min(y, dz);
-      const my = y - start + e * (target.y - base.y + start);
-      const ms = 1 + e * (target.s - 1);
-      const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
-      // Hand over to the header logo: phones fade out part-way, desktop fades
-      // as it lands on the logo.
-      const fade = phone ? PHONE_FADE : [0.8, 1];
-      const opacity = (1 - smooth(fade[0], fade[1], p)).toFixed(3);
-      const visibility = p >= fade[1] ? "hidden" : "visible";
+      let transform: string;
+      let opacity: string;
+      if (phone) {
+        // Phones: the wordmark scrolls away with the page like everything
+        // else, rising a little faster than it and fading out. It is never
+        // held in place, so it keeps its distance from the intro below.
+        const rise = p * height * PHONE_FADE * PHONE_RISE;
+        transform = `translate3d(0, ${(-rise).toFixed(1)}px, 0)`;
+        opacity = (1 - smooth(0, 1, p)).toFixed(3);
+        logo.style.opacity = smooth(0.4, 1, p).toFixed(3);
+      } else {
+        // Desktop: a slow-in glide all the way into the header logo, fading
+        // as it lands.
+        const e = easeInOut(p);
+        const mx = e * (target.x - base.x);
+        const my = y + e * (target.y - base.y);
+        const ms = 1 + e * (target.s - 1);
+        transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
+        opacity = (1 - smooth(0.8, 1, p)).toFixed(3);
+        logo.style.opacity = smooth(0.85, 1, p).toFixed(3);
+      }
+      const visibility = p >= 1 ? "hidden" : "visible";
       words.forEach((el) => {
         el.style.willChange = "transform, opacity";
         el.style.transform = transform;
         el.style.opacity = opacity;
         el.style.visibility = visibility;
       });
-      logo.style.opacity = (phone ? smooth(PHONE_LOGO[0], PHONE_LOGO[1], p) : smooth(0.85, 1, p)).toFixed(3);
     };
 
     const onScroll = () => {
