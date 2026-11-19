@@ -484,6 +484,25 @@
     z-index: 20;
     background: var(--color-cream);
   }
+  /* Phones: once the opening has played (HeroMorph adds .is-done when the
+     wipe ends), the wordmark travels above the header into the logo spot
+     instead of sliding under the frosted bar. The opening's own backgrounds
+     turn transparent (the page behind is the same cream), so only the
+     wordmark sits above the header, and taps pass through to whatever is
+     underneath. A class, not a timed animation, so the browser repaints. */
+  @media (max-width: 600px) {
+    .hero.is-done {
+      z-index: 60;
+      pointer-events: none;
+      background: transparent;
+    }
+    .hero.is-done .hero-final {
+      background: transparent;
+    }
+    .hero.is-done .hero-word {
+      pointer-events: auto;
+    }
+  }
   /* Scroll morph into the header logo: HeroMorph sets transform and opacity. */
   .hero-stage .hero-word {
     transform-origin: 0 0;
@@ -1535,6 +1554,10 @@
     .hero-final {
       position: relative;
       clip-path: none;
+    }
+    .hero.is-done {
+      z-index: 20;
+      pointer-events: auto;
     }
     .lb-box {
       transform: none;

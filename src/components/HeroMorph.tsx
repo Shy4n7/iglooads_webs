@@ -38,6 +38,30 @@ const smooth = (a: number, b: number, t: number) => {
  * Off for reduced motion.
  */
 export default function HeroMorph() {
+  // Marks the opening as finished once the wipe animation ends, so phones can
+  // lift the wordmark above the header for the hand-off (see globals.css).
+  useEffect(() => {
+    const hero = document.querySelector<HTMLElement>(".hero");
+    const final = document.querySelector<HTMLElement>(".hero-final");
+    if (!hero || !final) return;
+    const done = () => hero.classList.add("is-done");
+    if (window.matchMedia(QUERY).matches || getComputedStyle(final).animationName === "none") {
+      done();
+      return;
+    }
+    // The wipe may already be over if this script loaded late.
+    const wipe = final.getAnimations().find((a) => (a as CSSAnimation).animationName === "wipe");
+    if (!wipe || wipe.playState === "finished") {
+      done();
+      return;
+    }
+    const onEnd = (e: AnimationEvent) => {
+      if (e.target === final && e.animationName === "wipe") done();
+    };
+    final.addEventListener("animationend", onEnd);
+    return () => final.removeEventListener("animationend", onEnd);
+  }, []);
+
   // Flags <html> once the page has scrolled, so the phone intro can rise in.
   useEffect(() => {
     const root = document.documentElement;
@@ -123,15 +147,19 @@ export default function HeroMorph() {
       const my = y - start + e * (target.y - base.y + start);
       const ms = 1 + e * (target.s - 1);
       const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
-      const opacity = (1 - smooth(0.8, 1, p)).toFixed(3);
-      const visibility = p >= 1 ? "hidden" : "visible";
+      // Hand over to the header logo. Phones arrive early on the ease-out
+      // curve, so they hand over as soon as they arrive instead of waiting.
+      const phone = isPhone();
+      const fade = phone ? [0.5, 0.7] : [0.8, 1];
+      const opacity = (1 - smooth(fade[0], fade[1], p)).toFixed(3);
+      const visibility = p >= fade[1] ? "hidden" : "visible";
       words.forEach((el) => {
         el.style.willChange = "transform, opacity";
         el.style.transform = transform;
         el.style.opacity = opacity;
         el.style.visibility = visibility;
       });
-      logo.style.opacity = smooth(0.85, 1, p).toFixed(3);
+      logo.style.opacity = (phone ? smooth(0.55, 0.72, p) : smooth(0.85, 1, p)).toFixed(3);
     };
 
     const onScroll = () => {
