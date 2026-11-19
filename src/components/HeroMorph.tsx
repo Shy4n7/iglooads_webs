@@ -13,8 +13,8 @@ const morphDistance = () => (isPhone() ? 0.4 : 0.7);
 const deadZone = () => (isPhone() ? 48 : 0);
 // Phones only: a thumb rolls back a few pixels mid-swipe. The morph ignores
 // backward movement smaller than this, so the wordmark does not dip down.
-// Kept below the dead zone, so the wordmark still restores fully at the top.
-const backSlack = () => (isPhone() ? 32 : 0);
+// Kept no larger than the dead zone, so the wordmark still restores fully at the top.
+const backSlack = () => (isPhone() ? 48 : 0);
 // Phones: the intro comes in once the wordmark is about 20% into its glide,
 // so the heading never crowds the full-size wordmark. Scrolling back up, it
 // hides 20px before that point, early enough to clear the growing wordmark
