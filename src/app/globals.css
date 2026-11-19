@@ -408,22 +408,190 @@
     }
   }
 
-  /* ---------- Opening sequence ----------
-     0.25 to 2s: letters spin in, cream on indigo.
-     2 to 3.2s: background fades to cream, letters to indigo. */
+  /* ---------- Opening sequence: a camera take ----------
+     0 to 0.5s     viewfinder corners settle, REC light blinks
+     0.25 to 2s    letters spin in (both layers, in sync)
+     2.1 to 3.1s   amber ring grows out of the REC dot
+     2.2 to 3.2s   cream page follows just behind it
+     3.3s          the dark take is switched off */
   .hero {
     background: var(--color-cream);
-    animation: hero-bg 1.2s var(--ease-out-soft) 2s both;
   }
-  @keyframes hero-bg {
-    /* OKLCH endpoints (indigo, cream) blend through a cleaner midpoint than hex. */
+  .hero-stage {
+    position: relative;
+    /* Wipe origin: the REC dot. */
+    --wx: calc(100% - 64px);
+    --wy: 52px;
+  }
+  .hero-take {
+    position: relative;
+    background: var(--color-indigo);
+    color: var(--color-cream);
+    animation: take-off 0.01s linear 3.3s forwards;
+  }
+  .hero-take .hero-word {
+    color: var(--color-cream);
+    --pop: var(--color-amber);
+  }
+  @keyframes take-off {
+    from,
+    to {
+      visibility: hidden;
+    }
+  }
+  .hero-ring,
+  .hero-final {
+    position: absolute;
+    inset: 0;
+    clip-path: circle(0 at var(--wx) var(--wy));
+  }
+  .hero-ring {
+    background: var(--color-amber);
+    animation:
+      wipe 1s cubic-bezier(0.65, 0, 0.25, 1) 2.1s forwards,
+      take-off 0.01s linear 3.3s forwards;
+  }
+  .hero-final {
+    background: var(--color-cream);
+    animation: wipe 1s cubic-bezier(0.65, 0, 0.25, 1) 2.2s forwards;
+  }
+  @keyframes wipe {
     from {
-      background-color: oklch(0.3020 0.0559 278.28);
+      clip-path: circle(0 at var(--wx) var(--wy));
     }
     to {
-      background-color: oklch(0.9378 0.0228 98.65);
+      clip-path: circle(150vmax at var(--wx) var(--wy));
     }
   }
+
+  .viewfinder {
+    position: absolute;
+    inset: 24px;
+    pointer-events: none;
+    font-family: var(--font-bebas);
+    letter-spacing: 0.2em;
+    color: rgba(238, 235, 218, 0.78);
+  }
+  .vf-corner {
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    border: 2px solid rgba(238, 235, 218, 0.6);
+    animation: vf-in 0.7s var(--ease-out-soft) both;
+  }
+  .vf-tl {
+    top: 0;
+    left: 0;
+    border-right: 0;
+    border-bottom: 0;
+    --vx: -14px;
+    --vy: -14px;
+  }
+  .vf-tr {
+    top: 0;
+    right: 0;
+    border-left: 0;
+    border-bottom: 0;
+    --vx: 14px;
+    --vy: -14px;
+  }
+  .vf-bl {
+    bottom: 0;
+    left: 0;
+    border-right: 0;
+    border-top: 0;
+    --vx: -14px;
+    --vy: 14px;
+  }
+  .vf-br {
+    bottom: 0;
+    right: 0;
+    border-left: 0;
+    border-top: 0;
+    --vx: 14px;
+    --vy: 14px;
+  }
+  @keyframes vf-in {
+    from {
+      opacity: 0;
+      translate: var(--vx) var(--vy);
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+  .vf-rec {
+    position: absolute;
+    top: 18px;
+    right: 26px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    animation: vf-in 0.7s var(--ease-out-soft) 0.15s both;
+    --vx: 0;
+    --vy: -8px;
+  }
+  .vf-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--color-amber);
+    box-shadow: 0 0 12px rgba(242, 182, 97, 0.8);
+    animation:
+      rec-blink 0.9s steps(2, jump-none) infinite,
+      rec-swell 0.35s var(--ease-out-soft) 1.8s forwards;
+  }
+  @keyframes rec-blink {
+    50% {
+      opacity: 0.2;
+    }
+  }
+  @keyframes rec-swell {
+    to {
+      transform: scale(1.8);
+      opacity: 1;
+    }
+  }
+  .vf-meta {
+    position: absolute;
+    bottom: 14px;
+    font-size: 15px;
+    animation: vf-in 0.7s var(--ease-out-soft) 0.3s both;
+    --vx: 0;
+    --vy: 8px;
+  }
+  .vf-meta-l {
+    left: 26px;
+  }
+  .vf-meta-r {
+    right: 26px;
+  }
+  @media (max-width: 600px) {
+    .hero-stage {
+      --wx: calc(100% - 46px);
+      --wy: 42px;
+    }
+    .viewfinder {
+      inset: 14px;
+    }
+    .vf-rec {
+      top: 14px;
+      right: 18px;
+      font-size: 16px;
+    }
+    .vf-meta {
+      font-size: 13px;
+    }
+    .vf-meta-l {
+      left: 18px;
+    }
+    .vf-meta-r {
+      right: 18px;
+    }
+  }
+
   .hero-word-box {
     container-type: inline-size;
   }
@@ -435,15 +603,6 @@
     letter-spacing: 0.3em;
     color: var(--color-indigo);
     --pop: var(--color-orange);
-    animation: hero-ink 1.2s var(--ease-out-soft) 2s both;
-  }
-  @keyframes hero-ink {
-    from {
-      color: oklch(0.9378 0.0228 98.65);
-    }
-    to {
-      color: oklch(0.3020 0.0559 278.28);
-    }
   }
   /* Phones: two stacked lines, each spread edge to edge, so the wordmark
      fills the screen instead of one thin line. */
@@ -1128,8 +1287,7 @@
     .rv,
     .spin,
     .spin-clip,
-    .hero,
-    .hero-word {
+    .hero-final {
       animation: none !important;
     }
     .site-header {
@@ -1175,8 +1333,14 @@
       animation: none !important;
       transform: none;
     }
-    .spin-strip {
+    .spin-strip,
+    .hero-take,
+    .hero-ring {
       display: none;
+    }
+    .hero-final {
+      position: relative;
+      clip-path: none;
     }
     .lb-box {
       transform: none;
