@@ -11,6 +11,10 @@ const morphDistance = () => (isPhone() ? 0.4 : 0.7);
 // Phones only: a small dead zone at the top, so a light touch does not start
 // the hand-off or bring the intro in.
 const deadZone = () => (isPhone() ? 48 : 0);
+// Phones only: a thumb rolls back a few pixels mid-swipe. The morph ignores
+// backward movement smaller than this, so the wordmark does not dip down.
+// Kept below the dead zone, so the wordmark still restores fully at the top.
+const backSlack = () => (isPhone() ? 32 : 0);
 // Phones: the intro comes in once the wordmark is about 20% into its glide,
 // so the heading never crowds the full-size wordmark. Scrolling back up, it
 // hides 20px before that point, early enough to clear the growing wordmark
@@ -60,6 +64,9 @@ export default function HeroMorph() {
     let target = { x: 0, y: 0, s: 1 };
     let frame = 0;
     let lastP = -1;
+    // Scroll position the morph follows: rises with the real position, but
+    // only falls once the page has gone back more than backSlack().
+    let follow = 0;
     let width = window.innerWidth;
     // Screen height for the morph distance, fixed when measured: phone address
     // bars change innerHeight while scrolling, which would make the morph jitter.
@@ -76,6 +83,7 @@ export default function HeroMorph() {
       });
       logo.style.opacity = "";
       lastP = -1;
+      follow = window.scrollY;
     };
 
     const measure = () => {
@@ -93,7 +101,8 @@ export default function HeroMorph() {
       frame = 0;
       const y = window.scrollY;
       const dz = deadZone();
-      const p = clamp((y - dz) / (height * morphDistance()));
+      follow = Math.min(Math.max(follow, y), y + backSlack());
+      const p = clamp((follow - dz) / (height * morphDistance()));
       if (p === 0) {
         if (lastP !== 0) {
           reset();
@@ -108,8 +117,10 @@ export default function HeroMorph() {
       // rising intro never meets the wordmark. Desktop keeps the slow-in glide.
       const e = isPhone() ? easeOut(p) : easeInOut(p);
       const mx = e * (target.x - base.x);
-      // Start from where the wordmark sits after scrolling through the dead zone.
-      const my = y - dz + e * (target.y - base.y + dz);
+      // Start from where the wordmark naturally sits: scrolled with the page
+      // inside the dead zone, held at the dead zone's end beyond it.
+      const start = Math.min(y, dz);
+      const my = y - start + e * (target.y - base.y + start);
       const ms = 1 + e * (target.s - 1);
       const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
       const opacity = (1 - smooth(0.8, 1, p)).toFixed(3);
