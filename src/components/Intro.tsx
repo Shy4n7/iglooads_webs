@@ -13,8 +13,8 @@ export default function Intro() {
         </h2>
         <div className="rv flex flex-col gap-6">
           <p className="m-0 max-w-[480px] text-base leading-[1.75] text-ink-soft">
-            Igloo Ads is a Coimbatore studio for Instagram reels, UGC ads, brand shoots and Meta ad
-            campaigns. We script, shoot, edit and post short-form video, then build the fast, mobile-first
+            Igloo Ads is a Coimbatore studio for Instagram reels, UGC ads, brand shoots and
+            websites. We script, shoot, edit and post short-form video, then build the fast, mobile-first
             website your new customers land on. One team, from the first hook to the booking.
           </p>
           <div className="flex flex-wrap gap-3">
