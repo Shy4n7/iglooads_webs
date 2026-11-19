@@ -10,7 +10,7 @@ export default function Hero() {
     <section id="top" aria-labelledby="hero-title" className="hero on-light">
       <div className="wrap hero-word-box flex min-h-[100svh] items-center">
         <h1 id="hero-title" aria-label="Igloo Ads" className="giant hero-word font-bebas">
-          <SplitLetters lines={[{ text: "IGLOO ADS" }]} enter="blur" delay={0.1} stagger={0.07} />
+          <SplitLetters lines={[{ text: "IGLOO ADS" }]} enter="spin" delay={0.25} stagger={0.09} />
         </h1>
       </div>
     </section>
