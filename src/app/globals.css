@@ -490,6 +490,12 @@
      turn transparent (the page behind is the same cream), so only the
      wordmark sits above the header, and taps pass through to whatever is
      underneath. A class, not a timed animation, so the browser repaints. */
+  /* Finished: the dark take and the amber ring go at the same moment the
+     cream layer turns transparent, so the ring can never show through. */
+  .hero.is-done .hero-take,
+  .hero.is-done .hero-ring {
+    visibility: hidden;
+  }
   @media (max-width: 600px) {
     .hero.is-done {
       z-index: 60;
