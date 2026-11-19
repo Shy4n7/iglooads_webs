@@ -1,10 +1,35 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { NAV } from "@/lib/content";
 import MobileMenu from "./MobileMenu";
 
+// Distance scrolled before the header slides in.
+const SHOW_AFTER = 80;
+
 export default function Header() {
+  const [shown, setShown] = useState(false);
+
+  useEffect(() => {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      setShown(window.scrollY > SHOW_AFTER);
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <header
-      className="on-light sticky top-0 z-50 border-b border-indigo/10 bg-cream/70"
+      className={`site-header on-light border-b border-indigo/10 bg-cream/70 ${shown ? "is-shown" : ""}`}
       style={{ WebkitBackdropFilter: "blur(14px)", backdropFilter: "blur(14px)" }}
     >
       <div className="wrap flex h-[68px] items-center justify-between">
