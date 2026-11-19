@@ -66,4 +66,20 @@ export const TESTIMONIAL = {
   by: "[Client name], [Business]",
 };
 
-export const SLOTS = ["10:00 am", "11:30 am", "12:00 pm", "2:30 pm", "4:00 pm", "5:30 pm"];
+// Booking calendar. Shown as a guide only: the Google Calendar booking page
+// is where a slot is actually confirmed, so keep these in step with it.
+export const BOOKING = {
+  title: "Discovery call",
+  host: "Igloo Ads",
+  description:
+    "A quick call to learn your brand and goals, then map out the reels, ads or website that will move the needle.",
+  durationMin: 30,
+  // Days of the week that can be booked: 0 Sunday to 6 Saturday.
+  workDays: [1, 2, 3, 4, 5],
+  // First and last start times, in minutes after midnight IST, and the step.
+  firstSlot: 10 * 60,
+  lastSlot: 17 * 60 + 30,
+  stepMin: 30,
+  // How far ahead calls can be booked.
+  monthsAhead: 12,
+};
