@@ -3,6 +3,7 @@ import Booking from "@/components/Booking";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
+import Intro from "@/components/Intro";
 import OnSet from "@/components/OnSet";
 import Process from "@/components/Process";
 import Reels from "@/components/Reels";
@@ -16,6 +17,7 @@ export default function Home() {
       <Header />
       <main id="main">
         <Hero />
+        <Intro />
         <TrustedBy />
         <Reels />
         <Services />

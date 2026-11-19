@@ -17,8 +17,6 @@ export const NAV = [
   { href: "#book", label: "Contact" },
 ];
 
-export const CHIPS = ["REELS", "UGC ADS", "BRAND SHOOTS", "META ADS"];
-
 export type Reel = { id: string; client: string };
 
 export const REELS: Reel[] = [
