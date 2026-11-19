@@ -8,8 +8,10 @@
 #   <name>-poster.jpg    poster frame, 640px wide
 # Per still source:
 #   still-<name>.jpg     frame grab used for photo placeholders
-# Logos:
-#   logos/<name>.png     copied from assets/logos/wall
+# Brand:
+#   igloo-ads-pfp-1080.png  Open Graph image (copy)
+#   icon-192.png            favicon / touch icon
+# Logos are imported straight from assets/logos/wall by next/image.
 #
 # Usage: scripts/optimize_media.sh [--force]
 
@@ -23,15 +25,15 @@ FORCE=0
 
 command -v ffmpeg >/dev/null || { echo "ffmpeg is required" >&2; exit 1; }
 
-mkdir -p "$OUT" "$OUT/logos"
+mkdir -p "$OUT"
 
 # Videos shown as reels (portrait 9:16).
 REELS=(IMG_7724 IMG_7725 IMG_7728 IMG_7729 IMG_7730 IMG_7733)
 
 # Frame grabs for photo placeholders: "<video>:<seconds>:<output name>"
 STILLS=(
-  "IMG_7731:1.0:set-1"
-  "IMG_7731:6.0:set-2"
+  "IMG_7731:8.0:set-1"
+  "IMG_7731:9.5:set-2"
   "IMG_7725:9.0:set-3"
   "IMG_7730:7.0:set-4"
   "IMG_7729:2.0:service-reels"
@@ -81,12 +83,15 @@ for spec in "${STILLS[@]}"; do
   if need "$out"; then
     echo "still   $outname"
     ffmpeg -hide_banner -loglevel error -y -ss "$t" -i "$SRC/$vid.mp4" -frames:v 1 \
-      -vf "scale='min(1200,iw)':-2:flags=lanczos" -q:v 4 "$out"
+      -vf "scale='if(gt(iw,ih),min(1200,iw),min(800,iw))':-2:flags=lanczos" -q:v 5 "$out"
   fi
 done
 
-cp "$ROOT"/assets/logos/wall/*.png "$OUT/logos/"
 cp "$ROOT/assets/igloo-ads-pfp-1080.png" "$OUT/igloo-ads-pfp-1080.png"
+if need "$OUT/icon-192.png"; then
+  ffmpeg -hide_banner -loglevel error -y -i "$ROOT/assets/igloo-ads-pfp-1080.png" \
+    -vf "scale=192:192:flags=lanczos" "$OUT/icon-192.png"
+fi
 
 echo "done"
 ls -lh "$OUT"
