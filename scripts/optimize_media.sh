@@ -5,7 +5,7 @@
 # Per reel video:
 #   <name>-card.mp4      640px wide, muted, H.264 crf 26, faststart (grid cards)
 #   <name>-1080.mp4      up to 1080px wide, with audio, H.264 crf 24, faststart (lightbox)
-#   <name>-poster.jpg    poster frame, 640px wide
+#   <name>-poster.jpg    poster frame, 480px wide
 # Per still source:
 #   still-<name>.jpg     frame grab used for photo placeholders
 # Brand:
@@ -73,7 +73,7 @@ for name in "${REELS[@]}"; do
   if need "$poster"; then
     echo "poster  $name"
     ffmpeg -hide_banner -loglevel error -y -ss 0.3 -i "$in" -frames:v 1 \
-      -vf "$(vf_916 640)" -q:v 4 "$poster"
+      -vf "$(vf_916 480)" -q:v 6 "$poster"
   fi
 done
 

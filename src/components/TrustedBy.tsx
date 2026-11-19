@@ -37,10 +37,10 @@ export default function TrustedBy() {
   return (
     <section aria-labelledby="trusted-title" className="on-light pt-6 pb-16">
       <div className="wrap">
-        <h2 id="trusted-title" className="label rv mb-3">
+        <h2 id="trusted-title" className="label mb-3">
           TRUSTED BY
         </h2>
-        <p className="headline rv mb-10 max-w-[640px]" style={{ fontSize: "clamp(28px, 3.6vw, 46px)" }}>
+        <p className="headline mb-10 max-w-[640px]" style={{ fontSize: "clamp(28px, 3.6vw, 46px)" }}>
           Brands that already stopped the scroll with us.
         </p>
       </div>

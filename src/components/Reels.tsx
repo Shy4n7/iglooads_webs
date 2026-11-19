@@ -21,12 +21,19 @@ function ReelCard({
   const media = reelMedia(reel.id);
   const ref = useRef<HTMLVideoElement>(null);
   const [inView, setInView] = useState(false);
+  const [near, setNear] = useState(false);
 
   // Only load and play while the card is on screen.
   useEffect(() => {
     const v = ref.current;
     if (!v || !("IntersectionObserver" in window)) return;
-    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { rootMargin: "200px 0px" });
+    const io = new IntersectionObserver(
+      ([e]) => {
+        setInView(e.isIntersecting);
+        if (e.isIntersecting) setNear(true);
+      },
+      { rootMargin: "300px 300px" },
+    );
     io.observe(v);
     return () => io.disconnect();
   }, []);
@@ -53,7 +60,7 @@ function ReelCard({
       <video
         ref={ref}
         src={media.card}
-        poster={media.poster}
+        poster={near ? media.poster : undefined}
         muted
         loop
         playsInline
