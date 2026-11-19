@@ -4,7 +4,6 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 import Intro from "@/components/Intro";
-import OnSet from "@/components/OnSet";
 import Process from "@/components/Process";
 import Reels from "@/components/Reels";
 import Results from "@/components/Results";
@@ -23,7 +22,6 @@ export default function Home() {
         <Services />
         <Process />
         <Results />
-        <OnSet />
         <ActNow />
         <Booking />
       </main>
