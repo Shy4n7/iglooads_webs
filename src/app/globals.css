@@ -225,11 +225,11 @@
   .cell {
     display: inline-block;
   }
+  /* Clips only the bottom edge: letters rise in from below, and a
+     popped letter can still lift above the line on hover. */
   .mask {
     display: block;
-    overflow: hidden;
-    padding-top: 0.14em;
-    margin-top: -0.14em;
+    clip-path: inset(-1em -0.5em 0 -0.5em);
   }
   @keyframes rise {
     from {
