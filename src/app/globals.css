@@ -616,8 +616,8 @@
     color: var(--color-indigo);
     --pop: var(--color-orange);
   }
-  /* Phones: two stacked lines, each spread edge to edge, so the wordmark
-     fills the screen instead of one thin line. */
+  /* Phones: two stacked lines so the wordmark fills the screen instead of
+     one thin line. */
   @media (max-width: 600px) {
     .hero-word {
       font-size: calc(100cqw / 2.1);
@@ -628,10 +628,11 @@
       display: flex;
       flex-direction: column;
     }
+    /* Same small gap between letters on both lines; IGLOO fills the
+       width and ADS sits under it with its natural spacing. */
     .hero-word .word {
       display: flex;
-      justify-content: space-between;
-      width: 100%;
+      column-gap: 0.09em;
     }
     .hero-word .space {
       display: none;
