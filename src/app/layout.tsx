@@ -18,7 +18,14 @@ const fraunces = Fraunces({
   display: "swap",
   preload: false,
 });
-const poppins = Poppins({ weight: ["400", "500"], subsets: ["latin"], variable: "--font-poppins-face", display: "swap" });
+const poppins = Poppins({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--font-poppins-face",
+  display: "swap",
+  // Body text renders in a metric-matched fallback first, so the heading fonts load sooner.
+  preload: false,
+});
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://iglooads.vercel.app";
 
