@@ -18,8 +18,8 @@ const smooth = (a: number, b: number, t: number) => {
 /**
  * As the page scrolls away from the top, the giant wordmark shrinks and
  * glides up into the header logo's spot, then hands over to the real logo.
- * Writes CSS variables only: --mx, --my, --ms, --mo, --mv on the hero stage and
- * --logo-o on <html>. Off for reduced motion.
+ * Writes inline styles on the wordmark layers and the header logo only.
+ * Off for reduced motion.
  */
 export default function HeroMorph() {
   // Flags <html> once the page has scrolled, so the phone intro can rise in.
@@ -33,27 +33,38 @@ export default function HeroMorph() {
 
   useEffect(() => {
     const mq = window.matchMedia(QUERY);
-    const stage = document.querySelector<HTMLElement>(".hero-stage");
     const word = document.querySelector<HTMLElement>("#hero-title");
+    // Both layers of the opening (the dark take and the final page) move together.
+    const words = Array.from(document.querySelectorAll<HTMLElement>(".hero-stage .hero-word"));
     const logo = document.querySelector<HTMLElement>(".site-logo");
-    const root = document.documentElement;
-    if (!stage || !word || !logo) return;
+    if (!word || !logo || words.length === 0) return;
 
     let base = { x: 0, y: 0, w: 1, h: 1 };
     let target = { x: 0, y: 0, s: 1 };
     let frame = 0;
+    let lastP = -1;
+    let width = window.innerWidth;
+    // Screen height for the morph distance, fixed when measured: phone address
+    // bars change innerHeight while scrolling, which would make the morph jitter.
+    let height = window.innerHeight;
 
+    // Styles are written straight onto the few elements that move, never as
+    // inherited CSS variables, so a scroll frame does not restyle every letter.
     const reset = () => {
-      stage.style.removeProperty("--mx");
-      stage.style.removeProperty("--my");
-      stage.style.removeProperty("--ms");
-      stage.style.removeProperty("--mo");
-      stage.style.removeProperty("--mv");
-      root.style.removeProperty("--logo-o");
+      words.forEach((el) => {
+        el.style.transform = "";
+        el.style.opacity = "";
+        el.style.visibility = "";
+        el.style.willChange = "";
+      });
+      logo.style.opacity = "";
+      lastP = -1;
     };
 
     const measure = () => {
       reset();
+      width = window.innerWidth;
+      height = window.innerHeight;
       const r = word.getBoundingClientRect();
       base = { x: r.left + window.scrollX, y: r.top + window.scrollY, w: r.width, h: r.height };
       // The header is fixed at the top, so the logo's offsets are its spot on screen.
@@ -64,27 +75,39 @@ export default function HeroMorph() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
-      const p = clamp(y / (window.innerHeight * morphDistance()));
+      const p = clamp(y / (height * morphDistance()));
       if (p === 0) {
-        reset();
+        if (lastP !== 0) {
+          reset();
+          lastP = 0;
+        }
         return;
       }
+      // Once the hand-off is done there is nothing left to move.
+      if (p === 1 && lastP === 1) return;
+      lastP = p;
       const e = easeInOut(p);
       const mx = e * (target.x - base.x);
       const my = y + e * (target.y - base.y);
       const ms = 1 + e * (target.s - 1);
-      stage.style.setProperty("--mx", `${mx.toFixed(2)}px`);
-      stage.style.setProperty("--my", `${my.toFixed(2)}px`);
-      stage.style.setProperty("--ms", ms.toFixed(4));
-      stage.style.setProperty("--mo", (1 - smooth(0.8, 1, p)).toFixed(3));
-      stage.style.setProperty("--mv", p >= 1 ? "hidden" : "visible");
-      root.style.setProperty("--logo-o", smooth(0.85, 1, p).toFixed(3));
+      const transform = `translate3d(${mx.toFixed(1)}px, ${my.toFixed(1)}px, 0) scale(${ms.toFixed(4)})`;
+      const opacity = (1 - smooth(0.8, 1, p)).toFixed(3);
+      const visibility = p >= 1 ? "hidden" : "visible";
+      words.forEach((el) => {
+        el.style.willChange = "transform, opacity";
+        el.style.transform = transform;
+        el.style.opacity = opacity;
+        el.style.visibility = visibility;
+      });
+      logo.style.opacity = smooth(0.85, 1, p).toFixed(3);
     };
 
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
+    // Only a real width change (rotation, window resize) needs a new measure.
     const onResize = () => {
+      if (window.innerWidth === width) return;
       measure();
       update();
     };
@@ -107,7 +130,11 @@ export default function HeroMorph() {
     if (!mq.matches) start();
     mq.addEventListener("change", onPref);
     // Fonts change the wordmark's size once they load.
-    document.fonts?.ready.then(() => !mq.matches && onResize());
+    document.fonts?.ready.then(() => {
+      if (mq.matches) return;
+      measure();
+      update();
+    });
     return () => {
       mq.removeEventListener("change", onPref);
       stop();

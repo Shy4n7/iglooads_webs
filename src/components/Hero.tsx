@@ -9,8 +9,9 @@ const SPIN = { enter: "spin" as const, delay: 0.25, stagger: 0.09 };
  *
  * Two identical layers sit on top of each other: a dark take (indigo, cream
  * letters, viewfinder and REC light) and the final light page (cream, indigo
- * letters). Both spin their letters in sync. Then the REC dot grows into a
- * circle that wipes the light layer in, led by a thin amber ring.
+ * letters). The dark take spins its letters in; the final page, still hidden,
+ * already has them in place. Then the REC dot grows into a circle that wipes
+ * the light layer in, led by a thin amber ring.
  * On scroll the wordmark shrinks into the header logo (HeroMorph). On phones
  * the intro is pulled up under the opening and rises in once scrolling starts.
  * With reduced motion only the light layer is shown, with no morph.
@@ -41,8 +42,9 @@ export default function Hero() {
         <div className="hero-ring" aria-hidden="true" />
         <div className="hero-final">
           <div className="wrap hero-word-box flex min-h-[100svh] items-center">
+            {/* Hidden behind the wipe until every letter has landed, so it needs no spin. */}
             <h1 id="hero-title" aria-label="Igloo Ads" className="giant hero-word font-bebas">
-              <SplitLetters lines={WORD} {...SPIN} />
+              <SplitLetters lines={WORD} />
             </h1>
           </div>
         </div>

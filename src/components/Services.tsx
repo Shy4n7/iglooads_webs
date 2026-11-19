@@ -23,7 +23,7 @@ const SERVICES: Service[] = [
   },
   {
     img: ugc,
-    pos: "50% 25%",
+    pos: "32% 45%",
     tag: "UGC ADS",
     title: ["UGC ADS", "THAT SELL"],
     body: "Creator-style ads that feel like a customer talking, not a brand.",
