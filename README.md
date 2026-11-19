@@ -68,6 +68,11 @@ changing them.
 
 ## Booking link
 
+The booking card shows a week strip with arrows. The month button above it opens a full calendar
+(`src/components/DatePicker.tsx`) with month and year dropdowns. Calls can be picked from tomorrow
+up to 12 months ahead (`MONTHS_AHEAD` in `src/components/Booking.tsx`). Slot times are in
+`SLOTS` in `src/lib/content.ts`.
+
 The CONFIRM ON GOOGLE CALENDAR button opens your Google Calendar appointment schedule.
 
 1. In Google Calendar, create an appointment schedule and copy its booking page link.
