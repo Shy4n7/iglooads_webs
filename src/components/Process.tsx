@@ -35,9 +35,7 @@ export default function Process() {
                 {s.n}
               </span>
               <div className="step-card glass lift">
-                <span className="step-ghost" aria-hidden="true">
-                  {s.n}
-                </span>
+                <span className="step-ghost" data-n={s.n} aria-hidden="true" />
                 <span className="font-bebas text-[15px] tracking-[0.25em] text-amber">{s.kicker}</span>
                 <h3 className="headline mt-2 mb-2 text-2xl text-cream">
                   <span className="sr-only">Step {Number(s.n)}: </span>

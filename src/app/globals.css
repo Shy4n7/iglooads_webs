@@ -1109,6 +1109,10 @@
     pointer-events: none;
     transition: transform 0.8s var(--ease-out-soft);
   }
+  /* Drawn as generated content: decorative, not readable text. */
+  .step-ghost::before {
+    content: attr(data-n);
+  }
   .step:hover .step-ghost {
     transform: translate(-6px, -6px);
   }
