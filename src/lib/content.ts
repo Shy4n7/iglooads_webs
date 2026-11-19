@@ -35,9 +35,24 @@ export const reelMedia = (id: string) => ({
 });
 
 export const STEPS = [
-  { n: "01", title: "Discovery call", body: "We learn your brand, audience and what you want people to do." },
-  { n: "02", title: "Shoot and edit", body: "Scripts, a planned shoot day and fast, thumb-stopping edits." },
-  { n: "03", title: "Post and grow", body: "We post, track views and leads, and double down on what works." },
+  {
+    n: "01",
+    kicker: "TALK",
+    title: "Discovery call",
+    body: "We learn your brand, audience and what you want people to do.",
+  },
+  {
+    n: "02",
+    kicker: "CREATE",
+    title: "Shoot and edit",
+    body: "Scripts, a planned shoot day and fast, thumb-stopping edits.",
+  },
+  {
+    n: "03",
+    kicker: "GROW",
+    title: "Post and grow",
+    body: "We post, track views and leads, and double down on what works.",
+  },
 ];
 
 export const RESULTS = [
