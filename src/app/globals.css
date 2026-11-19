@@ -970,289 +970,272 @@
     backdrop-filter: blur(22px);
   }
 
-  /* ---------- Booking ---------- */
-  .day {
+  /* ---------- Booking widget ----------
+     Three panels in one card: call details, month calendar, time slots. */
+  .cal {
+    display: grid;
+    grid-template-columns: 270px minmax(0, 1fr) 260px;
+    border: 1px solid rgba(238, 235, 218, 0.14);
+    border-radius: 28px;
+    background: var(--color-deep);
+    overflow: hidden;
+  }
+  .cal-info,
+  .cal-month,
+  .cal-times {
+    padding: 26px 24px;
+  }
+  .cal-info {
+    border-right: 1px solid rgba(238, 235, 218, 0.12);
+  }
+  .cal-times {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 44px;
-    min-height: 60px;
-    border: 0;
-    border-radius: 999px;
-    cursor: pointer;
-    font-family: var(--font-poppins);
-    background: transparent;
-    color: var(--color-ink-soft);
-    transition:
-      background-color 0.3s,
-      color 0.3s;
+    border-left: 1px solid rgba(238, 235, 218, 0.12);
   }
-  .day:hover {
-    background: rgba(40, 43, 74, 0.08);
-  }
-  .day[aria-pressed="true"] {
-    background: var(--color-indigo);
-    color: var(--color-cream);
-  }
-  .day:focus-visible {
-    outline-color: var(--color-orange);
-  }
-  /* Month heading that opens the calendar, and the week arrows beside it. */
-  .cal-trigger {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 0 14px 0 18px;
-    border: 1px solid rgba(40, 43, 74, 0.18);
-    border-radius: 999px;
-    background: rgba(246, 244, 232, 0.6);
-    cursor: pointer;
-    font-family: var(--font-brico);
-    font-weight: 800;
-    font-size: 20px;
-    letter-spacing: -0.01em;
-    white-space: nowrap;
-    color: var(--color-indigo);
-    transition:
-      background-color 0.3s ease,
-      border-color 0.3s ease;
-  }
-  .cal-trigger:hover,
-  .cal-trigger[aria-expanded="true"] {
-    background: var(--color-card);
-    border-color: rgba(40, 43, 74, 0.35);
-  }
-  .cal-trigger-icon {
-    display: grid;
-    place-items: center;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: var(--color-indigo);
-    color: var(--color-cream);
-    transition: transform 0.4s var(--ease-out-soft);
-  }
-  .cal-trigger-icon.is-open {
-    transform: rotate(180deg);
-  }
-  .cal-arrow {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--color-indigo);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .cal-arrow:hover:not(:disabled) {
-    background: rgba(40, 43, 74, 0.08);
-  }
-  .cal-arrow:disabled,
-  .day:disabled {
-    opacity: 0.35;
-    cursor: not-allowed;
-  }
-  .cal-trigger:focus-visible,
-  .cal-arrow:focus-visible {
-    outline-color: var(--color-orange);
+  .cal :focus-visible {
+    outline-color: var(--color-amber);
   }
 
-  @media (max-width: 380px) {
-    .book-card-top,
-    .book-card-body {
-      padding-left: 14px !important;
-      padding-right: 14px !important;
-    }
-    .day {
-      min-width: 34px !important;
-    }
-    .picker {
-      left: 6px;
-      right: 6px;
-      padding: 12px 10px 14px;
-    }
-  }
-  @media (max-width: 420px) {
-    .cal-trigger {
-      gap: 6px;
-      padding: 0 10px 0 14px;
-      font-size: 17px;
-    }
-    .cal-arrow {
-      width: 34px;
-      height: 34px;
-    }
-    .picker-head {
-      gap: 2px;
-    }
-    .picker-nav {
-      width: 32px;
-      height: 32px;
-    }
-    .picker-select select {
-      padding: 0 28px 0 12px;
-      font-size: 14px;
-    }
-    .picker-select::after {
-      right: 11px;
-    }
-  }
-
-  /* Month calendar popover. */
-  .picker {
-    position: absolute;
-    z-index: 10;
-    top: 72px;
-    left: 12px;
-    right: 12px;
-    padding: 14px 14px 16px;
-    border-radius: 24px;
-    background: var(--color-card);
-    border: 1px solid var(--color-line);
-    box-shadow: 0 24px 60px rgba(29, 31, 56, 0.45);
-    color: var(--color-indigo);
-    transform-origin: 50% 0;
-    animation: picker-in 0.35s var(--ease-out-soft) both;
-  }
-  @keyframes picker-in {
-    from {
-      opacity: 0;
-      transform: translateY(-8px) scale(0.97);
-    }
-  }
-  .picker :focus-visible {
-    outline-color: var(--color-orange);
-  }
-  .picker-head {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 10px;
-  }
-  .picker-nav {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 40px;
-    height: 40px;
-    border: 0;
-    border-radius: 50%;
-    background: transparent;
-    color: var(--color-indigo);
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .picker-nav:hover:not(:disabled) {
-    background: rgba(40, 43, 74, 0.08);
-  }
-  .picker-nav:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
-  }
-  .picker-select {
+  /* Month and year read as a heading but are dropdowns. */
+  .cal-select {
     position: relative;
     display: inline-flex;
     min-width: 0;
   }
-  .picker-select select {
-    width: 100%;
-  }
-  .picker-select select {
+  .cal-select select {
     appearance: none;
     -webkit-appearance: none;
+    max-width: 100%;
     min-height: 40px;
-    padding: 0 34px 0 14px;
-    border: 1px solid rgba(40, 43, 74, 0.2);
-    border-radius: 999px;
-    background: var(--color-cream);
+    padding: 0 26px 0 6px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
     font-family: var(--font-brico);
-    font-weight: 800;
-    font-size: 15px;
-    color: var(--color-indigo);
+    font-size: 20px;
+    color: var(--color-cream);
     cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      border-color 0.3s ease;
   }
-  .picker-select::after {
+  .cal-select select:hover {
+    background: rgba(238, 235, 218, 0.06);
+    border-color: rgba(238, 235, 218, 0.16);
+  }
+  .cal-select select option {
+    color: var(--color-indigo);
+  }
+  .cal-select-month select {
+    font-weight: 800;
+  }
+  .cal-select-year select {
+    font-weight: 400;
+    color: var(--color-cream-mute);
+  }
+  .cal-select::after {
     content: "";
     position: absolute;
-    right: 14px;
+    right: 10px;
     top: 50%;
-    width: 7px;
-    height: 7px;
-    border-right: 2px solid var(--color-indigo);
-    border-bottom: 2px solid var(--color-indigo);
-    translate: 0 -70%;
+    width: 6px;
+    height: 6px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    color: var(--color-cream-mute);
+    translate: 0 -75%;
     rotate: 45deg;
     pointer-events: none;
   }
-  .picker-grid {
+  .cal-nav {
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));
-    gap: 2px;
-    text-align: center;
-  }
-  .picker-wd {
-    padding: 6px 0;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--color-ink-mute);
-  }
-  .picker-day {
-    width: 100%;
-    aspect-ratio: 1;
-    max-height: 44px;
+    place-items: center;
+    width: 36px;
+    height: 36px;
     border: 0;
     border-radius: 50%;
     background: transparent;
+    color: var(--color-cream);
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .cal-nav:hover:not(:disabled) {
+    background: rgba(238, 235, 218, 0.08);
+  }
+  .cal-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .cal-wd {
+    padding-bottom: 6px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    color: var(--color-cream-mute);
+  }
+  .cal-day {
+    position: relative;
+    aspect-ratio: 1;
+    max-height: 60px;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    background: transparent;
     font-family: var(--font-poppins);
     font-size: 14px;
+    font-weight: 500;
+    color: var(--color-cream-mute);
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease,
+      color 0.25s ease;
+  }
+  .cal-day:disabled {
+    cursor: default;
+    opacity: 0.75;
+  }
+  .cal-day.is-open {
+    background: rgba(238, 235, 218, 0.1);
+    color: var(--color-cream);
+    cursor: pointer;
+  }
+  .cal-day.is-open:hover {
+    border-color: var(--color-amber);
+  }
+  .cal-day[aria-pressed="true"] {
+    background: var(--color-cream);
     color: var(--color-indigo);
+  }
+  .cal-day.is-today::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 7px;
+    width: 4px;
+    height: 4px;
+    margin-left: -2px;
+    border-radius: 50%;
+    background: var(--color-amber);
+  }
+
+  .cal-toggle {
+    display: inline-flex;
+    padding: 2px;
+    border: 1px solid rgba(238, 235, 218, 0.2);
+    border-radius: 999px;
+  }
+  .cal-toggle button {
+    min-height: 30px;
+    padding: 0 10px;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    font-family: var(--font-poppins);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--color-cream-mute);
     cursor: pointer;
     transition:
       background-color 0.25s ease,
       color 0.25s ease;
   }
-  .picker-day.is-outside {
-    color: var(--color-ink-mute);
+  .cal-toggle button[aria-pressed="true"] {
+    background: var(--color-cream);
+    color: var(--color-indigo);
   }
-  .picker-day:hover:not(:disabled) {
-    background: rgba(40, 43, 74, 0.08);
+  .cal-slots {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 430px;
+    margin: 0;
+    padding: 0 4px 0 0;
+    list-style: none;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(238, 235, 218, 0.25) transparent;
   }
-  .picker-day[aria-pressed="true"] {
-    background: var(--color-indigo);
-    color: var(--color-cream);
+  .cal-slot-row {
+    display: flex;
+    gap: 8px;
+  }
+  /* See-through, so frosted. */
+  .cal-slot {
+    flex: 1;
+    min-height: 44px;
+    border: 1px solid rgba(238, 235, 218, 0.22);
+    border-radius: 12px;
+    background: rgba(238, 235, 218, 0.04);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    font-family: var(--font-poppins);
+    font-size: 14px;
     font-weight: 500;
+    color: var(--color-cream);
+    cursor: pointer;
+    transition:
+      background-color 0.25s ease,
+      border-color 0.25s ease;
   }
-  .picker-day:disabled {
-    color: rgba(40, 43, 74, 0.25);
-    cursor: not-allowed;
+  .cal-slot:hover {
+    border-color: var(--color-amber);
   }
-
-  .slot {
+  .cal-slot-row.is-picked .cal-slot {
+    background: rgba(238, 235, 218, 0.14);
+    border-color: rgba(238, 235, 218, 0.4);
+  }
+  .cal-confirm {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     min-height: 44px;
     border-radius: 12px;
-    cursor: pointer;
-    font-family: var(--font-poppins);
-    font-size: 13px;
-    transition:
-      background-color 0.3s,
-      color 0.3s,
-      border-color 0.3s;
-  }
-  .slot:hover {
-    --frost-edge: rgba(238, 235, 218, 0.45);
-    --frost-fill: rgba(238, 235, 218, 0.12);
-  }
-  .slot[aria-pressed="true"] {
-    --frost-fill: rgba(238, 235, 218, 0.94);
-    --frost-edge: rgba(255, 255, 255, 0.7);
-    color: var(--color-indigo);
+    font-size: 14px;
     font-weight: 500;
+    text-decoration: none;
+    animation: pop-in 0.35s var(--ease-out-soft) both;
+  }
+
+  @media (max-width: 1080px) {
+    .cal {
+      grid-template-columns: minmax(0, 1fr) 260px;
+    }
+    .cal-info {
+      grid-column: 1 / -1;
+      border-right: 0;
+      border-bottom: 1px solid rgba(238, 235, 218, 0.12);
+    }
+  }
+  @media (max-width: 720px) {
+    .cal {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .cal-info,
+    .cal-month,
+    .cal-times {
+      padding: 22px 16px;
+    }
+    .cal-times {
+      border-left: 0;
+      border-top: 1px solid rgba(238, 235, 218, 0.12);
+    }
+    .cal-slots {
+      max-height: 320px;
+    }
+    .cal-grid {
+      gap: 4px;
+    }
+    .cal-select select {
+      font-size: 18px;
+    }
   }
 
   .sr-only {
@@ -1406,7 +1389,7 @@
   }
 
   /* ---------- Frosted glass controls ----------
-     For see-through controls (play badge, time slots): a translucent fill,
+     For see-through controls (the video play badge): a translucent fill,
      background blur and a thin edge. */
   .frost {
     border: 1px solid var(--frost-edge);
@@ -1419,11 +1402,6 @@
     --frost-fill: rgba(238, 235, 218, 0.55);
     --frost-edge: rgba(40, 43, 74, 0.14);
     color: var(--color-indigo);
-  }
-  .frost-clear {
-    --frost-fill: rgba(238, 235, 218, 0.06);
-    --frost-edge: rgba(238, 235, 218, 0.2);
-    color: var(--color-cream);
   }
 
   /* ---------- Responsive ---------- */
@@ -1512,7 +1490,7 @@
     .site-header {
       transition: none;
     }
-    .picker {
+    .cal-confirm {
       animation: none;
     }
     .intro {

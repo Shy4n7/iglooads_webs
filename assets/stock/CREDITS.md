@@ -2,11 +2,11 @@
 
 Photos used on the What we do cards. All are free to use under the
 [Unsplash License](https://unsplash.com/license) (commercial use allowed, no attribution
-required). Credits are kept here as good practice.
+required). Credits are kept here as good practice. The media script turns them black and white.
 
 | File | Card | Photographer | Source |
 | --- | --- | --- | --- |
-| `reels.jpg` | Reels | Roman Manshin (@rmanshin) | https://unsplash.com/photos/a-phone-is-recording-content-on-a-tripod-qqc3HBlMZtk |
-| `ugc.jpg` | UGC ads | Afffect (@afffect) | https://unsplash.com/photos/woman-recording-herself-on-a-smartphone-tripod-3FTq0q3QZc8 |
-| `shoots.jpg` | Brand shoots | Vitaly Gariev (@silverkblack) | https://unsplash.com/photos/photographer-shooting-model-in-a-studio-setting-udW8GavQH0E |
-| `websites.jpg` | Websites | Campaign Creators (@campaign_creators) | https://unsplash.com/photos/person-using-macbook-tOPac1pz9Cc |
+| `reels.jpg` | Reels | Johnny Briggs (@johnnyboylee) | https://unsplash.com/photos/a-man-standing-next-to-a-camera-on-top-of-a-tripod-oPIo_PW1z6M |
+| `ugc.jpg` | UGC ads | Ninthgrid (@ninthgrid_) | https://unsplash.com/photos/a-woman-holding-a-cell-phone-in-her-right-hand-LLQY1s8HyYY |
+| `shoots.jpg` | Brand shoots | Alvis Wolff (@alviswolff) | https://unsplash.com/photos/a-black-and-white-photo-of-a-man-standing-in-front-of-a-camera--qjRrF8Z4Yk |
+| `websites.jpg` | Websites | Sergey Zolkin (@szolkin) | https://unsplash.com/photos/grayscale-photo-of-person-using-macbook-_UeY8aTI6d0 |

@@ -16,28 +16,28 @@ type Service = {
 const SERVICES: Service[] = [
   {
     img: reels,
-    pos: "50% 40%",
+    pos: "45% 35%",
     tag: "REELS",
     title: ["REELS THAT", "GO VIRAL"],
     body: "Hooks, scripts, shoots and edits built for the first three seconds.",
   },
   {
     img: ugc,
-    pos: "50% 45%",
+    pos: "50% 25%",
     tag: "UGC ADS",
     title: ["UGC ADS", "THAT SELL"],
     body: "Creator-style ads that feel like a customer talking, not a brand.",
   },
   {
     img: shoots,
-    pos: "50% 55%",
+    pos: "50% 50%",
     tag: "SHOOTS",
     title: ["BRAND", "SHOOTS"],
     body: "Photos and B-roll for your feed, website and ads in one shoot day.",
   },
   {
     img: websites,
-    pos: "50% 45%",
+    pos: "55% 50%",
     tag: "WEBSITES",
     title: ["WEBSITES THAT", "CONVERT"],
     body: "Fast, mobile-first sites that turn reel views into calls, bookings and sales.",
