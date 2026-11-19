@@ -390,8 +390,11 @@
   .spin {
     position: relative;
     display: inline-block;
+    will-change: transform;
     animation: spin-in 1.15s cubic-bezier(0.3, 1.12, 0.45, 1) var(--d) both;
   }
+  /* The blur clears by 45%, roughly when the letter lands, so each letter
+     is sharp before the next ones finish: the blur goes letter by letter. */
   @keyframes spin-in {
     0% {
       opacity: 0.01;
@@ -401,8 +404,8 @@
     12% {
       opacity: 1;
     }
-    75% {
-      filter: blur(1px);
+    45% {
+      filter: blur(0);
     }
     100% {
       opacity: 1;
@@ -461,15 +464,9 @@
     z-index: 20;
     background: var(--color-cream);
   }
-  /* Scroll morph into the header logo, driven by HeroMorph. */
+  /* Scroll morph into the header logo: HeroMorph sets transform and opacity. */
   .hero-stage .hero-word {
     transform-origin: 0 0;
-    transform: translate(var(--mx, 0), var(--my, 0)) scale(var(--ms, 1));
-    opacity: var(--mo, 1);
-    visibility: var(--mv, visible);
-  }
-  .site-logo {
-    opacity: var(--logo-o, 1);
   }
   .hero-stage {
     position: relative;
