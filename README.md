@@ -1,17 +1,132 @@
 # Igloo Ads website
 
-Design source for the Igloo Ads homepage.
+Website for Igloo Ads, an Instagram ads, reels and UGC agency in Coimbatore.
+
+Built with Next.js (App Router), TypeScript and Tailwind CSS. No animation libraries: motion is CSS
+(transitions, keyframes, scroll-driven animations) plus a few small client components.
+
+## Run
+
+Requires Node 20.9 or newer.
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Open http://localhost:3000.
+
+## Build
+
+```bash
+npm run build
+```
+
+```bash
+npm run start
+```
+
+Lint and type check:
+
+```bash
+npm run lint
+```
+
+```bash
+npm run typecheck
+```
+
+### Static export
+
+The site is fully static. To produce plain HTML in `out/` for any static host:
+
+```bash
+STATIC_EXPORT=1 npm run build
+```
+
+In export mode `next/image` serves the images as they are (the stills are already resized by the media
+script), and the cache headers in `next.config.ts` are not applied.
+
+## Deploy (Vercel)
+
+Import the repository in Vercel and keep the defaults (framework: Next.js). Do not set `STATIC_EXPORT`
+on Vercel, so `next/image` can optimize stills and logos. Add the environment variables below in
+Project Settings, Environment Variables.
+
+## Booking link
+
+The CONFIRM ON GOOGLE CALENDAR button opens your Google Calendar appointment schedule.
+
+1. In Google Calendar, create an appointment schedule and copy its booking page link.
+2. Set it as `NEXT_PUBLIC_BOOKING_URL`:
+   - locally: copy `.env.example` to `.env.local` and fill in the value
+   - on Vercel: add it under Environment Variables and redeploy
+
+The value is read at build time, so rebuild after changing it. While it is unset the button links back
+to the booking section and a `[YOUR GOOGLE CALENDAR BOOKING LINK]` note is shown under it.
+
+Optional: `NEXT_PUBLIC_SITE_URL` (for example `https://iglooads.in`) sets the base URL for social share
+metadata.
+
+## Media
+
+Originals live in `assets/` and are never modified or served. Web copies are generated into
+`public/media/` with ffmpeg:
+
+```bash
+npm run media
+```
+
+To regenerate everything, even files that already exist:
+
+```bash
+bash scripts/optimize_media.sh --force
+```
+
+Per reel it creates:
+
+| File | Use |
+| --- | --- |
+| `<name>-card.mp4` | 640px, muted, crf 26, faststart. Autoplaying grid card. |
+| `<name>-1080.mp4` | Up to 1080px, with audio, crf 24, faststart. Lightbox. |
+| `<name>-poster.jpg` | 480px poster frame. |
+
+It also grabs `still-*.jpg` frames used as placeholder photos in What we do and On the set, copies the
+Open Graph image and makes `icon-192.png`. Which videos are reels and which frames become stills is
+set at the top of `scripts/optimize_media.sh`. The reel list and labels are in `src/lib/content.ts`.
+
+Logos are imported straight from `assets/logos/wall/` by `next/image` (files are 2x, shown at half size).
+
+## Project layout
+
+- `src/app/` : layout (fonts, metadata), global styles and design tokens, home page
+- `src/components/` : one component per section, plus `SplitLetters` (per-letter hover type) and
+  `RevealFallback` (scroll reveal for browsers without `animation-timeline`)
+- `src/lib/content.ts` : copy, links, reel list and placeholders in one place
+- `scripts/optimize_media.sh` : media pipeline
+- `design/` : the approved design canvas (`Main.dc.html` desktop, `Mobile.dc.html` 390px). Reference
+  only, not deployable.
 
 ## Brand
 
-- Midnight indigo `#282B4A`, vanilla cream `#EEEBDA`, amber `#F2B661`, orange `#C9581E` (big type only)
-- Fonts: Bebas Neue (logo, labels), Anton (big type), Bricolage Grotesque (headings), Fraunces (quotes), Poppins (body)
-
-## Contents
-
-- `design/` : homepage design canvas files (`Main.dc.html` desktop, `Mobile.dc.html` phone, `canvas.json` layout). These use the design canvas format and are a reference, not a deployable site.
-- `assets/igloo-ads-pfp-1080.png` : Instagram profile picture, 1080 x 1080
+- Indigo `#282B4A`, deep indigo `#1D1F38`, cream `#EEEBDA`, card cream `#F6F4E8`, border `#DCD8C2`,
+  amber `#F2B661`, orange `#C9581E` (big type only), mid blue `#4A4F82` and `#5A5FA8`
+- Fonts: Bebas Neue (logo, labels), Anton (big type, numbers), Bricolage Grotesque (headings),
+  Fraunces (quotes), Poppins (body)
 
 ## Placeholders to fill
 
-Reel stills, client names, results, testimonial, Instagram handle, email, Google Calendar booking link.
+All in `src/lib/content.ts` unless noted.
+
+- `[INSTAGRAM LINK]` and `[@instagram]`: `INSTAGRAM_URL`, `INSTAGRAM_LABEL` (footer text in
+  `src/components/Footer.tsx`)
+- `[email]`: `EMAIL_URL`, `EMAIL_LABEL`
+- `[YOUR GOOGLE CALENDAR BOOKING LINK]`: `NEXT_PUBLIC_BOOKING_URL` env var
+- `[Client 1]` to `[Client 5]`: reel labels in `REELS`
+- Results `[00M]`, `[0X]`, `[00+]` and their labels: `RESULTS`. Only publish real, verifiable numbers.
+- Testimonial and attribution: `TESTIMONIAL`
+- `[Shoot name]`, `[Location]` and `[PHOTO]` stills: `src/components/OnSet.tsx`
+- `[PHOTO]` stills in What we do: `src/components/Services.tsx`
