@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: "Igloo Ads | Instagram reels, ads and UGC in Coimbatore",
   description:
-    "Igloo Ads scripts, shoots, edits and posts short-form video for Coimbatore brands. Instagram reels, UGC ads, brand shoots and Meta ads.",
+    "Igloo Ads scripts, shoots, edits and posts short-form video for Coimbatore brands, and builds the websites it sends customers to. Instagram reels, UGC ads, brand shoots, Meta ads and websites.",
   icons: { icon: "/media/icon-192.png", apple: "/media/icon-192.png" },
   openGraph: {
     title: "Igloo Ads",
