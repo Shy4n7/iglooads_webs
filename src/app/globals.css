@@ -401,6 +401,27 @@
       color: oklch(0.3020 0.0559 278.28);
     }
   }
+  /* Phones: two stacked lines, each spread edge to edge, so the wordmark
+     fills the screen instead of one thin line. */
+  @media (max-width: 600px) {
+    .hero-word {
+      font-size: calc(100cqw / 2.1);
+      line-height: 0.86;
+      letter-spacing: 0;
+    }
+    .hero-word .line {
+      display: flex;
+      flex-direction: column;
+    }
+    .hero-word .word {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .hero-word .space {
+      display: none;
+    }
+  }
   /* Starts at 0.01 rather than 0 so the browser still counts the paint. */
   @keyframes blur-in {
     from {
@@ -1054,12 +1075,6 @@
     .gsvc > * {
       flex: 0 0 260px;
       scroll-snap-align: start;
-    }
-    .g3.stack {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr);
-      margin: 0;
-      padding: 0;
     }
   }
 
