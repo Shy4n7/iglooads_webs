@@ -1,6 +1,6 @@
 import { STEPS } from "@/lib/content";
 
-// Three steps on a track that fills in amber as the section scrolls into view.
+// Three numbered steps joined by lines that fill in amber as the section scrolls into view.
 export default function Process() {
   return (
     <section
@@ -26,16 +26,16 @@ export default function Process() {
         </div>
 
         <ol className="steps m-0 list-none p-0">
-          <li aria-hidden="true" className="steps-track">
-            <span className="steps-fill" />
-          </li>
           {STEPS.map((s) => (
             <li key={s.n} className="step rv">
-              <span className="step-node frost frost-ink" aria-hidden="true">
+              <span className="step-node" aria-hidden="true">
                 {s.n}
               </span>
+              {/* Line to the next step; fills in amber as the section scrolls in. */}
+              <span className="step-link" aria-hidden="true">
+                <span className="step-link-fill" />
+              </span>
               <div className="step-card glass lift">
-                <span className="step-ghost" data-n={s.n} aria-hidden="true" />
                 <span className="font-bebas text-[15px] tracking-[0.25em] text-amber">{s.kicker}</span>
                 <h3 className="headline mt-2 mb-2 text-2xl text-cream">
                   <span className="sr-only">Step {Number(s.n)}: </span>
