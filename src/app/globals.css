@@ -1308,48 +1308,39 @@
     left: calc(50% + 32px);
     width: calc(100% + 24px - 64px);
     height: 2px;
-    border-radius: 2px;
-    background: rgba(238, 235, 218, 0.16);
-    overflow: hidden;
+    background: var(--color-amber);
   }
   .step:last-child .step-link {
     display: none;
   }
-  .step-link-fill {
-    position: absolute;
-    inset: 0;
-    background: var(--color-amber);
-    transform-origin: 0 50%;
-  }
-  @keyframes link-fill-x {
-    from {
-      transform: scaleX(0);
-    }
-    to {
-      transform: scaleX(1);
-    }
-  }
-  @keyframes link-fill-y {
-    from {
-      transform: scaleY(0);
-    }
-    to {
-      transform: scaleY(1);
-    }
-  }
-  @supports (animation-timeline: view()) {
-    .step-link-fill {
-      animation: link-fill-x linear both;
-      animation-timeline: view();
-      animation-range: entry 60% cover 45%;
-    }
-  }
   .step-card {
     position: relative;
+    overflow: hidden;
     width: 100%;
     min-height: 190px;
     border-radius: 24px;
     padding: 28px 26px 30px;
+  }
+  /* Large outlined step number behind the text. Generated content, so it is
+     decoration rather than readable text. Card content sits above it. */
+  .step-card::before {
+    content: attr(data-n);
+    position: absolute;
+    right: -4px;
+    bottom: -30px;
+    font-family: var(--font-anton);
+    font-size: 140px;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(238, 235, 218, 0.12);
+    pointer-events: none;
+    transition: translate 0.8s var(--ease-out-soft);
+  }
+  .step:hover .step-card::before {
+    translate: -6px -6px;
+  }
+  .step-card > * {
+    position: relative;
   }
   @media (max-width: 900px) {
     .steps {
@@ -1370,18 +1361,13 @@
       width: 2px;
       height: auto;
     }
-    .step-link-fill {
-      transform-origin: 50% 0;
-    }
-    @supports (animation-timeline: view()) {
-      .step-link-fill {
-        animation-name: link-fill-y;
-        animation-range: entry 70% cover 55%;
-      }
-    }
     .step-card {
       min-height: 0;
       padding: 22px 20px 24px;
+    }
+    .step-card::before {
+      font-size: 110px;
+      bottom: -24px;
     }
   }
 
@@ -1518,9 +1504,8 @@
     .lb-sound {
       animation: none;
     }
-    .step-link-fill {
-      animation: none !important;
-      transform: none;
+    .step-card::before {
+      transition: none;
     }
     .spin-strip,
     .hero-take,

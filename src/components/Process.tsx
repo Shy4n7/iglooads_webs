@@ -1,6 +1,7 @@
 import { STEPS } from "@/lib/content";
 
-// Three numbered steps joined by lines that fill in amber as the section scrolls into view.
+// Three numbered steps joined by amber lines. The list reveals as one piece so the
+// circles and lines always stay lined up.
 export default function Process() {
   return (
     <section
@@ -25,17 +26,16 @@ export default function Process() {
           </p>
         </div>
 
-        <ol className="steps m-0 list-none p-0">
+        <ol className="steps rv m-0 list-none p-0">
           {STEPS.map((s) => (
-            <li key={s.n} className="step rv">
+            <li key={s.n} className="step">
               <span className="step-node" aria-hidden="true">
                 {s.n}
               </span>
-              {/* Line to the next step; fills in amber as the section scrolls in. */}
-              <span className="step-link" aria-hidden="true">
-                <span className="step-link-fill" />
-              </span>
-              <div className="step-card glass lift">
+              {/* Line to the next step's circle. */}
+              <span className="step-link" aria-hidden="true" />
+              {/* data-n draws the large outlined number behind the card text. */}
+              <div className="step-card glass lift" data-n={s.n}>
                 <span className="font-bebas text-[15px] tracking-[0.25em] text-amber">{s.kicker}</span>
                 <h3 className="headline mt-2 mb-2 text-2xl text-cream">
                   <span className="sr-only">Step {Number(s.n)}: </span>
