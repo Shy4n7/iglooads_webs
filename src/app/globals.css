@@ -415,7 +415,19 @@
      2.2 to 3.2s   cream page follows just behind it
      3.3s          the dark take is switched off */
   .hero {
+    position: relative;
+    z-index: 20;
     background: var(--color-cream);
+  }
+  /* Scroll morph into the header logo, driven by HeroMorph. */
+  .hero-stage .hero-word {
+    transform-origin: 0 0;
+    transform: translate(var(--mx, 0), var(--my, 0)) scale(var(--ms, 1));
+    opacity: var(--mo, 1);
+    visibility: var(--mv, visible);
+  }
+  .site-logo {
+    opacity: var(--logo-o, 1);
   }
   .hero-stage {
     position: relative;

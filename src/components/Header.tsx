@@ -35,7 +35,7 @@ export default function Header() {
       <div className="wrap flex h-[68px] items-center justify-between">
         <a
           href="#top"
-          className="font-bebas text-[22px] tracking-[0.35em] text-indigo no-underline"
+          className="site-logo font-bebas text-[22px] tracking-[0.35em] text-indigo no-underline"
           aria-label="Igloo Ads, back to top"
         >
           IGLOO ADS
