@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 
 const QUERY = "(prefers-reduced-motion: reduce)";
+// Fraction of the screen height scrolled before the hand-off to the header is complete.
+const MORPH_DISTANCE = 0.35;
 
 const clamp = (v: number) => Math.min(1, Math.max(0, v));
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
@@ -51,7 +53,8 @@ export default function HeroMorph() {
     const update = () => {
       frame = 0;
       const y = window.scrollY;
-      const p = clamp(y / (window.innerHeight * 0.7));
+      // Done after a third of a screen of scrolling, so the page moves on quickly.
+      const p = clamp(y / (window.innerHeight * MORPH_DISTANCE));
       if (p === 0) {
         reset();
         return;

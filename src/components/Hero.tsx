@@ -1,4 +1,5 @@
 import HeroMorph from "./HeroMorph";
+import HeroSkip from "./HeroSkip";
 import SplitLetters from "./SplitLetters";
 
 const WORD = [{ text: "IGLOO ADS" }];
@@ -11,7 +12,8 @@ const SPIN = { enter: "spin" as const, delay: 0.25, stagger: 0.09 };
  * letters, viewfinder and REC light) and the final light page (cream, indigo
  * letters). Both spin their letters in sync. Then the REC dot grows into a
  * circle that wipes the light layer in, led by a thin amber ring.
- * On scroll the wordmark shrinks into the header logo (HeroMorph).
+ * On scroll the wordmark shrinks into the header logo (HeroMorph), and the
+ * first downward scroll from the opening glides straight to the intro (HeroSkip).
  * With reduced motion only the light layer is shown, with no morph.
  */
 export default function Hero() {
@@ -47,6 +49,7 @@ export default function Hero() {
         </div>
       </div>
       <HeroMorph />
+      <HeroSkip />
     </section>
   );
 }
