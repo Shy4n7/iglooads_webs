@@ -1,5 +1,5 @@
 import ActNow from "@/components/ActNow";
-import Booking from "@/components/Booking";
+import Contact from "@/components/Contact";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
@@ -23,7 +23,7 @@ export default function Home() {
         <Process />
         <Results />
         <ActNow />
-        <Booking />
+        <Contact />
       </main>
       <Footer />
     </>

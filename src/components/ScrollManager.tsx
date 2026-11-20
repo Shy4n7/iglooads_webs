@@ -7,7 +7,7 @@ import { useEffect } from "react";
  * - the browser's scroll restoration is off, and any #section left in the
  *   address is removed (the inline script in layout.tsx does this before the
  *   page paints; this is the fallback);
- * - in-page links (#work, #book, ...) scroll to their section without writing
+ * - in-page links (#work, #contact, ...) scroll to their section without writing
  *   the #section into the address, so a refresh does not jump back there.
  */
 export default function ScrollManager() {

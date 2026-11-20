@@ -1,20 +1,29 @@
 // All site copy and media references in one place.
 // Values in [square brackets] are placeholders to be replaced with real content.
 
-export const INSTAGRAM_URL = "#"; // [INSTAGRAM LINK]
-export const INSTAGRAM_LABEL = "[INSTAGRAM LINK]";
-export const INSTAGRAM_HANDLE = "[@instagram]"; // e.g. @iglooads
-export const EMAIL_LABEL = "[email]";
-export const EMAIL_URL = "#"; // [email] e.g. mailto:hello@example.com
+export const INSTAGRAM_URL = "https://www.instagram.com/iglooads/";
+export const INSTAGRAM_HANDLE = "@iglooads";
+export const EMAIL = "iglooads.in@gmail.com";
+export const GSTIN = "33JEIPM9440H1Z5";
 
-export const BOOKING_PLACEHOLDER = "[YOUR GOOGLE CALENDAR BOOKING LINK]";
-export const BOOKING_URL = process.env.NEXT_PUBLIC_BOOKING_URL?.trim() || "";
+// Phone numbers as shown and as dialled. The first one also takes WhatsApp.
+export const PHONES = [
+  { label: "+91 90475 25423", tel: "+919047525423" },
+  { label: "+91 93442 77370", tel: "+919344277370" },
+];
+export const WHATSAPP_URL = `https://wa.me/919047525423?text=${encodeURIComponent(
+  "Hi Igloo Ads, I would like to talk about a project.",
+)}`;
+
+// Enquiry form: sent through FormSubmit to EMAIL. The first enquiry makes
+// FormSubmit email an activation link to that address; click it once.
+export const ENQUIRY_ENDPOINT = `https://formsubmit.co/ajax/${EMAIL}`;
 
 export const NAV = [
   { href: "#work", label: "Work" },
   { href: "#services", label: "Services" },
   { href: "#process", label: "Process" },
-  { href: "#book", label: "Contact" },
+  { href: "#contact", label: "Contact" },
 ];
 
 export type Reel = { id: string; client: string; instagram: string };
@@ -61,25 +70,20 @@ export const RESULTS = [
   { value: "[00+]", label: "[brands served]" },
 ];
 
-export const TESTIMONIAL = {
-  quote: "[CLIENT TESTIMONIAL, one or two lines in their words]",
-  by: "[Client name], [Business]",
-};
-
-// Booking calendar. Shown as a guide only: the Google Calendar booking page
-// is where a slot is actually confirmed, so keep these in step with it.
-export const BOOKING = {
-  title: "Discovery call",
-  host: "Igloo Ads",
-  description:
-    "A quick call to learn your brand and goals, then map out the reels, ads or website that will move the needle.",
-  durationMin: 30,
-  // Days of the week that can be booked: 0 Sunday to 6 Saturday.
-  workDays: [1, 2, 3, 4, 5],
-  // First and last start times, in minutes after midnight IST, and the step.
-  firstSlot: 10 * 60,
-  lastSlot: 17 * 60 + 30,
-  stepMin: 30,
-  // How far ahead calls can be booked.
-  monthsAhead: 12,
-};
+export const REVIEWS = [
+  {
+    title: "Creativity and young energy",
+    quote:
+      "We really love the energy these guys bring! They\u2019re young, full of fresh ideas and always come up with something different for our brand. Working with Igloo Ads has definitely given our business a fresh identity on social media.",
+  },
+  {
+    title: "Speed and timely delivery",
+    quote:
+      "One thing we absolutely appreciate is their time management. Shoots, edits and final deliveries are all handled within the promised timelines. No unnecessary follow-ups or delays. That\u2019s something we genuinely value.",
+  },
+  {
+    title: "Understanding and professionalism",
+    quote:
+      "What makes Igloo Ads different is how well they understand our business. We don\u2019t have to explain everything repeatedly. They understand our requirements, take ownership and make sure the final output is exactly what we expect. Great experience working with them!",
+  },
+];

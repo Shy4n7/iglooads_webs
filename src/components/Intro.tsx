@@ -26,7 +26,7 @@ export default function Intro() {
           </p>
           <div className="intro-step flex flex-wrap gap-3" style={{ ["--d" as string]: "0.24s" }}>
             <a
-              href="#book"
+              href="#contact"
               className="btn btn-ink inline-flex min-h-12 items-center rounded-full px-6 py-3.5 font-bebas text-[19px] tracking-[0.06em] no-underline"
             >
               GET IN TOUCH <span aria-hidden="true">&nbsp;&rarr;</span>

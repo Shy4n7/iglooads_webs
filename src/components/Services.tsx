@@ -79,7 +79,7 @@ export default function Services() {
               </h3>
               <p className="mb-[18px] text-sm leading-[1.65] text-ink-soft">{s.body}</p>
               <a
-                href="#book"
+                href="#contact"
                 className="btn btn-ink mt-auto inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-bebas text-[17px] tracking-[0.06em] no-underline"
                 aria-label={`Know more about ${s.title.join(" ").toLowerCase()}`}
               >

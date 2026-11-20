@@ -57,7 +57,7 @@ script), and the cache headers in `next.config.ts` are not applied.
    If the repository is not listed, use Adjust GitHub App Permissions to give Vercel access to it.
 3. Keep the detected settings: Framework Preset Next.js, Root Directory `./`, default build and
    output commands. Do not set `STATIC_EXPORT`, so `next/image` can optimize photos and logos.
-4. Under Environment Variables add `NEXT_PUBLIC_BOOKING_URL` (and optionally `NEXT_PUBLIC_SITE_URL`).
+4. Optionally, under Environment Variables add `NEXT_PUBLIC_SITE_URL`.
 5. Click Deploy. You get a `*.vercel.app` URL in about a minute.
 6. Custom domain: Project Settings, Domains, add your domain and create the DNS records Vercel shows
    at your domain registrar. Then set `NEXT_PUBLIC_SITE_URL` to that domain and redeploy.
@@ -66,26 +66,17 @@ After that, every push to the production branch deploys automatically, and other
 URLs. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy (Deployments, Redeploy) after
 changing them.
 
-## Booking link
+## Contact and enquiries
 
-The booking section is a three-panel widget (`src/components/Booking.tsx`): call details, a month
-calendar with month and year dropdowns, and the chosen day's time slots with a 12h/24h switch.
-Picking a time shows a Confirm button that opens your Google Calendar booking page.
+The contact section (`src/components/Contact.tsx`) has an enquiry form (name, e-mail, phone,
+organisation, project), a one-tap WhatsApp button for the first phone number, both phone numbers and
+the e-mail address. Phone numbers, e-mail, Instagram and GSTIN live in `src/lib/content.ts`.
 
-Bookable days, start times and how far ahead people can book are set in `BOOKING` in
-`src/lib/content.ts` (weekdays only, 10:00 to 17:30 IST every 30 minutes, up to 12 months ahead).
-These are a guide: keep them in step with your Google Calendar appointment schedule, which is where
-the slot is actually confirmed.
-
-The CONFIRM button opens your Google Calendar appointment schedule.
-
-1. In Google Calendar, create an appointment schedule and copy its booking page link.
-2. Set it as `NEXT_PUBLIC_BOOKING_URL`:
-   - locally: copy `.env.example` to `.env.local` and fill in the value
-   - on Vercel: add it under Environment Variables and redeploy
-
-The value is read at build time, so rebuild after changing it. While it is unset the button links back
-to the booking section and a `[YOUR GOOGLE CALENDAR BOOKING LINK]` note is shown under it.
+The form needs no server or API key: it posts to FormSubmit (formsubmit.co), which forwards each
+enquiry to `EMAIL`. The very first enquiry makes FormSubmit send an activation e-mail to that inbox:
+open it and click the activation link once, after which every enquiry arrives as an e-mail. Send a
+test enquiry from the live site right after deploying to do this. If sending fails, the form asks
+the visitor to try again or use WhatsApp.
 
 Optional: `NEXT_PUBLIC_SITE_URL` (for example `https://iglooads.in`) sets the base URL for social share
 metadata.
@@ -163,9 +154,5 @@ Logos are imported straight from `assets/logos/wall/` by `next/image` (files are
 
 All in `src/lib/content.ts` unless noted.
 
-- `[INSTAGRAM LINK]` and `[@instagram]`: `INSTAGRAM_URL`, `INSTAGRAM_LABEL`, `INSTAGRAM_HANDLE`
-- `[email]`: `EMAIL_URL`, `EMAIL_LABEL`
-- `[YOUR GOOGLE CALENDAR BOOKING LINK]`: `NEXT_PUBLIC_BOOKING_URL` env var
 - Results `[00M]`, `[0X]`, `[00+]` and their labels: `RESULTS`. Only publish real, verifiable numbers.
-- Testimonial and attribution: `TESTIMONIAL`
 - Intro paragraph under the hero: `src/components/Intro.tsx`
