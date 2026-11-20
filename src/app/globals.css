@@ -1205,22 +1205,56 @@
   }
 
   /* ---------- Team ----------
-     One black and white group photo on a dark studio backdrop, framed with
-     the opening's viewfinder corners. The pointed-at person stays lit, the
-     others drop into shadow, and a lower-third caption introduces him. */
-  .team-stage {
+     The founder on a framed panel of his own, then the rest of the team as
+     one black and white group photo on a dark studio backdrop, both framed
+     with the opening's viewfinder corners. In the group the pointed-at
+     person stays lit, the others drop into shadow, and a lower-third
+     caption introduces him. */
+  .team-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 9fr);
+    gap: 20px;
+    max-width: 1180px;
+    margin-inline: auto;
+  }
+  .team-stage,
+  .team-founder {
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    max-width: 1100px;
-    margin-inline: auto;
-    padding-top: 7%;
+    margin: 0;
     border-radius: 28px;
     background:
       radial-gradient(70% 60% at 50% 30%, #34385f 0%, transparent 70%),
       var(--color-deep);
   }
+  .team-stage {
+    padding-top: 7%;
+  }
+  /* The founder's panel: a single portrait with amber corners and a caption
+     that is always shown. */
+  .team-founder {
+    min-height: 100%;
+    box-shadow: inset 0 0 0 1px rgba(242, 182, 97, 0.35);
+  }
+  .team-founder .team-corner {
+    border-color: var(--color-amber);
+  }
+  .team-founder-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 15%;
+  }
+  .team-caption.is-static {
+    left: 36px;
+    right: 28px;
+    bottom: 36px;
+  }
   /* Film grain over everything, so the separate photos read as one shot. */
+  .team-founder::after,
   .team-stage::after {
     content: "";
     position: absolute;
@@ -1232,6 +1266,7 @@
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
   /* Dark edges: a soft vignette pulls the eye to the middle. */
+  .team-founder::before,
   .team-stage::before {
     content: "";
     position: absolute;
@@ -1394,12 +1429,29 @@
       display: inline;
     }
   }
-  /* Phones: the caption sits under the photo, still inside the panel. */
+  /* Phones: the founder's panel sits above the group, and the group's
+     caption sits under the photo, still inside the panel. */
   @media (max-width: 720px) {
-    .team-stage {
+    .team-grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 16px;
       margin-inline: -8px;
+    }
+    .team-founder {
+      aspect-ratio: 5 / 5.4;
+      border-radius: 22px;
+    }
+    .team-stage {
       padding-top: 12%;
       border-radius: 22px;
+    }
+    .team-caption.is-static {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: 24px;
+      margin: 0;
+      padding: 0;
     }
     .team-stage::before {
       background:

@@ -99,23 +99,13 @@ export type Member = {
   line: string;
   handle: string;
   instagram: string;
+  /** Group shot only: centre of the face and the clickable band, in % of the width. */
   x: number;
   from: number;
   to: number;
 };
 
 export const TEAM: Member[] = [
-  {
-    id: "sudhir",
-    name: "Sudhir",
-    role: "Chief Operating Officer",
-    line: "Runs the shoots, schedules and deliveries so nothing ever slips.",
-    handle: "@_sudhir.____",
-    instagram: "https://www.instagram.com/_sudhir.____/",
-    x: 23.7,
-    from: 0,
-    to: 36,
-  },
   {
     id: "suhail",
     name: "Suhail",
@@ -124,6 +114,28 @@ export const TEAM: Member[] = [
     handle: "@moh_suhaill",
     instagram: "https://www.instagram.com/moh_suhaill/",
     x: 50,
+    from: 0,
+    to: 100,
+  },
+  {
+    id: "shyan",
+    name: "Shyan",
+    role: "Technical Lead",
+    line: "Builds the websites and keeps the tech behind every campaign running.",
+    handle: "@_shyan7",
+    instagram: "https://www.instagram.com/_shyan7/",
+    x: 22.8,
+    from: 0,
+    to: 36,
+  },
+  {
+    id: "sudhir",
+    name: "Sudhir",
+    role: "Chief Operating Officer",
+    line: "Runs the shoots, schedules and deliveries so nothing ever slips.",
+    handle: "@_sudhir.____",
+    instagram: "https://www.instagram.com/_sudhir.____/",
+    x: 51.3,
     from: 36,
     to: 64,
   },
@@ -139,3 +151,5 @@ export const TEAM: Member[] = [
     to: 100,
   },
 ];
+/** The founder has a panel of his own; everyone else shares the group shot. */
+export const FOUNDER_ID = "suhail";
