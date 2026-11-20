@@ -81,16 +81,17 @@ the visitor to try again or use WhatsApp.
 Optional: `NEXT_PUBLIC_SITE_URL` (for example `https://iglooads.in`) sets the base URL for social share
 metadata.
 
-## Team photo
+## Team photos
 
-The team section (`src/components/Team.tsx`, names, roles and Instagram links in `TEAM` in
-`src/lib/content.ts`) shows one black and white group photo built from a layer per person, so the
-hovered or tapped person can be lifted forward while the others fade back.
+The team section (`src/components/Team.tsx`; names, roles, Instagram links and the closing
+paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) is a scroll-driven fly-through: the
+section pins to the screen and the camera flies forward past each person's card to the next, in the
+order of `TEAM`, then to the paragraph. With reduced motion the cards are simply stacked.
 
-The layers are made by `scripts/team_photo.py` from the original photos in `assets/team` (which it
-only reads). It cuts each person out of their background, scales them so the faces match, places
-them side by side and writes `public/media/team-<name>.webp` plus a flattened
-`public/media/team-group.jpg`. To redo them, for example with a new photo:
+The cards are made by `scripts/team_photo.py` from the original photos in `assets/team` (which it
+only reads). It cuts each person out of their background, scales them so the faces match, grades
+everyone to the same black and white look and writes `public/media/team-card-<name>.jpg`. To redo
+them, for example with a new photo:
 
 ```bash
 pip install "rembg[cpu]" pillow pillow-heif
@@ -98,7 +99,7 @@ python3 scripts/team_photo.py
 ```
 
 Each person's eye line, chin and face centre are measured by hand at the top of the script. A new
-photo needs new measurements there, and new `x`, `from` and `to` values in `TEAM`.
+photo needs new measurements there.
 
 ## Opening sequence
 

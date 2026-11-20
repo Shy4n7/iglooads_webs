@@ -1,19 +1,19 @@
-"""Build the team group photo from the originals in assets/team.
+"""Build the team portrait cards from the originals in assets/team.
 
 Each person is cut out of their background (rembg), scaled so the faces
-match, placed side by side and turned black and white. Writes one
-transparent layer per person (public/media/team-<name>.webp, all the same
-canvas size, so they stack into one picture) and a flattened copy on the
-site's deep indigo (public/media/team-group.jpg) for previews and fallbacks.
+match, turned black and white, graded to one look and set on the site's
+deep indigo with a soft light behind the head. Writes one card per person:
+public/media/team-card-<name>.jpg (760 x 950).
 
 Needs: pip install "rembg[cpu]" pillow pillow-heif
 Run:   python3 scripts/team_photo.py
 The originals in assets/team are only read, never changed.
 """
 
+import math
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageEnhance, ImageOps
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 import pillow_heif
 from rembg import new_session, remove
 
@@ -23,44 +23,30 @@ ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "team"
 OUT = ROOT / "public" / "media"
 DEEP = (29, 31, 56)
+LIGHT = (58, 62, 104)
 
 # Measured on the photos after they are shrunk to fit 2400px: the eye line,
-# the chin and the face centre. Faces are scaled so eye-to-chin matches.
+# the chin and the face centre. Faces are scaled so eye-to-chin matches,
+# times scale where a face still reads smaller than the others.
 PEOPLE = {
-    "shyan": dict(file="shyan.jpg", eye=309, chin=428, cx=214, scale=0.95, x=300, lift=16),
-    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0, x=525, lift=0),
-    "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=840, lift=0),
-    "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=1150, lift=0),
+    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0),
+    "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0),
+    "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
+    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0),
 }
-# Painted back to front: Shyan stands just behind Suhail, whose shoulder
-# hides the edge of Shyan's photo where another person was standing.
-PAINT_ORDER = ["shyan", "ajay", "sudhir", "suhail"]
-EYE_TO_CHIN = 95
-TONE_MEAN, TONE_STD = 112, 58
-CANVAS = (1440, 720)
-EYE_Y = 300
-# Final frame: trims the empty space above the tallest head and at the sides.
-FRAME = (125, 120, 1345, 720)
+# Everyone is graded to match this photo's face: its brightness, contrast
+# and soft, deep-black look.
+REFERENCE = "shyan"
+
+CARD = (760, 950)
+EYE_Y = 360
+EYE_TO_CHIN = 168
 
 
-def cut_out(name, p, session):
+def cut_out(p, session):
     im = Image.open(SRC / p["file"]).convert("RGB")
     im.thumbnail((2400, 2400))
     im = remove(im, session=session).convert("RGBA")
-    if name == "shyan":
-        # Drop the other people in this photo, and fade the left edge where
-        # the original frame cuts through his arm.
-        keep = Image.new("L", im.size, 0)
-        ImageDraw.Draw(keep).polygon(
-            [(0, 0), (416, 0), (416, 505), (385, 505), (330, 560), (300, 620), (276, 700),
-             (252, 800), (226, 880), (232, 960), (150, 995), (150, 1280), (0, 1280)],
-            fill=255,
-        )
-        ramp = Image.linear_gradient("L").rotate(90).resize((60, im.height))
-        edge = ImageChops.multiply(keep.crop((0, 0, 60, im.height)), ramp)
-        keep.paste(edge, (0, 0))
-        alpha = Image.composite(im.getchannel("A"), Image.new("L", im.size, 0), keep)
-        im.putalpha(alpha)
     # Pull the edge in a little and soften it, so no background colour
     # shows as a light halo around the hair and shoulders.
     # Faint leftovers of the old background are dropped first.
@@ -70,46 +56,74 @@ def cut_out(name, p, session):
     return im
 
 
-def layer(im, p):
+def place(im, p):
+    """Scale and position the cut-out so the face sits centred on the card."""
     e = p["chin"] - p["eye"]
     s = EYE_TO_CHIN * p["scale"] / e
     y0 = max(0, p["eye"] - 3 * e)
-    y1 = min(im.height, p["eye"] + 7 * e)
+    y1 = min(im.height, p["eye"] + 8 * e)
     im = im.crop((0, y0, im.width, y1))
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
-    x = round(p["x"] - p["cx"] * s)
-    y = round(EYE_Y - p["lift"] - (p["eye"] - y0) * s)
-    canvas = Image.new("RGBA", CANVAS, (0, 0, 0, 0))
+    x = round(CARD[0] / 2 - p["cx"] * s)
+    y = round(EYE_Y - (p["eye"] - y0) * s)
+    canvas = Image.new("RGBA", CARD, (0, 0, 0, 0))
     canvas.alpha_composite(im, (max(0, x), max(0, y)), (max(0, -x), max(0, -y)))
     return canvas
 
 
-def to_grey(rgba):
+# The face, from the brows to the chin, on the card.
+FACE = (
+    round(CARD[0] / 2 - 0.7 * EYE_TO_CHIN),
+    round(EYE_Y - 0.3 * EYE_TO_CHIN),
+    round(CARD[0] / 2 + 0.7 * EYE_TO_CHIN),
+    round(EYE_Y + EYE_TO_CHIN),
+)
+
+
+def stats(grey, alpha):
+    vals = [g for g, a in zip(grey.crop(FACE).getdata(), alpha.crop(FACE).getdata()) if a > 200]
+    mean = sum(vals) / len(vals)
+    return mean, (sum((v - mean) ** 2 for v in vals) / len(vals)) ** 0.5
+
+
+# A gentle S-curve: deeper blacks and brighter highlights, mid-tones kept.
+S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
+
+
+def to_grey(rgba, target=None):
+    """Black and white. With a target (mean, std), the face is graded to
+    match it and polished: a touch of smoothing, the S-curve, then crisp
+    detail. Without one, the photo is only turned grey."""
     grey = ImageOps.grayscale(rgba.convert("RGB"))
-    # Match the tones: shift and stretch each person's greys so all four
-    # share the same brightness and contrast, whatever light they were shot in.
     alpha = rgba.getchannel("A")
-    solid = [g for g, a in zip(grey.getdata(), alpha.getdata()) if a > 200]
-    mean = sum(solid) / len(solid)
-    std = (sum((g - mean) ** 2 for g in solid) / len(solid)) ** 0.5
-    grey = grey.point(lambda g: max(0, min(255, round(TONE_MEAN + (g - mean) * TONE_STD / std))))
-    grey = grey.filter(ImageFilter.UnsharpMask(radius=1.6, percent=60, threshold=2))
-    out = Image.merge("RGBA", (grey, grey, grey, rgba.getchannel("A")))
-    return out.crop(FRAME)
+    if target:
+        mean, std = stats(grey, alpha)
+        t_mean, t_std = target
+        grey = grey.point(lambda g: max(0, min(255, round(t_mean + (g - mean) * t_std / std))))
+        grey = grey.filter(ImageFilter.GaussianBlur(0.6)).point(S_CURVE)
+        grey = grey.filter(ImageFilter.UnsharpMask(radius=2, percent=55, threshold=3))
+    return Image.merge("RGBA", (grey, grey, grey, alpha))
+
+
+def backdrop():
+    """Deep indigo with a soft light behind the head."""
+    bg = Image.new("RGB", CARD, DEEP)
+    glow = Image.new("L", CARD, 0)
+    ImageDraw.Draw(glow).ellipse((CARD[0] * 0.05, CARD[1] * 0.02, CARD[0] * 0.95, CARD[1] * 0.72), fill=120)
+    bg.paste(Image.new("RGB", CARD, LIGHT), (0, 0), glow.filter(ImageFilter.GaussianBlur(120)))
+    return bg.convert("RGBA")
 
 
 def main():
     session = new_session("isnet-general-use")
-    layers = {}
-    for name, p in PEOPLE.items():
-        layers[name] = to_grey(layer(cut_out(name, p, session), p))
-        layers[name].save(OUT / f"team-{name}.webp", quality=82, method=6)
-        print("layer", name)
-    group = Image.new("RGBA", layers["shyan"].size, DEEP + (255,))
-    for name in PAINT_ORDER:
-        group.alpha_composite(layers[name])
-    group.convert("RGB").save(OUT / "team-group.jpg", quality=82, optimize=True, progressive=True)
-    print("group", group.size)
+    placed = {name: place(cut_out(p, session), p) for name, p in PEOPLE.items()}
+    ref = placed[REFERENCE]
+    target = stats(ImageOps.grayscale(ref.convert("RGB")), ref.getchannel("A"))
+    for name, im in placed.items():
+        card = backdrop()
+        card.alpha_composite(to_grey(im, None if name == REFERENCE else target))
+        card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
+        print("card", name)
 
 
 if __name__ == "__main__":

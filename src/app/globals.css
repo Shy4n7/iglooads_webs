@@ -1204,152 +1204,188 @@
     }
   }
 
-  /* ---------- Team ----------
-     One black and white group photo on a dark studio backdrop, framed with
-     the opening's viewfinder corners. The pointed-at person stays lit, the
-     others drop into shadow, and a lower-third caption introduces him. */
-  .team-stage {
+  /* ---------- Team: fly-through ----------
+     The stage pins to the screen while the page scrolls; Team.tsx moves
+     each scene in depth (inline transform, opacity) so the camera seems to
+     fly forward through them. A scene is a card on one side and the
+     details on the other, alternating, with a gap down the middle. */
+  .fly {
     position: relative;
-    isolation: isolate;
+    height: 700vh;
+  }
+  .fly-stage {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    height: 100svh;
     overflow: hidden;
-    max-width: 1100px;
-    margin-inline: auto;
-    padding-top: 7%;
-    border-radius: 28px;
+    perspective: 900px;
     background:
-      radial-gradient(70% 60% at 50% 30%, #34385f 0%, transparent 70%),
+      radial-gradient(70% 60% at 50% 45%, #34385f 0%, var(--color-deep) 70%),
       var(--color-deep);
   }
-  /* Film grain over everything, so the four photos read as one shot. */
-  .team-stage::after {
+  /* Film grain, so the photos and the backdrop read as one shot. */
+  .fly-stage::after {
     content: "";
     position: absolute;
     inset: 0;
     z-index: 5;
     pointer-events: none;
-    opacity: 0.16;
+    opacity: 0.14;
     mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
-  /* Dark edges: a soft vignette pulls the eye to the middle. */
-  .team-stage::before {
-    content: "";
+  .fly-world {
     position: absolute;
     inset: 0;
-    z-index: 4;
-    pointer-events: none;
-    background:
-      linear-gradient(to right, var(--color-deep) 0%, transparent 9%, transparent 91%, var(--color-deep) 100%),
-      linear-gradient(to top, var(--color-deep) 0%, rgba(29, 31, 56, 0.85) 12%, transparent 38%);
+    transform-style: preserve-3d;
   }
-  .team-photo {
+  .fly-scene {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 12vw;
+    width: min(1080px, 92vw);
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+  }
+  /* Before the script runs, only the first person shows. */
+  .fly:not(.is-live):not(.is-static) .fly-scene:not(:first-child) {
+    visibility: hidden;
+  }
+  .fly-card {
     position: relative;
-    aspect-ratio: 1220 / 600;
+    justify-self: end;
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 760 / 950;
+    overflow: hidden;
+    border-radius: 18px;
+    box-shadow:
+      0 40px 80px -30px rgba(0, 0, 0, 0.8),
+      0 0 0 1px rgba(238, 235, 218, 0.08);
+    will-change: transform;
   }
-  .team-layer {
-    position: absolute;
-    inset: 0;
+  .fly-card img {
+    display: block;
     width: 100%;
     height: 100%;
-    transition:
-      filter 0.45s var(--ease-out-soft),
-      transform 0.5s var(--ease-out-soft);
+    object-fit: cover;
   }
-  .has-active .team-layer {
-    filter: brightness(0.3) contrast(0.9);
+  .fly-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    max-width: 380px;
+    padding-left: 18px;
+    border-left: 3px solid var(--color-amber);
+    color: var(--color-cream);
+    will-change: transform;
   }
-  .has-active .team-layer.is-active {
-    filter: brightness(1.06) contrast(1.06);
-    transform: translateY(-6px);
+  .fly-scene.is-flip .fly-card {
+    order: 2;
+    justify-self: start;
   }
-  /* Soft light behind the person being introduced. */
-  .team-glow {
+  .fly-scene.is-flip .fly-info {
+    justify-self: end;
+  }
+  .fly-count {
+    font-family: var(--font-bebas);
+    font-size: 14px;
+    letter-spacing: 0.3em;
+    color: var(--color-cream-mute);
+  }
+  .fly-name {
+    font-family: var(--font-bebas);
+    font-size: clamp(56px, 7vw, 96px);
+    font-weight: 400;
+    line-height: 0.88;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .fly-line {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--color-cream-soft);
+  }
+  .fly-story {
+    display: block;
+    width: min(760px, 88vw);
+    color: var(--color-cream);
+    text-align: center;
+  }
+  .fly-kicker {
+    margin: 0 0 18px;
+    font-family: var(--font-bebas);
+    font-size: 15px;
+    letter-spacing: 0.3em;
+    color: var(--color-amber);
+  }
+  .fly-story-text {
+    margin: 0;
+    font-size: clamp(22px, 2.6vw, 34px);
+    font-weight: 500;
+    line-height: 1.4;
+  }
+  /* Which scene the camera is on. */
+  .fly-rail {
     position: absolute;
-    top: 0;
-    width: 34%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgba(238, 235, 218, 0.16), transparent);
-    transform: translate(-50%, -12%);
-    transition:
-      left 0.5s var(--ease-out-soft),
-      opacity 0.4s;
-    pointer-events: none;
-  }
-  .team-hit {
-    position: absolute;
-    top: 0;
-    bottom: 0;
+    top: 50%;
+    right: clamp(14px, 3vw, 40px);
     z-index: 6;
-    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    translate: 0 -50%;
   }
-  .team-hit:focus-visible {
-    outline-offset: -6px;
-    border-radius: 20px;
+  .fly-rail span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(238, 235, 218, 0.25);
+    transition:
+      background 0.3s,
+      transform 0.3s;
+  }
+  .fly-rail span.is-on {
+    background: var(--color-amber);
+    transform: scale(1.5);
   }
   .team-corner {
     position: absolute;
-    z-index: 6;
-    width: 26px;
-    height: 26px;
-    border: 0 solid rgba(238, 235, 218, 0.55);
+    width: 22px;
+    height: 22px;
+    border: 0 solid rgba(238, 235, 218, 0.6);
     pointer-events: none;
   }
   .team-corner.tl {
-    top: 18px;
-    left: 18px;
+    top: 14px;
+    left: 14px;
     border-top-width: 2px;
     border-left-width: 2px;
   }
   .team-corner.tr {
-    top: 18px;
-    right: 18px;
+    top: 14px;
+    right: 14px;
     border-top-width: 2px;
     border-right-width: 2px;
   }
   .team-corner.bl {
-    bottom: 18px;
-    left: 18px;
+    bottom: 14px;
+    left: 14px;
     border-bottom-width: 2px;
     border-left-width: 2px;
   }
   .team-corner.br {
-    bottom: 18px;
-    right: 18px;
-    border-bottom-width: 2px;
+    right: 14px;
+    bottom: 14px;
     border-right-width: 2px;
-  }
-  /* Lower third, like a name caption on a TV interview. */
-  .team-caption {
-    position: absolute;
-    left: 48px;
-    bottom: 40px;
-    z-index: 7;
-    max-width: 420px;
-    color: var(--color-cream);
-    pointer-events: none;
-  }
-  .team-caption.on-right {
-    left: auto;
-    right: 48px;
-  }
-  .team-caption a {
-    pointer-events: auto;
-  }
-  .team-caption-in {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
-    padding-left: 16px;
-    border-left: 3px solid var(--color-amber);
-    animation: caption-in 0.45s var(--ease-out-soft) both;
-  }
-  @keyframes caption-in {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
+    border-bottom-width: 2px;
   }
   .team-role {
     padding: 3px 8px;
@@ -1357,25 +1393,12 @@
     background: var(--color-amber);
     color: var(--color-indigo);
     font-family: var(--font-bebas);
-    font-size: 14px;
+    font-size: 15px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
-  .team-name {
-    font-family: var(--font-bebas);
-    font-size: clamp(40px, 5vw, 64px);
-    font-weight: 400;
-    line-height: 0.9;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-  .team-line {
-    font-size: 14px;
-    line-height: 1.55;
-    color: var(--color-cream-soft);
-  }
   .team-handle {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     color: var(--color-amber);
     text-decoration: none;
@@ -1383,59 +1406,63 @@
   .team-handle:hover {
     text-decoration: underline;
   }
-  .team-hint-touch {
-    display: none;
-  }
-  @media (hover: none) {
-    .team-hint-hover {
-      display: none;
-    }
-    .team-hint-touch {
-      display: inline;
-    }
-  }
-  /* Phones: the caption sits under the photo, still inside the panel. */
+  /* Phones: card above, details below; the camera still flies through the middle. */
   @media (max-width: 720px) {
-    .team-stage {
-      margin-inline: -8px;
-      padding-top: 12%;
-      border-radius: 22px;
+    .fly {
+      height: 620vh;
     }
-    .team-stage::before {
-      background:
-        linear-gradient(to right, var(--color-deep) 0%, transparent 7%, transparent 93%, var(--color-deep) 100%),
-        linear-gradient(to top, var(--color-deep) 0%, var(--color-deep) 28%, transparent 48%);
+    .fly-stage {
+      perspective: 640px;
     }
-    .team-caption,
-    .team-caption.on-right {
-      position: relative;
-      left: auto;
-      right: auto;
-      bottom: auto;
-      max-width: none;
-      margin-top: -14%;
-      padding: 0 22px 26px;
+    /* A little lower, clear of the header. */
+    .fly-scene {
+      top: calc(50% + 32px);
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
+      width: 86vw;
     }
-    .team-corner {
-      width: 18px;
-      height: 18px;
+    .fly-card,
+    .fly-scene.is-flip .fly-card {
+      order: 0;
+      justify-self: center;
+      width: min(62vw, 40vh);
     }
-    .team-corner.tl,
-    .team-corner.tr {
-      top: 12px;
+    .fly-scene.is-flip .fly-info {
+      justify-self: start;
     }
-    .team-corner.bl,
-    .team-corner.br {
-      bottom: 12px;
+    .fly-name {
+      font-size: 52px;
     }
-    .team-corner.tl,
-    .team-corner.bl {
-      left: 12px;
+    .fly-line {
+      font-size: 14px;
     }
-    .team-corner.tr,
-    .team-corner.br {
-      right: 12px;
+    .fly-rail {
+      right: 8px;
+      gap: 10px;
     }
+  }
+  /* Reduced motion: no camera, the scenes simply follow one another. */
+  .fly.is-static {
+    height: auto;
+  }
+  .fly.is-static .fly-stage {
+    position: relative;
+    height: auto;
+    padding: 72px 0;
+  }
+  .fly.is-static .fly-world {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 72px;
+  }
+  .fly.is-static .fly-scene {
+    position: static;
+    transform: none;
+  }
+  .fly.is-static .fly-rail {
+    display: none;
   }
 
   /* ---------- Contact: enquiry form ----------
@@ -2036,16 +2063,11 @@
     }
     .enq-field span,
     .enq-send,
-    .team-layer,
-    .team-glow,
     .svc-name,
     .svc-desc,
     .svc-float-in,
     .svc-body {
       transition: none;
-    }
-    .team-caption-in {
-      animation: none;
     }
     html .intro .intro-step.intro-step {
       transition: none;
