@@ -27,16 +27,18 @@ DEEP = (29, 31, 56)
 # Measured on the photos after they are shrunk to fit 2400px: the eye line,
 # the chin and the face centre. Faces are scaled so eye-to-chin matches.
 PEOPLE = {
-    "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=430, lift=0),
-    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.36, x=720, lift=8),
-    "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=1010, lift=0),
+    "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=445, lift=0, tilt=4),
+    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0, x=720, lift=52, tilt=0),
+    "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=995, lift=0, tilt=-4),
 }
-# Painted back to front: Suhail, the founder, stands in the centre and in
-# front, clearly larger than the other two.
+# Painted back to front: Suhail, the founder, stands in the centre, a little
+# higher and in front; the other two lean out towards their own side
+# (tilt in degrees, positive leans left).
 PAINT_ORDER = ["sudhir", "ajay", "suhail"]
 EYE_TO_CHIN = 95
 TONE_MEAN, TONE_STD = 112, 58
-CANVAS = (1440, 720)
+# Taller than the final frame, so a leaning body still fills the bottom edge.
+CANVAS = (1440, 1000)
 EYE_Y = 300
 # Final frame: trims the empty space above the tallest head and at the sides.
 FRAME = (160, 100, 1280, 720)
@@ -66,6 +68,8 @@ def layer(im, p):
     y = round(EYE_Y - p["lift"] - (p["eye"] - y0) * s)
     canvas = Image.new("RGBA", CANVAS, (0, 0, 0, 0))
     canvas.alpha_composite(im, (max(0, x), max(0, y)), (max(0, -x), max(0, -y)))
+    if p["tilt"]:
+        canvas = canvas.rotate(p["tilt"], Image.BICUBIC, center=(p["x"], FRAME[3]))
     return canvas
 
 
