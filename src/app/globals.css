@@ -1531,169 +1531,264 @@
     opacity: 0.6;
     cursor: progress;
   }
-  /* ---------- Contact: visiting card ----------
-     Cream front with the details, indigo panel with a WhatsApp QR code.
-     VisitingCard tilts it towards a mouse pointer (inline transform) and
-     moves the light (--gx, --gy). */
-  .vc-wrap {
-    max-width: 780px;
+  /* ---------- Contact: 3D visiting card ----------
+     A card with real thickness: an indigo brand side and a cream side with
+     every way to reach us plus a WhatsApp QR code. Everything inside is
+     sized in cqw, so phones get the same card, only smaller. VisitingCard
+     sets --ry/--rx (turn), --sx (sheen) and --sw/--so (shadow). */
+  .vc3 {
+    width: min(100%, 560px);
     margin: 72px auto 0;
   }
-  .vc {
+  .vc3-box {
+    container-type: inline-size;
+  }
+  .vc3-scene {
     position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    padding: 4cqw 0 8cqw;
+    perspective: 1400px;
+    perspective-origin: 50% 30%;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .vc3-scene.is-dragging {
+    cursor: grabbing;
+  }
+  .vc3-card {
+    --t: 1.6cqw;
+    position: relative;
+    width: 100cqw;
+    height: 60cqw;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 6deg)) rotateY(var(--ry, 0deg));
+  }
+  .vc3-face {
+    position: absolute;
+    inset: 0;
     overflow: hidden;
-    border-radius: 22px;
-    background: var(--color-cream);
-    color: var(--color-indigo);
-    box-shadow:
-      0 1px 0 rgba(255, 255, 255, 0.6) inset,
-      0 40px 70px -30px rgba(0, 0, 0, 0.6);
-    transform: perspective(1100px) rotateX(0) rotateY(0);
-    transition: transform 0.6s var(--ease-out-soft);
-    will-change: transform;
+    border-radius: 3.2cqw;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
-  .vc.is-tilting {
-    transition: transform 0.12s linear;
+  /* Edge: cream, an amber core, cream. */
+  .vc3-edge {
+    position: absolute;
+    top: 3.2cqw;
+    bottom: 3.2cqw;
+    left: 50%;
+    width: var(--t);
+    margin-left: calc(var(--t) / -2);
+    background: linear-gradient(90deg, #d9d5bf 0 30%, var(--color-amber) 30% 70%, #d9d5bf 70%);
   }
-  .vc-front {
+  .vc3-edge.is-r {
+    transform: rotateY(90deg) translateZ(calc(50cqw - 0.05cqw));
+  }
+  .vc3-edge.is-l {
+    transform: rotateY(-90deg) translateZ(calc(50cqw - 0.05cqw));
+  }
+
+  .vc3-front {
     display: flex;
     flex-direction: column;
-    gap: 22px;
-    padding: 30px 32px 26px;
-    border-left: 8px solid var(--color-amber);
+    justify-content: space-between;
+    padding: 6cqw 6.5cqw;
+    background:
+      radial-gradient(70% 90% at 85% 15%, #3b3f6c 0%, transparent 60%),
+      var(--color-deep);
+    color: var(--color-cream);
+    transform: translateZ(calc(var(--t) / 2));
   }
-  .vc-logo {
+  .vc3-ring {
+    position: absolute;
+    right: -12cqw;
+    bottom: -26cqw;
+    width: 52cqw;
+    height: 52cqw;
+    border: 0.5cqw solid rgba(242, 182, 97, 0.55);
+    border-radius: 50%;
+  }
+  .vc3-ring.is-inner {
+    right: -4cqw;
+    bottom: -18cqw;
+    width: 36cqw;
+    height: 36cqw;
+    border-color: rgba(242, 182, 97, 0.3);
+  }
+  .vc3-tag {
     font-family: var(--font-bebas);
-    font-size: 26px;
-    line-height: 1;
-    letter-spacing: 0.32em;
+    font-size: 2.8cqw;
+    letter-spacing: 0.3em;
+    color: var(--color-amber);
   }
-  .vc-list {
+  .vc3-word {
+    margin-top: 3cqw;
+    font-family: var(--font-bebas);
+    font-size: 15cqw;
+    line-height: 0.82;
+    letter-spacing: 0.02em;
+  }
+  .vc3-word span {
+    color: var(--color-amber);
+  }
+  .vc3-sub {
+    margin-top: 1.6cqw;
+    font-size: 2.6cqw;
+    color: var(--color-cream-mute);
+  }
+  .vc3-foot {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    font-family: var(--font-bebas);
+    font-size: 2.8cqw;
+    letter-spacing: 0.2em;
+    color: var(--color-cream-mute);
+  }
+  .vc3-foot b {
+    font-weight: 400;
+    color: var(--color-cream);
+  }
+
+  .vc3-back {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4cqw;
+    padding: 5cqw 5cqw 4.4cqw;
+    border-left: 1.6cqw solid var(--color-amber);
+    background: var(--color-card);
+    color: var(--color-indigo);
+    transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  }
+  .vc3-logo {
+    margin-bottom: 3cqw;
+    font-family: var(--font-bebas);
+    font-size: 4.4cqw;
+    line-height: 1;
+    letter-spacing: 0.3em;
+  }
+  .vc3-list {
     display: flex;
     flex-direction: column;
-    gap: 11px;
+    gap: 1.9cqw;
     margin: 0;
     padding: 0;
     list-style: none;
-    font-size: 15px;
+    font-size: 2.85cqw;
     font-weight: 500;
   }
-  .vc-list li {
+  .vc3-list li {
     display: flex;
     align-items: center;
-    gap: 12px;
-    min-width: 0;
+    gap: 1.8cqw;
+    white-space: nowrap;
   }
-  .vc-list a {
-    color: inherit;
-    text-decoration: none;
-    overflow-wrap: anywhere;
-    background: linear-gradient(var(--color-amber), var(--color-amber)) 0 100% / 0 2px no-repeat;
-    transition: background-size 0.3s var(--ease-out-soft);
-  }
-  .vc-list a:hover {
-    background-size: 100% 2px;
-  }
-  .vc-icon {
+  .vc3-icon {
     flex: none;
+    width: 3.3cqw;
+    height: 3.3cqw;
     color: var(--color-orange);
   }
-  .vc-sep {
-    color: var(--color-ink-mute);
+  .vc3-back a {
+    color: inherit;
+    text-decoration: none;
   }
-  .vc-gst {
-    margin-top: auto;
-    font-size: 11px;
+  .vc3-list a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-amber);
+    text-underline-offset: 0.5cqw;
+  }
+  .vc3-gst {
+    position: absolute;
+    left: 6.6cqw;
+    bottom: 4cqw;
+    font-size: 2cqw;
     letter-spacing: 0.14em;
     color: var(--color-ink-mute);
   }
-  .vc-back {
+  .vc3-qr {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 14px;
-    padding: 26px;
-    background:
-      radial-gradient(80% 70% at 50% 30%, #3a3e68 0%, transparent 75%),
-      var(--color-deep);
-    color: var(--color-cream);
+    align-self: center;
+    gap: 1.8cqw;
   }
-  .vc-qr {
-    padding: 12px;
-    border-radius: 14px;
-    background: var(--color-cream);
+  .vc3-qr a {
+    display: block;
+    padding: 1.6cqw;
+    border-radius: 2cqw;
+    background: #fff;
     line-height: 0;
+    box-shadow: 0 0 0 0.3cqw var(--color-indigo);
   }
-  .vc-qr img {
-    width: 150px;
-    height: 150px;
+  .vc3-qr img {
+    display: block;
+    width: 24cqw;
+    height: 24cqw;
   }
-  .vc-qr-label {
+  .vc3-qr p {
     font-family: var(--font-bebas);
-    font-size: 15px;
+    font-size: 2.6cqw;
+    line-height: 1.1;
     letter-spacing: 0.16em;
     text-align: center;
   }
-  .vc-wa {
-    display: none;
-  }
-  /* Light catching the card as it tilts. */
-  .vc-glare {
+  /* A sheen that slides across as the card turns. */
+  .vc3-sheen {
     position: absolute;
-    inset: 0;
+    inset: -20%;
     pointer-events: none;
-    background: radial-gradient(
-      circle at var(--gx, 50%) var(--gy, 0%),
-      rgba(255, 255, 255, 0.35),
-      transparent 45%
-    );
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.32) 48%, transparent 60%);
     mix-blend-mode: soft-light;
-    opacity: 0;
-    transition: opacity 0.4s;
+    transform: translateX(var(--sx, 0%));
   }
-  .vc.is-tilting .vc-glare {
-    opacity: 1;
+  .vc3-back .vc3-sheen {
+    background: linear-gradient(105deg, transparent 40%, rgba(40, 43, 74, 0.05) 55%, transparent 65%);
+    mix-blend-mode: multiply;
   }
-  /* Touch screens are already the phone: a WhatsApp button instead of the code. */
-  @media (hover: none), (max-width: 720px) {
-    .vc {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .vc-front {
-      padding: 24px 22px 22px;
-      border-left-width: 6px;
-    }
-    .vc-qr,
-    .vc-qr-label {
-      display: none;
-    }
-    .vc-back {
-      padding: 18px 22px;
-    }
-    .vc-wa {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      min-height: 50px;
-      border-radius: 999px;
-      background: var(--color-amber);
-      color: var(--color-indigo);
-      font-family: var(--font-bebas);
-      font-size: 19px;
-      letter-spacing: 0.08em;
-      text-decoration: none;
-    }
+  .vc3-shadow {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: 0;
+    height: 5cqw;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent);
+    filter: blur(4px);
+    opacity: var(--so, 0.9);
+    transform: scaleX(var(--sw, 1));
+  }
+  .vc3-ctrl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 16px;
+    margin-top: 6px;
+  }
+  .vc3-flip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 24px;
+    border-radius: 999px;
+    background: var(--color-amber);
+    color: var(--color-indigo);
+    font-family: var(--font-bebas);
+    font-size: 18px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
+  }
+  .vc3-hint {
+    font-size: 13px;
+    color: var(--color-cream-mute);
   }
   @media (max-width: 720px) {
-    .vc-wrap {
+    .vc3 {
       margin-top: 56px;
-    }
-    .vc-list {
-      font-size: 14px;
     }
   }
   @media (max-width: 600px) {
@@ -1946,8 +2041,7 @@
     .svc-name,
     .svc-desc,
     .svc-float-in,
-    .svc-body,
-    .vc {
+    .svc-body {
       transition: none;
     }
     .team-caption-in {
