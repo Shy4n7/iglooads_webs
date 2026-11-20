@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { EMAIL, ENQUIRY_ENDPOINT, INSTAGRAM_HANDLE, INSTAGRAM_URL, PHONES, WHATSAPP_URL } from "@/lib/content";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { ENQUIRY_ENDPOINT } from "@/lib/content";
+import { ENQUIRE_EVENT } from "@/lib/enquire";
+import VisitingCard from "./VisitingCard";
 
 type Status = { kind: "idle" | "sending" | "sent" | "error"; text: string };
 
@@ -12,22 +14,29 @@ const FIELDS = [
   { name: "organisation", label: "Organisation", type: "text", autoComplete: "organization", required: false },
 ] as const;
 
-const WhatsAppIcon = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" className="flex-none">
-    <path
-      fill="currentColor"
-      d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm0 18.2c-1.5 0-3-.4-4.3-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8-.2-.1-.4-.1-.6.1l-.8 1c-.1.2-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.2-.4.7-1.3.1-.2 0-.3 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.2-1.2-.1-.1-.3-.2-.5-.3Z"
-    />
-  </svg>
-);
-
 /**
  * Enquiry form (name, e-mail, phone, organisation, project) with underlined
- * fields whose labels float up when used, plus one-tap WhatsApp, call and
- * e-mail. Enquiries are posted to FormSubmit, which forwards them to EMAIL.
+ * fields whose labels float up when used, then the studio's visiting card.
+ * Enquiries are posted to FormSubmit, which forwards them to EMAIL.
  */
 export default function Contact() {
   const [status, setStatus] = useState<Status>({ kind: "idle", text: "" });
+  const projectRef = useRef<HTMLTextAreaElement>(null);
+
+  // A service picked in What we do lands here as the first line of the
+  // project field, replacing an earlier pick but keeping anything typed.
+  useEffect(() => {
+    const onEnquire = (e: Event) => {
+      const field = projectRef.current;
+      if (!field) return;
+      const line = `Interested in: ${(e as CustomEvent<string>).detail}`;
+      const rest = field.value.replace(/^Interested in: .*\n?/, "");
+      field.value = rest ? `${line}\n${rest}` : `${line}\n`;
+      window.setTimeout(() => field.focus({ preventScroll: true }), 700);
+    };
+    window.addEventListener(ENQUIRE_EVENT, onEnquire);
+    return () => window.removeEventListener(ENQUIRE_EVENT, onEnquire);
+  }, []);
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -87,7 +96,7 @@ export default function Contact() {
             </label>
           ))}
           <label className="enq-field enq-wide">
-            <textarea name="message" rows={3} required placeholder=" " />
+            <textarea ref={projectRef} name="message" rows={3} required placeholder=" " />
             <span>Tell us about your project</span>
           </label>
           {/* Spam trap: people never see or fill this. */}
@@ -105,34 +114,7 @@ export default function Contact() {
           </div>
         </form>
 
-        <div className="rv mx-auto mt-10 grid max-w-[820px] gap-4 sm:grid-cols-3">
-          <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="enq-direct enq-wa">
-            <WhatsAppIcon />
-            <span>
-              <strong>Chat on WhatsApp</strong>
-              <small>{PHONES[0].label}</small>
-            </span>
-          </a>
-          <div className="enq-direct">
-            <span>
-              <strong>Call us</strong>
-              {PHONES.map((p) => (
-                <a key={p.tel} href={`tel:${p.tel}`}>
-                  {p.label}
-                </a>
-              ))}
-            </span>
-          </div>
-          <div className="enq-direct">
-            <span>
-              <strong>Write to us</strong>
-              <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer">
-                {INSTAGRAM_HANDLE}
-              </a>
-            </span>
-          </div>
-        </div>
+        <VisitingCard />
       </div>
     </section>
   );

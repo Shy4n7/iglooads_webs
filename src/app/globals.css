@@ -140,16 +140,6 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
-  .gsvc {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px;
-  }
-  @media (max-width: 1200px) {
-    .gsvc {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
   .g2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1002,14 +992,216 @@
   }
 
   /* ---------- Service cards ---------- */
-  .cut {
-    clip-path: polygon(0 0, 100% 0, 100% 62%, 55% 100%, 0 74%);
-  }
   .glass {
     background: rgba(29, 31, 56, 0.62);
     border: 1px solid rgba(238, 235, 218, 0.25);
     -webkit-backdrop-filter: blur(22px);
     backdrop-filter: blur(22px);
+  }
+
+  /* ---------- Services: numbered index ----------
+     Big rows in three groups. With a mouse, the pointed-at row lights up,
+     the others fade, its description slides in and its photo floats beside
+     the cursor. On touch screens and narrow windows each row opens in place. */
+  .svc-index {
+    position: relative;
+    isolation: isolate;
+  }
+  /* Rows sit above the floating photo, so the highlighted name reads on top of it. */
+  .svc-group {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    border-top: 1px solid var(--color-indigo);
+  }
+  .svc-group-label {
+    margin: 0;
+    padding-top: 30px;
+    font-family: var(--font-bebas);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    color: var(--color-ink-mute);
+  }
+  .svc-row {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .svc-row:last-child {
+    border-bottom: 0;
+  }
+  .svc-head {
+    display: grid;
+    grid-template-columns: 44px auto minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 20px 0;
+    border: 0;
+    background: none;
+    color: var(--color-indigo);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .svc-num {
+    font-family: var(--font-anton);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: var(--color-orange);
+  }
+  .svc-name {
+    font-family: var(--font-bebas);
+    font-size: clamp(36px, 4.6vw, 66px);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    transition:
+      color 0.3s,
+      translate 0.4s var(--ease-out-soft);
+  }
+  .svc-desc {
+    justify-self: end;
+    max-width: 300px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-ink-soft);
+    text-align: right;
+    opacity: 0;
+    translate: 12px 0;
+    transition:
+      opacity 0.3s,
+      translate 0.4s var(--ease-out-soft);
+  }
+  .svc-arrow {
+    justify-self: end;
+    transition:
+      rotate 0.35s var(--ease-out-soft),
+      color 0.3s;
+  }
+  .svc-index.is-pointing .svc-name {
+    color: rgba(40, 43, 74, 0.28);
+  }
+  .svc-index .svc-row.is-active .svc-name {
+    color: var(--color-orange);
+    translate: 14px 0;
+  }
+  .svc-row.is-active .svc-desc {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .svc-row.is-active .svc-arrow {
+    rotate: 45deg;
+    color: var(--color-orange);
+  }
+  .svc-body {
+    display: none;
+  }
+  /* The floating photo: its wrapper is moved to the cursor by script. */
+  .svc-float {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .svc-float-in {
+    position: absolute;
+    left: 36px;
+    top: -170px;
+    width: 250px;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--color-mid);
+    box-shadow: 0 30px 60px -24px rgba(29, 31, 56, 0.55);
+    opacity: 0;
+    rotate: -5deg;
+    scale: 0.8;
+    transition:
+      opacity 0.3s,
+      scale 0.45s var(--ease-out-soft),
+      rotate 0.45s var(--ease-out-soft);
+  }
+  .svc-float.on-left .svc-float-in {
+    left: -286px;
+  }
+  .svc-index.is-pointing .svc-float-in {
+    opacity: 1;
+    scale: 1;
+    rotate: -3deg;
+  }
+  .svc-float-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .svc-float-img.is-on {
+    opacity: 1;
+  }
+  @media (hover: none), (max-width: 720px) {
+    .svc-group {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .svc-group-label {
+      padding-top: 18px;
+      font-size: 14px;
+    }
+    .svc-head {
+      grid-template-columns: 34px minmax(0, 1fr) 26px;
+      gap: 12px;
+      padding: 16px 0;
+    }
+    .svc-name {
+      font-size: clamp(28px, 8vw, 44px);
+    }
+    .svc-desc,
+    .svc-float {
+      display: none;
+    }
+    .svc-index.is-pointing .svc-name {
+      color: inherit;
+    }
+    .svc-row.is-open .svc-name {
+      color: var(--color-orange);
+    }
+    .svc-row.is-open .svc-arrow {
+      rotate: 135deg;
+      color: var(--color-orange);
+    }
+    .svc-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s var(--ease-out-soft);
+    }
+    .svc-row.is-open .svc-body {
+      grid-template-rows: 1fr;
+    }
+    .svc-body-in {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .svc-row.is-open .svc-body-in {
+      padding-bottom: 20px;
+    }
+    .svc-body-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--color-mid);
+    }
   }
 
   /* ---------- Team ----------
@@ -1339,51 +1531,170 @@
     opacity: 0.6;
     cursor: progress;
   }
-  /* Direct contact cards under the form. */
-  .enq-direct {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 18px 20px;
-    border: 1px solid rgba(238, 235, 218, 0.16);
-    border-radius: 18px;
-    color: var(--color-cream);
-    text-decoration: none;
+  /* ---------- Contact: visiting card ----------
+     Cream front with the details, indigo panel with a WhatsApp QR code.
+     VisitingCard tilts it towards a mouse pointer (inline transform) and
+     moves the light (--gx, --gy). */
+  .vc-wrap {
+    max-width: 780px;
+    margin: 72px auto 0;
   }
-  .enq-direct > span {
+  .vc {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+    overflow: hidden;
+    border-radius: 22px;
+    background: var(--color-cream);
+    color: var(--color-indigo);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.6) inset,
+      0 40px 70px -30px rgba(0, 0, 0, 0.6);
+    transform: perspective(1100px) rotateX(0) rotateY(0);
+    transition: transform 0.6s var(--ease-out-soft);
+    will-change: transform;
+  }
+  .vc.is-tilting {
+    transition: transform 0.12s linear;
+  }
+  .vc-front {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-    font-size: 14px;
+    gap: 22px;
+    padding: 30px 32px 26px;
+    border-left: 8px solid var(--color-amber);
   }
-  .enq-direct strong {
-    font-weight: 600;
+  .vc-logo {
+    font-family: var(--font-bebas);
+    font-size: 26px;
+    line-height: 1;
+    letter-spacing: 0.32em;
+  }
+  .vc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
     font-size: 15px;
+    font-weight: 500;
   }
-  .enq-direct small {
-    font-size: 14px;
-    color: var(--color-cream-soft);
+  .vc-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
   }
-  .enq-direct a {
-    color: var(--color-cream-soft);
+  .vc-list a {
+    color: inherit;
     text-decoration: none;
     overflow-wrap: anywhere;
+    background: linear-gradient(var(--color-amber), var(--color-amber)) 0 100% / 0 2px no-repeat;
+    transition: background-size 0.3s var(--ease-out-soft);
   }
-  .enq-direct a:hover {
-    color: var(--color-amber);
+  .vc-list a:hover {
+    background-size: 100% 2px;
   }
-  .enq-wa {
-    background: var(--color-amber);
-    border-color: var(--color-amber);
-    color: var(--color-indigo);
-    transition: background-color 0.2s;
+  .vc-icon {
+    flex: none;
+    color: var(--color-orange);
   }
-  .enq-wa small {
-    color: var(--color-indigo);
+  .vc-sep {
+    color: var(--color-ink-mute);
   }
-  .enq-wa:hover {
-    background: #f6c57e;
+  .vc-gst {
+    margin-top: auto;
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-mute);
+  }
+  .vc-back {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 26px;
+    background:
+      radial-gradient(80% 70% at 50% 30%, #3a3e68 0%, transparent 75%),
+      var(--color-deep);
+    color: var(--color-cream);
+  }
+  .vc-qr {
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--color-cream);
+    line-height: 0;
+  }
+  .vc-qr img {
+    width: 150px;
+    height: 150px;
+  }
+  .vc-qr-label {
+    font-family: var(--font-bebas);
+    font-size: 15px;
+    letter-spacing: 0.16em;
+    text-align: center;
+  }
+  .vc-wa {
+    display: none;
+  }
+  /* Light catching the card as it tilts. */
+  .vc-glare {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      circle at var(--gx, 50%) var(--gy, 0%),
+      rgba(255, 255, 255, 0.35),
+      transparent 45%
+    );
+    mix-blend-mode: soft-light;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .vc.is-tilting .vc-glare {
+    opacity: 1;
+  }
+  /* Touch screens are already the phone: a WhatsApp button instead of the code. */
+  @media (hover: none), (max-width: 720px) {
+    .vc {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .vc-front {
+      padding: 24px 22px 22px;
+      border-left-width: 6px;
+    }
+    .vc-qr,
+    .vc-qr-label {
+      display: none;
+    }
+    .vc-back {
+      padding: 18px 22px;
+    }
+    .vc-wa {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-height: 50px;
+      border-radius: 999px;
+      background: var(--color-amber);
+      color: var(--color-indigo);
+      font-family: var(--font-bebas);
+      font-size: 19px;
+      letter-spacing: 0.08em;
+      text-decoration: none;
+    }
+  }
+  @media (max-width: 720px) {
+    .vc-wrap {
+      margin-top: 56px;
+    }
+    .vc-list {
+      font-size: 14px;
+    }
   }
   @media (max-width: 600px) {
     .enq {
@@ -1582,8 +1893,7 @@
     }
   }
   @media (max-width: 560px) {
-    .g3,
-    .gsvc {
+    .g3 {
       display: flex;
       overflow-x: auto;
       gap: 12px;
@@ -1592,12 +1902,10 @@
       padding: 4px 20px 16px;
       scrollbar-width: none;
     }
-    .g3::-webkit-scrollbar,
-    .gsvc::-webkit-scrollbar {
+    .g3::-webkit-scrollbar {
       display: none;
     }
-    .g3 > *,
-    .gsvc > * {
+    .g3 > * {
       flex: 0 0 260px;
       scroll-snap-align: start;
     }
@@ -1634,7 +1942,12 @@
     .enq-field span,
     .enq-send,
     .team-layer,
-    .team-glow {
+    .team-glow,
+    .svc-name,
+    .svc-desc,
+    .svc-float-in,
+    .svc-body,
+    .vc {
       transition: none;
     }
     .team-caption-in {
