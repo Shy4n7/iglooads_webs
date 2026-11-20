@@ -1409,7 +1409,7 @@
   /* Phones: card above, details below; the camera still flies through the middle. */
   @media (max-width: 720px) {
     .fly {
-      height: 620vh;
+      height: 400vh;
     }
     .fly-stage {
       perspective: 640px;
