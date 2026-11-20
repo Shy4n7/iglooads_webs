@@ -84,9 +84,10 @@ metadata.
 ## Team photos
 
 The team section (`src/components/Team.tsx`; names, roles, Instagram links and the closing
-paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) is a scroll-driven fly-through: the
-section pins to the screen and the camera flies forward past each person's card to the next, in the
-order of `TEAM`, then to the paragraph. With reduced motion the cards are simply stacked.
+paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) shows a row of portrait cards. "Play the team intro" opens an
+optional full-screen fly-through: scrolling inside it moves a camera forward past each person's
+card to the next, in the order of `TEAM`, then to the paragraph. It closes with the X, Esc or the
+button at the end, and the page never pins. With reduced motion the intro's cards are stacked.
 
 The cards are made by `scripts/team_photo.py` from the original photos in `assets/team` (which it
 only reads). It cuts each person out of their background, scales them so the faces match, grades
