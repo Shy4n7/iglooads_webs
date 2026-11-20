@@ -4,7 +4,7 @@ Each person is cut out of their background (rembg), scaled so the faces
 match, placed side by side and turned black and white. Writes one
 transparent layer per person (public/media/team-<name>.webp, all the same
 canvas size, so they stack into one picture) and a flattened copy on the
-site's cream (public/media/team-group.jpg) for previews and fallbacks.
+site's deep indigo (public/media/team-group.jpg) for previews and fallbacks.
 
 Needs: pip install "rembg[cpu]" pillow pillow-heif
 Run:   python3 scripts/team_photo.py
@@ -22,7 +22,7 @@ pillow_heif.register_heif_opener()
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / "assets" / "team"
 OUT = ROOT / "public" / "media"
-CREAM = (238, 235, 218)
+DEEP = (29, 31, 56)
 
 # Measured on the photos after they are shrunk to fit 2400px: the eye line,
 # the chin and the face centre. Faces are scaled so eye-to-chin matches.
@@ -36,6 +36,7 @@ PEOPLE = {
 # hides the edge of Shyan's photo where another person was standing.
 PAINT_ORDER = ["shyan", "ajay", "sudhir", "suhail"]
 EYE_TO_CHIN = 95
+TONE_MEAN, TONE_STD = 112, 58
 CANVAS = (1440, 720)
 EYE_Y = 300
 # Final frame: trims the empty space above the tallest head and at the sides.
@@ -85,7 +86,14 @@ def layer(im, p):
 
 def to_grey(rgba):
     grey = ImageOps.grayscale(rgba.convert("RGB"))
-    grey = ImageEnhance.Contrast(grey).enhance(1.08)
+    # Match the tones: shift and stretch each person's greys so all four
+    # share the same brightness and contrast, whatever light they were shot in.
+    alpha = rgba.getchannel("A")
+    solid = [g for g, a in zip(grey.getdata(), alpha.getdata()) if a > 200]
+    mean = sum(solid) / len(solid)
+    std = (sum((g - mean) ** 2 for g in solid) / len(solid)) ** 0.5
+    grey = grey.point(lambda g: max(0, min(255, round(TONE_MEAN + (g - mean) * TONE_STD / std))))
+    grey = grey.filter(ImageFilter.UnsharpMask(radius=1.6, percent=60, threshold=2))
     out = Image.merge("RGBA", (grey, grey, grey, rgba.getchannel("A")))
     return out.crop(FRAME)
 
@@ -97,7 +105,7 @@ def main():
         layers[name] = to_grey(layer(cut_out(name, p, session), p))
         layers[name].save(OUT / f"team-{name}.webp", quality=82, method=6)
         print("layer", name)
-    group = Image.new("RGBA", layers["shyan"].size, CREAM + (255,))
+    group = Image.new("RGBA", layers["shyan"].size, DEEP + (255,))
     for name in PAINT_ORDER:
         group.alpha_composite(layers[name])
     group.convert("RGB").save(OUT / "team-group.jpg", quality=82, optimize=True, progressive=True)

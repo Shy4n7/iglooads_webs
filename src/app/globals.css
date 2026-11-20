@@ -1013,20 +1013,46 @@
   }
 
   /* ---------- Team ----------
-     One black and white group photo built from a layer per person. The
-     hovered person lifts forward and the others fade back; his card pops
-     up over him. Everything stays black and white. */
+     One black and white group photo on a dark studio backdrop, framed with
+     the opening's viewfinder corners. The pointed-at person stays lit, the
+     others drop into shadow, and a lower-third caption introduces him. */
   .team-stage {
     position: relative;
-    aspect-ratio: 1220 / 600;
+    isolation: isolate;
+    overflow: hidden;
     max-width: 1100px;
     margin-inline: auto;
+    padding-top: 7%;
+    border-radius: 28px;
+    background:
+      radial-gradient(70% 60% at 50% 30%, #34385f 0%, transparent 70%),
+      var(--color-deep);
   }
-  .team-photo {
+  /* Film grain over everything, so the four photos read as one shot. */
+  .team-stage::after {
+    content: "";
     position: absolute;
     inset: 0;
-    /* Fade the cut at the bottom of the photo into the page. */
-    mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* Dark edges: a soft vignette pulls the eye to the middle. */
+  .team-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, var(--color-deep) 0%, transparent 9%, transparent 91%, var(--color-deep) 100%),
+      linear-gradient(to top, var(--color-deep) 0%, rgba(29, 31, 56, 0.85) 12%, transparent 38%);
+  }
+  .team-photo {
+    position: relative;
+    aspect-ratio: 1220 / 600;
   }
   .team-layer {
     position: absolute;
@@ -1034,66 +1060,104 @@
     width: 100%;
     height: 100%;
     transition:
-      opacity 0.35s var(--ease-out-soft),
-      filter 0.35s var(--ease-out-soft),
-      transform 0.45s var(--ease-out-soft);
+      filter 0.45s var(--ease-out-soft),
+      transform 0.5s var(--ease-out-soft);
   }
-  /* The others wash out towards the page colour but stay solid, so the
-     layering of the photo (who stands in front of whom) never changes. */
   .has-active .team-layer {
-    filter: brightness(1.45) contrast(0.45) blur(1px);
+    filter: brightness(0.3) contrast(0.9);
   }
   .has-active .team-layer.is-active {
-    filter: contrast(1.12) brightness(1.04);
-    transform: translateY(-8px) scale(1.025);
+    filter: brightness(1.06) contrast(1.06);
+    transform: translateY(-6px);
+  }
+  /* Soft light behind the person being introduced. */
+  .team-glow {
+    position: absolute;
+    top: 0;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(238, 235, 218, 0.16), transparent);
+    transform: translate(-50%, -12%);
+    transition:
+      left 0.5s var(--ease-out-soft),
+      opacity 0.4s;
+    pointer-events: none;
   }
   .team-hit {
     position: absolute;
     top: 0;
     bottom: 0;
-    z-index: 3;
+    z-index: 6;
     cursor: pointer;
   }
   .team-hit:focus-visible {
-    outline-offset: -4px;
-    border-radius: 18px;
+    outline-offset: -6px;
+    border-radius: 20px;
   }
-  .team-card {
+  .team-corner {
     position: absolute;
-    top: 58%;
-    z-index: 4;
+    z-index: 6;
+    width: 26px;
+    height: 26px;
+    border: 0 solid rgba(238, 235, 218, 0.55);
+    pointer-events: none;
+  }
+  .team-corner.tl {
+    top: 18px;
+    left: 18px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .team-corner.tr {
+    top: 18px;
+    right: 18px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+  }
+  .team-corner.bl {
+    bottom: 18px;
+    left: 18px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+  .team-corner.br {
+    bottom: 18px;
+    right: 18px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+  /* Lower third, like a name caption on a TV interview. */
+  .team-caption {
+    position: absolute;
+    left: 48px;
+    bottom: 40px;
+    z-index: 7;
+    max-width: 420px;
+    color: var(--color-cream);
+    pointer-events: none;
+  }
+  .team-caption.on-right {
+    left: auto;
+    right: 48px;
+  }
+  .team-caption a {
+    pointer-events: auto;
+  }
+  .team-caption-in {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 4px;
-    width: 250px;
-    padding: 16px 18px;
-    border-radius: 18px;
-    background: var(--color-indigo);
-    color: var(--color-cream);
-    box-shadow: 0 18px 40px -16px rgba(29, 31, 56, 0.6);
-    pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, 12px) scale(0.96);
-    transition:
-      opacity 0.25s var(--ease-out-soft),
-      transform 0.35s var(--ease-out-soft);
+    gap: 6px;
+    padding-left: 16px;
+    border-left: 3px solid var(--color-amber);
+    animation: caption-in 0.45s var(--ease-out-soft) both;
   }
-  .team-card.at-start {
-    transform: translate(-30%, 12px) scale(0.96);
-  }
-  .team-card.at-end {
-    transform: translate(-70%, 12px) scale(0.96);
-  }
-  .team-card.is-shown {
-    opacity: 1;
-    transform: translate(-50%, 0) scale(1);
-  }
-  .team-card.at-start.is-shown {
-    transform: translate(-30%, 0) scale(1);
-  }
-  .team-card.at-end.is-shown {
-    transform: translate(-70%, 0) scale(1);
+  @keyframes caption-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
   }
   .team-role {
     padding: 3px 8px;
@@ -1102,89 +1166,83 @@
     color: var(--color-indigo);
     font-family: var(--font-bebas);
     font-size: 14px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
   .team-name {
-    margin-top: 4px;
     font-family: var(--font-bebas);
-    font-size: 40px;
+    font-size: clamp(40px, 5vw, 64px);
     font-weight: 400;
-    line-height: 0.95;
+    line-height: 0.9;
     letter-spacing: 0.02em;
+    text-transform: uppercase;
   }
   .team-line {
-    font-size: 13px;
-    line-height: 1.5;
+    font-size: 14px;
+    line-height: 1.55;
     color: var(--color-cream-soft);
   }
   .team-handle {
-    margin-top: 4px;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
     color: var(--color-amber);
-  }
-  .team-list {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
-    max-width: 1100px;
-    margin: 18px auto 0;
-  }
-  .team-chip {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    height: 100%;
-    padding: 14px 16px;
-    border: 1px solid var(--color-line);
-    border-radius: 16px;
-    color: var(--color-indigo);
     text-decoration: none;
-    transition:
-      background-color 0.25s,
-      color 0.25s,
-      border-color 0.25s;
   }
-  .team-chip strong {
-    font-family: var(--font-bebas);
-    font-size: 24px;
-    font-weight: 400;
-    letter-spacing: 0.03em;
-    line-height: 1;
+  .team-handle:hover {
+    text-decoration: underline;
   }
-  .team-chip span {
-    font-size: 13px;
-    color: var(--color-ink-soft);
+  .team-hint-touch {
+    display: none;
   }
-  .team-chip small {
-    margin-top: 4px;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-orange);
-  }
-  .team-chip.is-active {
-    border-color: var(--color-indigo);
-    background: var(--color-indigo);
-    color: var(--color-cream);
-  }
-  .team-chip.is-active span {
-    color: var(--color-cream-soft);
-  }
-  .team-chip.is-active small {
-    color: var(--color-amber);
-  }
-  /* Phones: the photo is too small for a card over it, so the names below
-     carry the details and the tapped person's name lights up. */
-  @media (max-width: 720px) {
-    .team-stage {
-      margin-inline: -20px;
-    }
-    .team-card {
+  @media (hover: none) {
+    .team-hint-hover {
       display: none;
     }
-    .team-list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
+    .team-hint-touch {
+      display: inline;
+    }
+  }
+  /* Phones: the caption sits under the photo, still inside the panel. */
+  @media (max-width: 720px) {
+    .team-stage {
+      margin-inline: -8px;
+      padding-top: 12%;
+      border-radius: 22px;
+    }
+    .team-stage::before {
+      background:
+        linear-gradient(to right, var(--color-deep) 0%, transparent 7%, transparent 93%, var(--color-deep) 100%),
+        linear-gradient(to top, var(--color-deep) 0%, var(--color-deep) 28%, transparent 48%);
+    }
+    .team-caption,
+    .team-caption.on-right {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      max-width: none;
+      margin-top: -14%;
+      padding: 0 22px 26px;
+    }
+    .team-corner {
+      width: 18px;
+      height: 18px;
+    }
+    .team-corner.tl,
+    .team-corner.tr {
+      top: 12px;
+    }
+    .team-corner.bl,
+    .team-corner.br {
+      bottom: 12px;
+    }
+    .team-corner.tl,
+    .team-corner.bl {
+      left: 12px;
+    }
+    .team-corner.tr,
+    .team-corner.br {
+      right: 12px;
     }
   }
 
@@ -1576,9 +1634,11 @@
     .enq-field span,
     .enq-send,
     .team-layer,
-    .team-card,
-    .team-chip {
+    .team-glow {
       transition: none;
+    }
+    .team-caption-in {
+      animation: none;
     }
     html .intro .intro-step.intro-step {
       transition: none;
