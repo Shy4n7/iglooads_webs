@@ -1244,7 +1244,7 @@
   }
   .team-photo {
     position: relative;
-    aspect-ratio: 1120 / 630;
+    aspect-ratio: 1120 / 620;
   }
   .team-layer {
     position: absolute;
@@ -1254,10 +1254,6 @@
     transition:
       filter 0.45s var(--ease-out-soft),
       transform 0.5s var(--ease-out-soft);
-  }
-  /* At rest the founder in the centre is lit a touch brighter than the others. */
-  .team-stage:not(.has-active) .team-layer:not(.is-lead) {
-    filter: brightness(0.8);
   }
   .has-active .team-layer {
     filter: brightness(0.3) contrast(0.9);

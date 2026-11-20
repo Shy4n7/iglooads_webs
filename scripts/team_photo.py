@@ -28,18 +28,18 @@ DEEP = (29, 31, 56)
 # the chin and the face centre. Faces are scaled so eye-to-chin matches.
 PEOPLE = {
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=430, lift=0),
-    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.16, x=720, lift=22),
+    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.36, x=720, lift=8),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=1010, lift=0),
 }
 # Painted back to front: Suhail, the founder, stands in the centre and in
-# front, a little larger than the others.
+# front, clearly larger than the other two.
 PAINT_ORDER = ["sudhir", "ajay", "suhail"]
 EYE_TO_CHIN = 95
 TONE_MEAN, TONE_STD = 112, 58
 CANVAS = (1440, 720)
 EYE_Y = 300
 # Final frame: trims the empty space above the tallest head and at the sides.
-FRAME = (160, 90, 1280, 720)
+FRAME = (160, 100, 1280, 720)
 
 
 def cut_out(p, session):

@@ -8,10 +8,8 @@ import sudhir from "../../public/media/team-sudhir.webp";
 import ajay from "../../public/media/team-ajay.webp";
 
 const LAYERS = { suhail, sudhir, ajay };
-// Back to front: Suhail, the founder, stands in the centre and in front.
+// Back to front: Suhail, the founder, stands in the centre, larger and in front.
 const PAINT = ["sudhir", "ajay", "suhail"] as const;
-// Lit a little brighter than the others while nobody is pointed at.
-const LEAD = "suhail";
 
 /**
  * The team as one black and white group photo, the founder in the centre on a dark studio backdrop,
@@ -67,7 +65,7 @@ export default function Team() {
           <span
             className="team-glow"
             aria-hidden="true"
-            style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0.8 }}
+            style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0 }}
           />
           {PAINT.map((id) => {
             const i = TEAM.findIndex((t) => t.id === id);
@@ -78,7 +76,7 @@ export default function Team() {
                 alt=""
                 aria-hidden="true"
                 sizes="(max-width: 1180px) 100vw, 1100px"
-                className={`team-layer ${active === i ? "is-active" : ""} ${id === LEAD ? "is-lead" : ""}`}
+                className={`team-layer ${active === i ? "is-active" : ""}`}
               />
             );
           })}
