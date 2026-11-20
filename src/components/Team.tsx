@@ -3,17 +3,18 @@
 import Image from "next/image";
 import { useState, type FocusEvent, type MouseEvent, type PointerEvent } from "react";
 import { TEAM } from "@/lib/content";
-import shyan from "../../public/media/team-shyan.webp";
 import suhail from "../../public/media/team-suhail.webp";
 import sudhir from "../../public/media/team-sudhir.webp";
 import ajay from "../../public/media/team-ajay.webp";
 
-const LAYERS = { shyan, suhail, sudhir, ajay };
-// Back to front: Shyan stands just behind Suhail.
-const PAINT = ["shyan", "ajay", "sudhir", "suhail"] as const;
+const LAYERS = { suhail, sudhir, ajay };
+// Back to front: Suhail, the founder, stands in the centre and in front.
+const PAINT = ["sudhir", "ajay", "suhail"] as const;
+// Lit a little brighter than the others while nobody is pointed at.
+const LEAD = "suhail";
 
 /**
- * The team as one black and white group photo on a dark studio backdrop,
+ * The team as one black and white group photo, the founder in the centre on a dark studio backdrop,
  * framed like the opening's viewfinder. Each person is a separate layer:
  * hovering (or tapping) someone keeps him lit while the others drop into
  * shadow, and a caption in the corner introduces him with his role and
@@ -52,7 +53,7 @@ export default function Team() {
           </p>
         </div>
         <p className="m-0 max-w-[300px] text-sm leading-relaxed text-ink-soft">
-          Young, quick and hands-on. The same four people plan, shoot and deliver your work.
+          Young, quick and hands-on. The same people plan, shoot and deliver your work.
         </p>
       </div>
 
@@ -66,7 +67,7 @@ export default function Team() {
           <span
             className="team-glow"
             aria-hidden="true"
-            style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0 }}
+            style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0.8 }}
           />
           {PAINT.map((id) => {
             const i = TEAM.findIndex((t) => t.id === id);
@@ -77,7 +78,7 @@ export default function Team() {
                 alt=""
                 aria-hidden="true"
                 sizes="(max-width: 1180px) 100vw, 1100px"
-                className={`team-layer ${active === i ? "is-active" : ""}`}
+                className={`team-layer ${active === i ? "is-active" : ""} ${id === LEAD ? "is-lead" : ""}`}
               />
             );
           })}

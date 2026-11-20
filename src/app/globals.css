@@ -1220,7 +1220,7 @@
       radial-gradient(70% 60% at 50% 30%, #34385f 0%, transparent 70%),
       var(--color-deep);
   }
-  /* Film grain over everything, so the four photos read as one shot. */
+  /* Film grain over everything, so the separate photos read as one shot. */
   .team-stage::after {
     content: "";
     position: absolute;
@@ -1244,7 +1244,7 @@
   }
   .team-photo {
     position: relative;
-    aspect-ratio: 1220 / 600;
+    aspect-ratio: 1120 / 630;
   }
   .team-layer {
     position: absolute;
@@ -1254,6 +1254,10 @@
     transition:
       filter 0.45s var(--ease-out-soft),
       transform 0.5s var(--ease-out-soft);
+  }
+  /* At rest the founder in the centre is lit a touch brighter than the others. */
+  .team-stage:not(.has-active) .team-layer:not(.is-lead) {
+    filter: brightness(0.8);
   }
   .has-active .team-layer {
     filter: brightness(0.3) contrast(0.9);
