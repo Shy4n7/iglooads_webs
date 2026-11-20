@@ -23,7 +23,7 @@ export default function Footer() {
       </div>
       <div className="wrap mt-6 flex flex-wrap justify-between gap-x-6 gap-y-2 text-xs text-cream-mute">
         <span>
-          &copy; <Year /> Igloo Ads. Instagram reels, UGC ads, brand shoots and websites.
+          &copy; <Year /> Igloo Ads. Social media, influencer and digital marketing, video production, models, events and websites.
         </span>
         <span>GSTIN {GSTIN}</span>
       </div>
