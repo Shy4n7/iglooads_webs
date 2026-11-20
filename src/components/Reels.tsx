@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type MouseEvent } from "react";
-import { INSTAGRAM_LABEL, INSTAGRAM_URL, REELS, reelMedia } from "@/lib/content";
+import { INSTAGRAM_HANDLE, INSTAGRAM_URL, REELS, reelMedia } from "@/lib/content";
 import { useReducedMotion } from "@/lib/useReducedMotion";
 
 const CLOSE_MS = 600;
@@ -196,8 +196,13 @@ export default function Reels() {
           <h2 id="work-title" className="label text-cream">
             LATEST REELS
           </h2>
-          <a href={INSTAGRAM_URL} className="text-sm text-amber hover:underline">
-            {INSTAGRAM_LABEL} <span aria-hidden="true">&#8599;</span>
+          <a
+            href={INSTAGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-amber hover:underline"
+          >
+            More on {INSTAGRAM_HANDLE} <span aria-hidden="true">&#8599;</span>
           </a>
         </div>
         <div className="g6">

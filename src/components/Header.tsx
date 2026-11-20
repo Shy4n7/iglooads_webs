@@ -49,10 +49,10 @@ export default function Header() {
         </nav>
         <div className="flex items-center gap-2">
           <a
-            href="#book"
+            href="#contact"
             className="btn btn-amber inline-flex min-h-11 items-center rounded-full px-5 py-3 font-bebas text-[17px] tracking-[0.08em] no-underline"
           >
-            BOOK A CALL
+            GET IN TOUCH
           </a>
           <MobileMenu />
         </div>
