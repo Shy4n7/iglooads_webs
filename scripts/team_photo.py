@@ -12,8 +12,6 @@ The originals in assets/team are only read, never changed.
 """
 
 import math
-
-import numpy as np
 from pathlib import Path
 
 from PIL import Image, ImageFilter, ImageOps
@@ -31,10 +29,9 @@ DEEP = (29, 31, 56)
 # the chin and the face centre. Faces are scaled so eye-to-chin matches,
 # times scale where a face still reads smaller than the others.
 # x: face centre in the row; drop: how far the eyes sit below EYE_Y
-# (negative is higher); rough: a cleanly lit studio photo, given plainer,
-# natural light (sun from the top left) so it looks as casual as the others.
+# (negative is higher).
 PEOPLE = {
-    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0, x=330, drop=0, rough=True),
+    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0, x=330, drop=0),
     "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.06, x=590, drop=-6),
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=850, drop=0),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=1110, drop=4),
@@ -96,34 +93,12 @@ def stats(grey, alpha, box):
 S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
 
 
-def roughen(grey, alpha, box):
-    """Natural light: flatter and a little dimmer than the studio original,
-    slightly soft, with sun falling on him from the top left: the hair and
-    that side of the face catch it, the far side and lower body fall into
-    shade."""
-    mean, std = stats(grey, alpha, box)
-    grey = grey.point(lambda g: max(0, min(255, round(mean - 10 + (g - mean) * 0.78))))
-    w = box[2] - box[0]
-    # The sun sits above and to the left of the head.
-    sx, sy = box[0] + 0.05 * w, box[1] - 0.25 * w
-    reach = 1.9 * w
-    yy, xx = np.mgrid[0 : grey.height, 0 : grey.width]
-    near = np.clip(1 - np.hypot(xx - sx, yy - sy) / reach, 0, 1)
-    g = np.asarray(grey, dtype=np.float32)
-    # Shade away from the sun, a warm-white lift where it lands.
-    g = g * (0.6 + 0.4 * near) + 190 * near**1.6 * (g / 255) ** 0.5
-    grey = Image.fromarray(np.clip(g, 0, 255).astype(np.uint8))
-    return grey.filter(ImageFilter.GaussianBlur(0.9))
-
-
-def to_grey(rgba, box, target=None, rough=False):
+def to_grey(rgba, box, target=None):
     """Black and white. With a target (mean, std), the face is graded to
     match it and polished: a touch of smoothing, the S-curve, then crisp
     detail. Without one, the photo is only turned grey."""
     grey = ImageOps.grayscale(rgba.convert("RGB"))
     alpha = rgba.getchannel("A")
-    if rough:
-        grey = roughen(grey, alpha, box)
     if target:
         mean, std = stats(grey, alpha, box)
         t_mean, t_std = target
@@ -138,11 +113,10 @@ def main():
     canvases = {name: layer(cut_out(p, session), p) for name, p in PEOPLE.items()}
     ref = canvases[REFERENCE]
     target = stats(ImageOps.grayscale(ref.convert("RGB")), ref.getchannel("A"), face_box(PEOPLE[REFERENCE]))
-    # The reference sets the grade before any roughening, so the others keep it.
     print("reference face", [round(v, 1) for v in target])
     layers = {}
     for name, p in PEOPLE.items():
-        layers[name] = to_grey(canvases[name], face_box(p), None if name == REFERENCE else target, p.get("rough", False))
+        layers[name] = to_grey(canvases[name], face_box(p), None if name == REFERENCE else target)
         layers[name].save(OUT / f"team-{name}.webp", quality=82, method=6)
         print("layer", name)
     group = Image.new("RGBA", layers[REFERENCE].size, DEEP + (255,))
