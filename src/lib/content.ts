@@ -23,6 +23,7 @@ export const NAV = [
   { href: "#work", label: "Work" },
   { href: "#services", label: "Services" },
   { href: "#process", label: "Process" },
+  { href: "#team", label: "Team" },
   { href: "#contact", label: "Contact" },
 ];
 
@@ -85,5 +86,67 @@ export const REVIEWS = [
     title: "Understanding and professionalism",
     quote:
       "What makes Igloo Ads different is how well they understand our business. We don\u2019t have to explain everything repeatedly. They understand our requirements, take ownership and make sure the final output is exactly what we expect. Great experience working with them!",
+  },
+];
+
+// Team, left to right as they stand in the group photo (public/media/team-*,
+// built by scripts/team_photo.py). x is each face's centre and from/to the
+// edges of the area that highlights them, all as % of the photo's width.
+export type Member = {
+  id: string;
+  name: string;
+  role: string;
+  line: string;
+  handle: string;
+  instagram: string;
+  x: number;
+  from: number;
+  to: number;
+};
+
+export const TEAM: Member[] = [
+  {
+    id: "shyan",
+    name: "Shyan",
+    role: "Technical Lead",
+    line: "Builds the websites and keeps the tech behind every campaign running.",
+    handle: "@_shyan7",
+    instagram: "https://www.instagram.com/_shyan7/",
+    x: 14.3,
+    from: 0,
+    to: 23.5,
+  },
+  {
+    id: "suhail",
+    name: "Suhail",
+    role: "Founder and CEO",
+    line: "Started Igloo Ads and sets the direction for every brand we take on.",
+    handle: "@moh_suhaill",
+    instagram: "https://www.instagram.com/moh_suhaill/",
+    x: 32.8,
+    from: 23.5,
+    to: 45.7,
+  },
+  {
+    id: "sudhir",
+    name: "Sudhir",
+    role: "Chief Operating Officer",
+    line: "Runs the shoots, schedules and deliveries so nothing ever slips.",
+    handle: "@_sudhir.____",
+    instagram: "https://www.instagram.com/_sudhir.____/",
+    x: 58.6,
+    from: 45.7,
+    to: 71.3,
+  },
+  {
+    id: "ajay",
+    name: "Ajay",
+    role: "Creative Head and Model",
+    line: "Dreams up the concepts, then steps in front of the camera himself.",
+    handle: "@_ajayy.13_",
+    instagram: "https://www.instagram.com/_ajayy.13_/",
+    x: 84,
+    from: 71.3,
+    to: 100,
   },
 ];

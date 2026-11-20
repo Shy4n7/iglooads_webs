@@ -140,16 +140,6 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 20px;
   }
-  .gsvc {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 18px;
-  }
-  @media (max-width: 1200px) {
-    .gsvc {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
   .g2 {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1002,14 +992,450 @@
   }
 
   /* ---------- Service cards ---------- */
-  .cut {
-    clip-path: polygon(0 0, 100% 0, 100% 62%, 55% 100%, 0 74%);
-  }
   .glass {
     background: rgba(29, 31, 56, 0.62);
     border: 1px solid rgba(238, 235, 218, 0.25);
     -webkit-backdrop-filter: blur(22px);
     backdrop-filter: blur(22px);
+  }
+
+  /* ---------- Services: numbered index ----------
+     Big rows in three groups. With a mouse, the pointed-at row lights up,
+     the others fade, its description slides in and its photo floats beside
+     the cursor. On touch screens and narrow windows each row opens in place. */
+  .svc-index {
+    position: relative;
+    isolation: isolate;
+  }
+  /* Rows sit above the floating photo, so the highlighted name reads on top of it. */
+  .svc-group {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 130px minmax(0, 1fr);
+    border-top: 1px solid var(--color-indigo);
+  }
+  .svc-group-label {
+    margin: 0;
+    padding-top: 30px;
+    font-family: var(--font-bebas);
+    font-size: 16px;
+    font-weight: 400;
+    letter-spacing: 0.3em;
+    color: var(--color-ink-mute);
+  }
+  .svc-row {
+    border-bottom: 1px solid var(--color-line);
+  }
+  .svc-row:last-child {
+    border-bottom: 0;
+  }
+  .svc-head {
+    display: grid;
+    grid-template-columns: 44px auto minmax(0, 1fr) 32px;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 20px 0;
+    border: 0;
+    background: none;
+    color: var(--color-indigo);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .svc-num {
+    font-family: var(--font-anton);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    color: var(--color-orange);
+  }
+  .svc-name {
+    font-family: var(--font-bebas);
+    font-size: clamp(36px, 4.6vw, 66px);
+    line-height: 0.95;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    transition:
+      color 0.3s,
+      translate 0.4s var(--ease-out-soft);
+  }
+  .svc-desc {
+    justify-self: end;
+    max-width: 300px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-ink-soft);
+    text-align: right;
+    opacity: 0;
+    translate: 12px 0;
+    transition:
+      opacity 0.3s,
+      translate 0.4s var(--ease-out-soft);
+  }
+  .svc-arrow {
+    justify-self: end;
+    transition:
+      rotate 0.35s var(--ease-out-soft),
+      color 0.3s;
+  }
+  .svc-index.is-pointing .svc-name {
+    color: rgba(40, 43, 74, 0.28);
+  }
+  .svc-index .svc-row.is-active .svc-name {
+    color: var(--color-orange);
+    translate: 14px 0;
+  }
+  .svc-row.is-active .svc-desc {
+    opacity: 1;
+    translate: 0 0;
+  }
+  .svc-row.is-active .svc-arrow {
+    rotate: 45deg;
+    color: var(--color-orange);
+  }
+  .svc-body {
+    display: none;
+  }
+  /* The floating photo: its wrapper is moved to the cursor by script. */
+  .svc-float {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+  }
+  .svc-float-in {
+    position: absolute;
+    left: 36px;
+    top: -170px;
+    width: 250px;
+    height: 320px;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--color-mid);
+    box-shadow: 0 30px 60px -24px rgba(29, 31, 56, 0.55);
+    opacity: 0;
+    rotate: -5deg;
+    scale: 0.8;
+    transition:
+      opacity 0.3s,
+      scale 0.45s var(--ease-out-soft),
+      rotate 0.45s var(--ease-out-soft);
+  }
+  .svc-float.on-left .svc-float-in {
+    left: -286px;
+  }
+  .svc-index.is-pointing .svc-float-in {
+    opacity: 1;
+    scale: 1;
+    rotate: -3deg;
+  }
+  .svc-float-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .svc-float-img.is-on {
+    opacity: 1;
+  }
+  @media (hover: none), (max-width: 720px) {
+    .svc-group {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .svc-group-label {
+      padding-top: 18px;
+      font-size: 14px;
+    }
+    .svc-head {
+      grid-template-columns: 34px minmax(0, 1fr) 26px;
+      gap: 12px;
+      padding: 16px 0;
+    }
+    .svc-name {
+      font-size: clamp(28px, 8vw, 44px);
+    }
+    .svc-desc,
+    .svc-float {
+      display: none;
+    }
+    .svc-index.is-pointing .svc-name {
+      color: inherit;
+    }
+    .svc-row.is-open .svc-name {
+      color: var(--color-orange);
+    }
+    .svc-row.is-open .svc-arrow {
+      rotate: 135deg;
+      color: var(--color-orange);
+    }
+    .svc-body {
+      display: grid;
+      grid-template-rows: 0fr;
+      transition: grid-template-rows 0.4s var(--ease-out-soft);
+    }
+    .svc-row.is-open .svc-body {
+      grid-template-rows: 1fr;
+    }
+    .svc-body-in {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 14px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .svc-row.is-open .svc-body-in {
+      padding-bottom: 20px;
+    }
+    .svc-body-img {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      border-radius: 16px;
+      background: var(--color-mid);
+    }
+  }
+
+  /* ---------- Team ----------
+     One black and white group photo on a dark studio backdrop, framed with
+     the opening's viewfinder corners. The pointed-at person stays lit, the
+     others drop into shadow, and a lower-third caption introduces him. */
+  .team-stage {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    max-width: 1100px;
+    margin-inline: auto;
+    padding-top: 7%;
+    border-radius: 28px;
+    background:
+      radial-gradient(70% 60% at 50% 30%, #34385f 0%, transparent 70%),
+      var(--color-deep);
+  }
+  /* Film grain over everything, so the four photos read as one shot. */
+  .team-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    pointer-events: none;
+    opacity: 0.16;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+  /* Dark edges: a soft vignette pulls the eye to the middle. */
+  .team-stage::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background:
+      linear-gradient(to right, var(--color-deep) 0%, transparent 9%, transparent 91%, var(--color-deep) 100%),
+      linear-gradient(to top, var(--color-deep) 0%, rgba(29, 31, 56, 0.85) 12%, transparent 38%);
+  }
+  .team-photo {
+    position: relative;
+    aspect-ratio: 1220 / 600;
+  }
+  .team-layer {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transition:
+      filter 0.45s var(--ease-out-soft),
+      transform 0.5s var(--ease-out-soft);
+  }
+  .has-active .team-layer {
+    filter: brightness(0.3) contrast(0.9);
+  }
+  .has-active .team-layer.is-active {
+    filter: brightness(1.06) contrast(1.06);
+    transform: translateY(-6px);
+  }
+  /* Soft light behind the person being introduced. */
+  .team-glow {
+    position: absolute;
+    top: 0;
+    width: 34%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(238, 235, 218, 0.16), transparent);
+    transform: translate(-50%, -12%);
+    transition:
+      left 0.5s var(--ease-out-soft),
+      opacity 0.4s;
+    pointer-events: none;
+  }
+  .team-hit {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 6;
+    cursor: pointer;
+  }
+  .team-hit:focus-visible {
+    outline-offset: -6px;
+    border-radius: 20px;
+  }
+  .team-corner {
+    position: absolute;
+    z-index: 6;
+    width: 26px;
+    height: 26px;
+    border: 0 solid rgba(238, 235, 218, 0.55);
+    pointer-events: none;
+  }
+  .team-corner.tl {
+    top: 18px;
+    left: 18px;
+    border-top-width: 2px;
+    border-left-width: 2px;
+  }
+  .team-corner.tr {
+    top: 18px;
+    right: 18px;
+    border-top-width: 2px;
+    border-right-width: 2px;
+  }
+  .team-corner.bl {
+    bottom: 18px;
+    left: 18px;
+    border-bottom-width: 2px;
+    border-left-width: 2px;
+  }
+  .team-corner.br {
+    bottom: 18px;
+    right: 18px;
+    border-bottom-width: 2px;
+    border-right-width: 2px;
+  }
+  /* Lower third, like a name caption on a TV interview. */
+  .team-caption {
+    position: absolute;
+    left: 48px;
+    bottom: 40px;
+    z-index: 7;
+    max-width: 420px;
+    color: var(--color-cream);
+    pointer-events: none;
+  }
+  .team-caption.on-right {
+    left: auto;
+    right: 48px;
+  }
+  .team-caption a {
+    pointer-events: auto;
+  }
+  .team-caption-in {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    padding-left: 16px;
+    border-left: 3px solid var(--color-amber);
+    animation: caption-in 0.45s var(--ease-out-soft) both;
+  }
+  @keyframes caption-in {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  .team-role {
+    padding: 3px 8px;
+    border-radius: 5px;
+    background: var(--color-amber);
+    color: var(--color-indigo);
+    font-family: var(--font-bebas);
+    font-size: 14px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .team-name {
+    font-family: var(--font-bebas);
+    font-size: clamp(40px, 5vw, 64px);
+    font-weight: 400;
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .team-line {
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--color-cream-soft);
+  }
+  .team-handle {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--color-amber);
+    text-decoration: none;
+  }
+  .team-handle:hover {
+    text-decoration: underline;
+  }
+  .team-hint-touch {
+    display: none;
+  }
+  @media (hover: none) {
+    .team-hint-hover {
+      display: none;
+    }
+    .team-hint-touch {
+      display: inline;
+    }
+  }
+  /* Phones: the caption sits under the photo, still inside the panel. */
+  @media (max-width: 720px) {
+    .team-stage {
+      margin-inline: -8px;
+      padding-top: 12%;
+      border-radius: 22px;
+    }
+    .team-stage::before {
+      background:
+        linear-gradient(to right, var(--color-deep) 0%, transparent 7%, transparent 93%, var(--color-deep) 100%),
+        linear-gradient(to top, var(--color-deep) 0%, var(--color-deep) 28%, transparent 48%);
+    }
+    .team-caption,
+    .team-caption.on-right {
+      position: relative;
+      left: auto;
+      right: auto;
+      bottom: auto;
+      max-width: none;
+      margin-top: -14%;
+      padding: 0 22px 26px;
+    }
+    .team-corner {
+      width: 18px;
+      height: 18px;
+    }
+    .team-corner.tl,
+    .team-corner.tr {
+      top: 12px;
+    }
+    .team-corner.bl,
+    .team-corner.br {
+      bottom: 12px;
+    }
+    .team-corner.tl,
+    .team-corner.bl {
+      left: 12px;
+    }
+    .team-corner.tr,
+    .team-corner.br {
+      right: 12px;
+    }
   }
 
   /* ---------- Contact: enquiry form ----------
@@ -1105,51 +1531,265 @@
     opacity: 0.6;
     cursor: progress;
   }
-  /* Direct contact cards under the form. */
-  .enq-direct {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    padding: 18px 20px;
-    border: 1px solid rgba(238, 235, 218, 0.16);
-    border-radius: 18px;
-    color: var(--color-cream);
-    text-decoration: none;
+  /* ---------- Contact: 3D visiting card ----------
+     A card with real thickness: an indigo brand side and a cream side with
+     every way to reach us plus a WhatsApp QR code. Everything inside is
+     sized in cqw, so phones get the same card, only smaller. VisitingCard
+     sets --ry/--rx (turn), --sx (sheen) and --sw/--so (shadow). */
+  .vc3 {
+    width: min(100%, 560px);
+    margin: 72px auto 0;
   }
-  .enq-direct > span {
+  .vc3-box {
+    container-type: inline-size;
+  }
+  .vc3-scene {
+    position: relative;
+    padding: 4cqw 0 8cqw;
+    perspective: 1400px;
+    perspective-origin: 50% 30%;
+    touch-action: pan-y;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .vc3-scene.is-dragging {
+    cursor: grabbing;
+  }
+  .vc3-card {
+    --t: 1.6cqw;
+    position: relative;
+    width: 100cqw;
+    height: 60cqw;
+    transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 6deg)) rotateY(var(--ry, 0deg));
+  }
+  .vc3-face {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 3.2cqw;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  /* Edge: cream, an amber core, cream. */
+  .vc3-edge {
+    position: absolute;
+    top: 3.2cqw;
+    bottom: 3.2cqw;
+    left: 50%;
+    width: var(--t);
+    margin-left: calc(var(--t) / -2);
+    background: linear-gradient(90deg, #d9d5bf 0 30%, var(--color-amber) 30% 70%, #d9d5bf 70%);
+  }
+  .vc3-edge.is-r {
+    transform: rotateY(90deg) translateZ(calc(50cqw - 0.05cqw));
+  }
+  .vc3-edge.is-l {
+    transform: rotateY(-90deg) translateZ(calc(50cqw - 0.05cqw));
+  }
+
+  .vc3-front {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    min-width: 0;
-    font-size: 14px;
+    justify-content: space-between;
+    padding: 6cqw 6.5cqw;
+    background:
+      radial-gradient(70% 90% at 85% 15%, #3b3f6c 0%, transparent 60%),
+      var(--color-deep);
+    color: var(--color-cream);
+    transform: translateZ(calc(var(--t) / 2));
   }
-  .enq-direct strong {
-    font-weight: 600;
-    font-size: 15px;
+  .vc3-ring {
+    position: absolute;
+    right: -12cqw;
+    bottom: -26cqw;
+    width: 52cqw;
+    height: 52cqw;
+    border: 0.5cqw solid rgba(242, 182, 97, 0.55);
+    border-radius: 50%;
   }
-  .enq-direct small {
-    font-size: 14px;
-    color: var(--color-cream-soft);
+  .vc3-ring.is-inner {
+    right: -4cqw;
+    bottom: -18cqw;
+    width: 36cqw;
+    height: 36cqw;
+    border-color: rgba(242, 182, 97, 0.3);
   }
-  .enq-direct a {
-    color: var(--color-cream-soft);
-    text-decoration: none;
-    overflow-wrap: anywhere;
-  }
-  .enq-direct a:hover {
+  .vc3-tag {
+    font-family: var(--font-bebas);
+    font-size: 2.8cqw;
+    letter-spacing: 0.3em;
     color: var(--color-amber);
   }
-  .enq-wa {
+  .vc3-word {
+    margin-top: 3cqw;
+    font-family: var(--font-bebas);
+    font-size: 15cqw;
+    line-height: 0.82;
+    letter-spacing: 0.02em;
+  }
+  .vc3-word span {
+    color: var(--color-amber);
+  }
+  .vc3-sub {
+    margin-top: 1.6cqw;
+    font-size: 2.6cqw;
+    color: var(--color-cream-mute);
+  }
+  .vc3-foot {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    font-family: var(--font-bebas);
+    font-size: 2.8cqw;
+    letter-spacing: 0.2em;
+    color: var(--color-cream-mute);
+  }
+  .vc3-foot b {
+    font-weight: 400;
+    color: var(--color-cream);
+  }
+
+  .vc3-back {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 4cqw;
+    padding: 5cqw 5cqw 4.4cqw;
+    border-left: 1.6cqw solid var(--color-amber);
+    background: var(--color-card);
+    color: var(--color-indigo);
+    transform: rotateY(180deg) translateZ(calc(var(--t) / 2));
+  }
+  .vc3-logo {
+    margin-bottom: 3cqw;
+    font-family: var(--font-bebas);
+    font-size: 4.4cqw;
+    line-height: 1;
+    letter-spacing: 0.3em;
+  }
+  .vc3-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.9cqw;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 2.85cqw;
+    font-weight: 500;
+  }
+  .vc3-list li {
+    display: flex;
+    align-items: center;
+    gap: 1.8cqw;
+    white-space: nowrap;
+  }
+  .vc3-icon {
+    flex: none;
+    width: 3.3cqw;
+    height: 3.3cqw;
+    color: var(--color-orange);
+  }
+  .vc3-back a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .vc3-list a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--color-amber);
+    text-underline-offset: 0.5cqw;
+  }
+  .vc3-gst {
+    position: absolute;
+    left: 6.6cqw;
+    bottom: 4cqw;
+    font-size: 2cqw;
+    letter-spacing: 0.14em;
+    color: var(--color-ink-mute);
+  }
+  .vc3-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+    gap: 1.8cqw;
+  }
+  .vc3-qr a {
+    display: block;
+    padding: 1.6cqw;
+    border-radius: 2cqw;
+    background: #fff;
+    line-height: 0;
+    box-shadow: 0 0 0 0.3cqw var(--color-indigo);
+  }
+  .vc3-qr img {
+    display: block;
+    width: 24cqw;
+    height: 24cqw;
+  }
+  .vc3-qr p {
+    font-family: var(--font-bebas);
+    font-size: 2.6cqw;
+    line-height: 1.1;
+    letter-spacing: 0.16em;
+    text-align: center;
+  }
+  /* A sheen that slides across as the card turns. */
+  .vc3-sheen {
+    position: absolute;
+    inset: -20%;
+    pointer-events: none;
+    background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.32) 48%, transparent 60%);
+    mix-blend-mode: soft-light;
+    transform: translateX(var(--sx, 0%));
+  }
+  .vc3-back .vc3-sheen {
+    background: linear-gradient(105deg, transparent 40%, rgba(40, 43, 74, 0.05) 55%, transparent 65%);
+    mix-blend-mode: multiply;
+  }
+  .vc3-shadow {
+    position: absolute;
+    left: 12%;
+    right: 12%;
+    bottom: 0;
+    height: 5cqw;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgba(0, 0, 0, 0.5), transparent);
+    filter: blur(4px);
+    opacity: var(--so, 0.9);
+    transform: scaleX(var(--sw, 1));
+  }
+  .vc3-ctrl {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px 16px;
+    margin-top: 6px;
+  }
+  .vc3-flip {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 46px;
+    padding: 0 24px;
+    border-radius: 999px;
     background: var(--color-amber);
-    border-color: var(--color-amber);
     color: var(--color-indigo);
-    transition: background-color 0.2s;
+    font-family: var(--font-bebas);
+    font-size: 18px;
+    letter-spacing: 0.12em;
+    cursor: pointer;
   }
-  .enq-wa small {
-    color: var(--color-indigo);
+  .vc3-hint {
+    font-size: 13px;
+    color: var(--color-cream-mute);
   }
-  .enq-wa:hover {
-    background: #f6c57e;
+  @media (max-width: 720px) {
+    .vc3 {
+      margin-top: 56px;
+    }
   }
   @media (max-width: 600px) {
     .enq {
@@ -1348,8 +1988,7 @@
     }
   }
   @media (max-width: 560px) {
-    .g3,
-    .gsvc {
+    .g3 {
       display: flex;
       overflow-x: auto;
       gap: 12px;
@@ -1358,12 +1997,10 @@
       padding: 4px 20px 16px;
       scrollbar-width: none;
     }
-    .g3::-webkit-scrollbar,
-    .gsvc::-webkit-scrollbar {
+    .g3::-webkit-scrollbar {
       display: none;
     }
-    .g3 > *,
-    .gsvc > * {
+    .g3 > * {
       flex: 0 0 260px;
       scroll-snap-align: start;
     }
@@ -1398,8 +2035,17 @@
       transition: none;
     }
     .enq-field span,
-    .enq-send {
+    .enq-send,
+    .team-layer,
+    .team-glow,
+    .svc-name,
+    .svc-desc,
+    .svc-float-in,
+    .svc-body {
       transition: none;
+    }
+    .team-caption-in {
+      animation: none;
     }
     html .intro .intro-step.intro-step {
       transition: none;

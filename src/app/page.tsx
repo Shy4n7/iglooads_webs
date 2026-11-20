@@ -8,6 +8,7 @@ import Process from "@/components/Process";
 import Reels from "@/components/Reels";
 import Results from "@/components/Results";
 import Services from "@/components/Services";
+import Team from "@/components/Team";
 import TrustedBy from "@/components/TrustedBy";
 
 export default function Home() {
@@ -22,6 +23,7 @@ export default function Home() {
         <Services />
         <Process />
         <Results />
+        <Team />
         <ActNow />
         <Contact />
       </main>
