@@ -103,23 +103,9 @@ export type Member = {
   x: number;
   from: number;
   to: number;
-  /** Top and bottom of the clickable area in % of the height, when not the full height. */
-  y?: [number, number];
 };
 
 export const TEAM: Member[] = [
-  {
-    id: "suhail",
-    name: "Suhail",
-    role: "Founder and CEO",
-    line: "Started Igloo Ads and sets the direction for every brand we take on.",
-    handle: "@moh_suhaill",
-    instagram: "https://www.instagram.com/moh_suhaill/",
-    x: 50.4,
-    from: 34,
-    to: 66,
-    y: [37, 100],
-  },
   {
     id: "shyan",
     name: "Shyan",
@@ -127,9 +113,20 @@ export const TEAM: Member[] = [
     line: "Builds the websites and keeps the tech behind every campaign running.",
     handle: "@_shyan7",
     instagram: "https://www.instagram.com/_shyan7/",
-    x: 24.1,
+    x: 17.5,
     from: 0,
-    to: 34,
+    to: 28.3,
+  },
+  {
+    id: "suhail",
+    name: "Suhail",
+    role: "Founder and CEO",
+    line: "Started Igloo Ads and sets the direction for every brand we take on.",
+    handle: "@moh_suhaill",
+    instagram: "https://www.instagram.com/moh_suhaill/",
+    x: 39.2,
+    from: 28.3,
+    to: 50,
   },
   {
     id: "sudhir",
@@ -138,10 +135,9 @@ export const TEAM: Member[] = [
     line: "Runs the shoots, schedules and deliveries so nothing ever slips.",
     handle: "@_sudhir.____",
     instagram: "https://www.instagram.com/_sudhir.____/",
-    x: 51.8,
-    from: 34,
-    to: 66,
-    y: [0, 37],
+    x: 60.8,
+    from: 50,
+    to: 71.7,
   },
   {
     id: "ajay",
@@ -150,8 +146,8 @@ export const TEAM: Member[] = [
     line: "Dreams up the concepts, then steps in front of the camera himself.",
     handle: "@_ajayy.13_",
     instagram: "https://www.instagram.com/_ajayy.13_/",
-    x: 76.3,
-    from: 66,
+    x: 82.5,
+    from: 71.7,
     to: 100,
   },
 ];

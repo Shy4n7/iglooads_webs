@@ -1244,7 +1244,7 @@
   }
   .team-photo {
     position: relative;
-    aspect-ratio: 1120 / 710;
+    aspect-ratio: 1200 / 610;
   }
   .team-layer {
     position: absolute;
@@ -1278,6 +1278,8 @@
   }
   .team-hit {
     position: absolute;
+    top: 0;
+    bottom: 0;
     z-index: 6;
     cursor: pointer;
   }

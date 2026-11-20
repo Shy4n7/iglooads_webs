@@ -9,11 +9,11 @@ import sudhir from "../../public/media/team-sudhir.webp";
 import ajay from "../../public/media/team-ajay.webp";
 
 const LAYERS = { shyan, suhail, sudhir, ajay };
-// Back to front: Suhail, the founder, stands first, in front; Sudhir looks over his head.
+// Back to front, so the founder's shoulders sit in front of his neighbours'.
 const PAINT = ["shyan", "ajay", "sudhir", "suhail"] as const;
 
 /**
- * The team as one black and white group photo, the founder in the centre on a dark studio backdrop,
+ * The team as one black and white group photo on a dark studio backdrop,
  * framed like the opening's viewfinder. Each person is a separate layer:
  * hovering (or tapping) someone keeps him lit while the others drop into
  * shadow, and a caption in the corner introduces him with his role and
@@ -88,12 +88,7 @@ export default function Team() {
               target="_blank"
               rel="noopener noreferrer"
               className="team-hit"
-              style={{
-                left: `${t.from}%`,
-                width: `${t.to - t.from}%`,
-                top: `${t.y?.[0] ?? 0}%`,
-                height: `${(t.y?.[1] ?? 100) - (t.y?.[0] ?? 0)}%`,
-              }}
+              style={{ left: `${t.from}%`, width: `${t.to - t.from}%` }}
               aria-label={`${t.name}, ${t.role}. ${t.handle} on Instagram`}
               onPointerEnter={hover(i)}
               onFocus={focus(i)}
