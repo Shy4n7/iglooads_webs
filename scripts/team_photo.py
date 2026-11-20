@@ -14,7 +14,7 @@ The originals in assets/team are only read, never changed.
 import math
 from pathlib import Path
 
-from PIL import Image, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageFilter, ImageOps
 import pillow_heif
 from rembg import new_session, remove
 
@@ -29,9 +29,10 @@ DEEP = (29, 31, 56)
 # the chin and the face centre. Faces are scaled so eye-to-chin matches,
 # times scale where a face still reads smaller than the others.
 # x: face centre in the row; drop: how far the eyes sit below EYE_Y
-# (negative is higher).
+# (negative is higher); rough: a cleanly lit photo, given plainer, uneven
+# light so it looks as casual as the others.
 PEOPLE = {
-    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0, x=330, drop=0),
+    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0, x=330, drop=0, rough=True),
     "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.06, x=590, drop=-6),
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0, x=850, drop=0),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0, x=1110, drop=4),
@@ -93,12 +94,27 @@ def stats(grey, alpha, box):
 S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
 
 
-def to_grey(rgba, box, target=None):
+def roughen(grey, alpha, box):
+    """Plainer light: flatter and a little dimmer, light falling off across
+    the face from one side, and slightly soft, like an ordinary phone photo."""
+    mean, std = stats(grey, alpha, box)
+    grey = grey.point(lambda g: max(0, min(255, round(mean - 10 + (g - mean) * 0.78))))
+    # Light from the right: across the face the left side drops about a quarter.
+    left, right = box[0], box[2]
+    row = Image.new("L", (grey.width, 1))
+    row.putdata([round(255 * (0.74 + 0.26 * min(1, max(0, (x - left) / (right - left))))) for x in range(grey.width)])
+    grey = ImageChops.multiply(grey, row.resize(grey.size))
+    return grey.filter(ImageFilter.GaussianBlur(0.9))
+
+
+def to_grey(rgba, box, target=None, rough=False):
     """Black and white. With a target (mean, std), the face is graded to
     match it and polished: a touch of smoothing, the S-curve, then crisp
     detail. Without one, the photo is only turned grey."""
     grey = ImageOps.grayscale(rgba.convert("RGB"))
     alpha = rgba.getchannel("A")
+    if rough:
+        grey = roughen(grey, alpha, box)
     if target:
         mean, std = stats(grey, alpha, box)
         t_mean, t_std = target
@@ -113,10 +129,11 @@ def main():
     canvases = {name: layer(cut_out(p, session), p) for name, p in PEOPLE.items()}
     ref = canvases[REFERENCE]
     target = stats(ImageOps.grayscale(ref.convert("RGB")), ref.getchannel("A"), face_box(PEOPLE[REFERENCE]))
+    # The reference sets the grade before any roughening, so the others keep it.
     print("reference face", [round(v, 1) for v in target])
     layers = {}
     for name, p in PEOPLE.items():
-        layers[name] = to_grey(canvases[name], face_box(p), None if name == REFERENCE else target)
+        layers[name] = to_grey(canvases[name], face_box(p), None if name == REFERENCE else target, p.get("rough", False))
         layers[name].save(OUT / f"team-{name}.webp", quality=82, method=6)
         print("layer", name)
     group = Image.new("RGBA", layers[REFERENCE].size, DEEP + (255,))
