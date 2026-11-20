@@ -2,31 +2,19 @@
 
 import Image from "next/image";
 import { useState, type FocusEvent, type MouseEvent, type PointerEvent } from "react";
-import { FOUNDER_ID, TEAM } from "@/lib/content";
+import { TEAM } from "@/lib/content";
 import suhail from "../../public/media/team-suhail.webp";
 import shyan from "../../public/media/team-shyan.webp";
 import sudhir from "../../public/media/team-sudhir.webp";
 import ajay from "../../public/media/team-ajay.webp";
 
-const FOUNDER = TEAM.find((t) => t.id === FOUNDER_ID)!;
-const CREW = TEAM.filter((t) => t.id !== FOUNDER_ID);
-const LAYERS = { shyan, sudhir, ajay };
-// Back to front: Sudhir stands in the centre, in front of the other two.
-const PAINT = ["shyan", "ajay", "sudhir"] as const;
-
-const Corners = () => (
-  <>
-    <span className="team-corner tl" aria-hidden="true" />
-    <span className="team-corner tr" aria-hidden="true" />
-    <span className="team-corner bl" aria-hidden="true" />
-    <span className="team-corner br" aria-hidden="true" />
-  </>
-);
+const LAYERS = { shyan, suhail, sudhir, ajay };
+// Back to front: Suhail, the founder, stands first, in front; Sudhir looks over his head.
+const PAINT = ["shyan", "ajay", "sudhir", "suhail"] as const;
 
 /**
- * The founder on a panel of his own, beside the rest of the team as one
- * black and white group photo on a dark studio backdrop, both framed like
- * the opening's viewfinder. In the group each person is a separate layer:
+ * The team as one black and white group photo, the founder in the centre on a dark studio backdrop,
+ * framed like the opening's viewfinder. Each person is a separate layer:
  * hovering (or tapping) someone keeps him lit while the others drop into
  * shadow, and a caption in the corner introduces him with his role and
  * Instagram. Clicking a person opens his Instagram; on touch screens the
@@ -34,7 +22,7 @@ const Corners = () => (
  */
 export default function Team() {
   const [active, setActive] = useState<number | null>(null);
-  const m = active !== null ? CREW[active] : null;
+  const m = active !== null ? TEAM[active] : null;
 
   // Hover follows a real mouse only: a tap also fires mouse enter and leave
   // events, which would introduce and clear a person around the click.
@@ -68,87 +56,74 @@ export default function Team() {
         </p>
       </div>
 
-      <div className="team-grid rv">
-        <figure className="team-founder">
-          <Corners />
-          <Image
-            src={suhail}
-            alt={`${FOUNDER.name}, ${FOUNDER.role} of Igloo Ads`}
-            sizes="(max-width: 720px) 100vw, 420px"
-            className="team-founder-img"
+      <div className={`team-stage rv ${m ? "has-active" : ""}`} onPointerLeave={hover(null)}>
+        <span className="team-corner tl" aria-hidden="true" />
+        <span className="team-corner tr" aria-hidden="true" />
+        <span className="team-corner bl" aria-hidden="true" />
+        <span className="team-corner br" aria-hidden="true" />
+
+        <div className="team-photo">
+          <span
+            className="team-glow"
+            aria-hidden="true"
+            style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0 }}
           />
-          <figcaption className="team-caption is-static">
-            <div className="team-caption-in">
-              <span className="team-role">{FOUNDER.role}</span>
-              <strong className="team-name">{FOUNDER.name}</strong>
-              <span className="team-line">{FOUNDER.line}</span>
-              <a className="team-handle" href={FOUNDER.instagram} target="_blank" rel="noopener noreferrer">
-                {FOUNDER.handle} <span aria-hidden="true">&#8599;</span>
+          {PAINT.map((id) => {
+            const i = TEAM.findIndex((t) => t.id === id);
+            return (
+              <Image
+                key={id}
+                src={LAYERS[id]}
+                alt=""
+                aria-hidden="true"
+                sizes="(max-width: 1180px) 100vw, 1100px"
+                className={`team-layer ${active === i ? "is-active" : ""}`}
+              />
+            );
+          })}
+          {TEAM.map((t, i) => (
+            <a
+              key={t.id}
+              href={t.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="team-hit"
+              style={{
+                left: `${t.from}%`,
+                width: `${t.to - t.from}%`,
+                top: `${t.y?.[0] ?? 0}%`,
+                height: `${(t.y?.[1] ?? 100) - (t.y?.[0] ?? 0)}%`,
+              }}
+              aria-label={`${t.name}, ${t.role}. ${t.handle} on Instagram`}
+              onPointerEnter={hover(i)}
+              onFocus={focus(i)}
+              onBlur={() => setActive(null)}
+              onClick={onPerson(i)}
+            />
+          ))}
+        </div>
+
+        {/* The caption moves to the opposite side from the person it names. */}
+        <div className={`team-caption ${m && m.x < 50 ? "on-right" : ""}`} aria-live="polite">
+          {m ? (
+            <div key={m.id} className="team-caption-in">
+              <span className="team-role">{m.role}</span>
+              <strong className="team-name">{m.name}</strong>
+              <span className="team-line">{m.line}</span>
+              <a className="team-handle" href={m.instagram} target="_blank" rel="noopener noreferrer">
+                {m.handle} <span aria-hidden="true">&#8599;</span>
               </a>
             </div>
-          </figcaption>
-        </figure>
-
-        <div className={`team-stage ${m ? "has-active" : ""}`} onPointerLeave={hover(null)}>
-          <Corners />
-          <div className="team-photo">
-            <span
-              className="team-glow"
-              aria-hidden="true"
-              style={{ left: `${m ? m.x : 50}%`, opacity: m ? 1 : 0 }}
-            />
-            {PAINT.map((id) => {
-              const i = CREW.findIndex((t) => t.id === id);
-              return (
-                <Image
-                  key={id}
-                  src={LAYERS[id]}
-                  alt=""
-                  aria-hidden="true"
-                  sizes="(max-width: 720px) 100vw, 700px"
-                  className={`team-layer ${active === i ? "is-active" : ""}`}
-                />
-              );
-            })}
-            {CREW.map((t, i) => (
-              <a
-                key={t.id}
-                href={t.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="team-hit"
-                style={{ left: `${t.from}%`, width: `${t.to - t.from}%` }}
-                aria-label={`${t.name}, ${t.role}. ${t.handle} on Instagram`}
-                onPointerEnter={hover(i)}
-                onFocus={focus(i)}
-                onBlur={() => setActive(null)}
-                onClick={onPerson(i)}
-              />
-            ))}
-          </div>
-
-          {/* The caption moves to the opposite side from the person it names. */}
-          <div className={`team-caption ${m && m.x < 50 ? "on-right" : ""}`} aria-live="polite">
-            {m ? (
-              <div key={m.id} className="team-caption-in">
-                <span className="team-role">{m.role}</span>
-                <strong className="team-name">{m.name}</strong>
-                <span className="team-line">{m.line}</span>
-                <a className="team-handle" href={m.instagram} target="_blank" rel="noopener noreferrer">
-                  {m.handle} <span aria-hidden="true">&#8599;</span>
-                </a>
-              </div>
-            ) : (
-              <div key="crew" className="team-caption-in">
-                <span className="team-role">The crew</span>
-                <strong className="team-name">Meet the team</strong>
-                <span className="team-line">
-                  <span className="team-hint-hover">Point at anyone to meet them.</span>
-                  <span className="team-hint-touch">Tap anyone to meet them.</span>
-                </span>
-              </div>
-            )}
-          </div>
+          ) : (
+            <div key="crew" className="team-caption-in">
+              <span className="team-role">The crew</span>
+              <strong className="team-name">Meet the team</strong>
+              <span className="team-line">
+                <span className="team-hint-hover">Point at anyone to meet them.</span>
+                <span className="team-hint-touch">Tap anyone to meet them.</span>
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </section>
