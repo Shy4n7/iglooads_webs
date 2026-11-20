@@ -99,24 +99,10 @@ export type Member = {
   line: string;
   handle: string;
   instagram: string;
-  /** Centre of the face and the clickable area in the group photo, in % of its width. */
-  x: number;
-  from: number;
-  to: number;
 };
 
+/** In the order the team section introduces them. */
 export const TEAM: Member[] = [
-  {
-    id: "shyan",
-    name: "Shyan",
-    role: "Technical Lead",
-    line: "Builds the websites and keeps the tech behind every campaign running.",
-    handle: "@_shyan7",
-    instagram: "https://www.instagram.com/_shyan7/",
-    x: 17.5,
-    from: 0,
-    to: 28.3,
-  },
   {
     id: "suhail",
     name: "Suhail",
@@ -124,9 +110,6 @@ export const TEAM: Member[] = [
     line: "Started Igloo Ads and sets the direction for every brand we take on.",
     handle: "@moh_suhaill",
     instagram: "https://www.instagram.com/moh_suhaill/",
-    x: 39.2,
-    from: 28.3,
-    to: 50,
   },
   {
     id: "sudhir",
@@ -135,9 +118,6 @@ export const TEAM: Member[] = [
     line: "Runs the shoots, schedules and deliveries so nothing ever slips.",
     handle: "@_sudhir.____",
     instagram: "https://www.instagram.com/_sudhir.____/",
-    x: 60.8,
-    from: 50,
-    to: 71.7,
   },
   {
     id: "ajay",
@@ -146,9 +126,18 @@ export const TEAM: Member[] = [
     line: "Dreams up the concepts, then steps in front of the camera himself.",
     handle: "@_ajayy.13_",
     instagram: "https://www.instagram.com/_ajayy.13_/",
-    x: 82.5,
-    from: 71.7,
-    to: 100,
+  },
+  {
+    id: "shyan",
+    name: "Shyan",
+    role: "Technical Lead",
+    line: "Builds the websites and keeps the tech behind every campaign running.",
+    handle: "@_shyan7",
+    instagram: "https://www.instagram.com/_shyan7/",
   },
 ];
+
+/** Closes the team section, after the last person. */
+export const TEAM_STORY =
+  "Behind every campaign is a team that knows your brand inside out. We listen first, plan with purpose, and create content and websites built to turn attention into customers, all from our studio in Coimbatore.";
 
