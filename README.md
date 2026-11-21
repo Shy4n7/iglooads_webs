@@ -84,14 +84,14 @@ metadata.
 ## Team photos
 
 The team section (`src/components/Team.tsx`; names, roles, Instagram links and the closing
-paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) shows Sudhir, Ajay and Suhail together in one frame, cut out of the group photo `assets/team/group.jpg` by `scripts/team_group.py` into `public/media/team-group-cut.webp` (column positions in `FRAME`). Hovering (or tapping) a person lights them up and shows their role, name and Instagram in the frame; on phones the details show under it. "Play the team intro" opens an
+paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) shows a row of portrait cards. "Play the team intro" opens an
 optional full-screen fly-through: scrolling inside it moves a camera forward past each person's
 card to the next, in the order of `TEAM`, then to the paragraph. It closes with the X, Esc or the
 button at the end, and the page never pins. With reduced motion the intro's cards are stacked.
 
 The cards are made by `scripts/team_photo.py` from the original photos in `assets/team` (which it
 only reads). It cuts each person out of their background, scales them so the faces match, grades
-everyone to the same black and white look and writes `public/media/team-card-<name>.jpg` (for the intro) and `public/media/team-cut-<name>.webp` (clear background, for the group frame). To redo
+everyone to the same black and white look and writes `public/media/team-card-<name>.jpg`. To redo
 them, for example with a new photo:
 
 ```bash
