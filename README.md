@@ -175,5 +175,5 @@ Logos are imported straight from `assets/logos/wall/` by `next/image` (files are
 
 All in `src/lib/content.ts` unless noted.
 
-- Results (300K+ views, 3x growth, 6+ brands served): `RESULTS`. Only publish real, verifiable numbers.
+- Results (300K+ views, 3x growth, 6+ brands served): `RESULTS` (`to`, `suffix`, `label`, `visual`). The numbers count up and a small graphic plays when the card scrolls into view (`src/components/StatCard.tsx`). Only publish real, verifiable numbers.
 - Intro paragraph under the hero: `src/components/Intro.tsx`

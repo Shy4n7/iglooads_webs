@@ -65,10 +65,15 @@ export const STEPS = [
   },
 ];
 
-export const RESULTS = [
-  { value: "300K+", label: "views" },
-  { value: "3x", label: "growth" },
-  { value: "6+", label: "brands served" },
+export const RESULTS: {
+  to: number;
+  suffix: string;
+  label: string;
+  visual: "views" | "growth" | "brands";
+}[] = [
+  { to: 300, suffix: "K+", label: "views", visual: "views" },
+  { to: 3, suffix: "x", label: "growth", visual: "growth" },
+  { to: 6, suffix: "+", label: "brands served", visual: "brands" },
 ];
 
 export const REVIEWS = [
