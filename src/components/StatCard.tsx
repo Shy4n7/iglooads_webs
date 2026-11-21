@@ -6,11 +6,12 @@ type Props = {
   to: number;
   suffix: string;
   label: string;
+  line: string;
 };
 
 const ease = (t: number) => 1 - Math.pow(1 - t, 3);
 
-export default function StatCard({ to, suffix, label }: Props) {
+export default function StatCard({ to, suffix, label, line }: Props) {
   const ref = useRef<HTMLLIElement>(null);
   const [n, setN] = useState(to); // the real number until the animation takes over
 
@@ -55,8 +56,8 @@ export default function StatCard({ to, suffix, label }: Props) {
           {suffix}
         </span>
       </div>
-      <span className="stat-rule" aria-hidden="true" />
-      <div className="text-sm text-cream">{label}</div>
+      <div className="stat-label">{label}</div>
+      <p className="stat-line-text">{line}</p>
     </li>
   );
 }
