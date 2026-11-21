@@ -1,14 +1,27 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TEAM, TEAM_STORY } from "@/lib/content";
 import suhail from "../../public/media/team-card-suhail.jpg";
 import sudhir from "../../public/media/team-card-sudhir.jpg";
 import ajay from "../../public/media/team-card-ajay.jpg";
 import shyan from "../../public/media/team-card-shyan.jpg";
+import group from "../../public/media/team-group-cut.webp";
 
 const CARDS: Record<string, typeof suhail> = { suhail, sudhir, ajay, shyan };
+// Left to right in the group photo: where each person's column starts and
+// ends (percent of the frame), where their name tag sits in the column, and
+// where the glow behind them is centred.
+const FRAME = [
+  { id: "sudhir", left: 0, width: 40, tag: 77, spot: 31 },
+  { id: "ajay", left: 40, width: 18.5, tag: 49, spot: 49 },
+  { id: "suhail", left: 58.5, width: 41.5, tag: 33, spot: 72 },
+];
+const IN_FRAME = FRAME.map((f) => ({
+  ...f,
+  member: TEAM.find((t) => t.id === f.id)!,
+}));
 
 // Depth between scenes, and the share of scroll spent resting on a scene
 // versus flying to the next one.
@@ -19,7 +32,8 @@ const SCENES = TEAM.length + 1; // everyone, then the closing paragraph
 const UNITS = SCENES * HOLD + (SCENES - 1) * TRAVEL;
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const ease = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /** Scroll units to camera depth: it rests on each scene, then flies to the next. */
 function camera(u: number) {
@@ -32,29 +46,250 @@ function camera(u: number) {
   return { z: (SCENES - 1) * GAP, rest: SCENES - 1 };
 }
 
-/** Where to scroll so the camera rests on a scene. */
-function restingScroll(fly: HTMLElement, i: number) {
-  const u = i * (HOLD + TRAVEL) + HOLD / 2;
-  const top = fly.getBoundingClientRect().top + window.scrollY;
-  return top + (fly.offsetHeight - window.innerHeight) * (u / UNITS);
+const Corners = () => (
+  <>
+    <span className="team-corner tl" aria-hidden="true" />
+    <span className="team-corner tr" aria-hidden="true" />
+    <span className="team-corner bl" aria-hidden="true" />
+    <span className="team-corner br" aria-hidden="true" />
+  </>
+);
+
+/**
+ * The team: everyone in one frame, with an optional intro. Hovering a person
+ * (or tapping, or tabbing to them) lights them up and shows their role, name
+ * and Instagram. "Play the team intro" opens a full-screen fly-through that
+ * the visitor scrolls through at their own pace and can close at any time.
+ */
+export default function Team() {
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
+  const [pop, setPop] = useState<string | null>(null);
+  const playRef = useRef<HTMLButtonElement>(null);
+  const lastRef = useRef<HTMLElement | null>(null);
+  const spot = IN_FRAME.find((f) => f.id === active)?.spot ?? 50;
+  const popped = TEAM.find((t) => t.id === pop);
+
+  return (
+    <section
+      id="team"
+      aria-labelledby="team-title"
+      className="on-light wrap py-[88px]"
+    >
+      <div className="rv mb-9 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h2 id="team-title" className="label mb-2">
+            THE TEAM
+          </h2>
+          <p
+            className="headline max-w-[720px]"
+            style={{ fontSize: "clamp(30px, 4vw, 52px)" }}
+          >
+            The people behind the reels.
+          </p>
+        </div>
+        <button
+          ref={playRef}
+          type="button"
+          className="team-play"
+          onClick={() => setOpen(true)}
+        >
+          <span className="team-play-icon" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 12 12">
+              <path d="M2 1l9 5-9 5z" fill="currentColor" />
+            </svg>
+          </span>
+          PLAY THE TEAM INTRO
+        </button>
+      </div>
+
+      <div className="rv">
+        <div
+          className={`team-frame ${active ? "has-active" : ""}`}
+          style={{ ["--spot" as string]: `${spot}%` }}
+          onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
+        >
+          <Image
+            src={group}
+            alt="Sudhir, Ajay and Suhail of Igloo Ads, laughing together at a table"
+            className="team-photo"
+            sizes="(max-width: 1100px) 92vw, 1000px"
+          />
+          <ul className="team-people" aria-label="The Igloo Ads team">
+            {IN_FRAME.map(({ id, left, width, tag, member: t }) => (
+              <li
+                key={id}
+                className={`team-person ${id === active ? "is-on" : ""}`}
+                style={{
+                  left: `${left}%`,
+                  width: `${width}%`,
+                  ["--tag" as string]: `${tag}%`,
+                }}
+              >
+                <button
+                  type="button"
+                  className="team-person-hit"
+                  aria-haspopup="dialog"
+                  aria-label={`${t.name}, ${t.role}. Open their card`}
+                  onPointerEnter={(e) =>
+                    e.pointerType === "mouse" && setActive(id)
+                  }
+                  onFocus={() => setActive(id)}
+                  onBlur={() => setActive(null)}
+                  onClick={(e) => {
+                    lastRef.current = e.currentTarget;
+                    setPop(id);
+                  }}
+                />
+                <div className="team-tag" aria-hidden="true">
+                  <span className="team-role">{t.role}</span>
+                  <strong className="team-tag-name">{t.name}</strong>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="team-frame-hint" aria-hidden="true">
+            CLICK A FACE TO MEET THEM
+          </p>
+          <Corners />
+        </div>
+      </div>
+
+      {popped && (
+        <TeamPop
+          member={popped}
+          onClose={() => {
+            setPop(null);
+            lastRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
+
+      {open && (
+        <TeamIntro
+          onClose={() => {
+            setOpen(false);
+            playRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
+    </section>
+  );
+}
+
+/** One person on their own: their portrait card, role, a line and Instagram. */
+function TeamPop({
+  member: t,
+  onClose,
+}: {
+  member: (typeof TEAM)[number];
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    closeRef.current?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      html.style.overflow = before;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="team-pop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t.name}
+      onClick={onClose}
+    >
+      <div className="team-pop-card" onClick={(e) => e.stopPropagation()}>
+        <div className="team-pop-photo">
+          <Image
+            src={CARDS[t.id]}
+            alt={`${t.name}, ${t.role}`}
+            sizes="(max-width: 720px) 80vw, 380px"
+            priority
+          />
+          <Corners />
+        </div>
+        <div className="team-pop-info">
+          <span className="team-role">{t.role}</span>
+          <strong className="fly-name">{t.name}</strong>
+          <p className="fly-line">{t.line}</p>
+          <a
+            className="team-handle"
+            href={t.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.handle} <span aria-hidden="true">&#8599;</span>
+          </a>
+        </div>
+        <button
+          ref={closeRef}
+          type="button"
+          className="fly-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 5l14 14M19 5L5 19"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
 }
 
 /**
- * The team as a fly-through. The section pins to the screen and scrolling
- * moves a camera forward through it: each person's card stands on one side
- * with their details on the other, the camera flies down the gap between
- * them to the next person (the sides alternate), and after the last one
- * it reaches a closing paragraph. Scrolling back flies back out.
- * With reduced motion the scenes are simply stacked down the page.
+ * Full-screen fly-through. Scrolling inside it moves a camera forward: each
+ * person's card stands on one side with their details on the other (the
+ * sides alternate), the camera flies down the gap between them to the next
+ * person, and ends on the closing paragraph. Scrolling back flies back out.
+ * The page behind stays where it was. With reduced motion the scenes are
+ * simply stacked.
  */
-export default function Team() {
+function TeamIntro({ onClose }: { onClose: () => void }) {
+  const boxRef = useRef<HTMLDivElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const sceneRefs = useRef<(HTMLDivElement | null)[]>([]);
   const dotRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const hintRef = useRef<HTMLParagraphElement>(null);
+
+  // Lock the page behind, take focus, close on Escape.
+  useEffect(() => {
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    closeRef.current?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      html.style.overflow = before;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
 
   useEffect(() => {
+    const box = boxRef.current;
     const fly = flyRef.current;
-    if (!fly) return;
+    if (!box || !fly) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       fly.classList.add("is-static");
       return;
@@ -63,9 +298,8 @@ export default function Team() {
     let frame = 0;
     const render = () => {
       frame = 0;
-      const r = fly.getBoundingClientRect();
-      if (r.bottom < 0 || r.top > window.innerHeight) return;
-      const cam = camera(clamp(-r.top / (r.height - window.innerHeight)) * UNITS);
+      const span = fly.offsetHeight - box.clientHeight;
+      const cam = camera(clamp(box.scrollTop / span) * UNITS);
       const wide = window.innerWidth > 720;
       sceneRefs.current.forEach((el, i) => {
         if (!el) return;
@@ -78,20 +312,30 @@ export default function Team() {
         el.style.transform = `translate(-50%, -50%) translate3d(0, 0, ${rel}px)`;
         const passed = clamp(rel / 520);
         const ahead = clamp(-rel / GAP);
-        el.style.opacity = ((1 - passed) * (1 - 0.9 * Math.sqrt(ahead))).toFixed(3);
+        el.style.opacity = (
+          (1 - passed) *
+          (1 - 0.9 * Math.sqrt(ahead))
+        ).toFixed(3);
         // Flying past, the card and the details part to their own sides.
         const card = el.querySelector<HTMLElement>(".fly-card");
         const info = el.querySelector<HTMLElement>(".fly-info");
         if (card && info) {
           const side = i % 2 === 0 ? -1 : 1;
           const away = passed * (wide ? 260 : 140);
-          card.style.transform = wide ? `translateX(${side * away}px)` : `translateY(${-away}px)`;
-          info.style.transform = wide ? `translateX(${-side * away}px)` : `translateY(${away}px)`;
+          card.style.transform = wide
+            ? `translateX(${side * away}px)`
+            : `translateY(${-away}px)`;
+          info.style.transform = wide
+            ? `translateX(${-side * away}px)`
+            : `translateY(${away}px)`;
           card.style.filter = `blur(${(passed * 4).toFixed(2)}px) brightness(${(0.45 + 0.55 * (1 - ahead)).toFixed(3)})`;
         }
       });
       const near = cam.rest >= 0 ? cam.rest : Math.round(cam.z / GAP);
-      dotRefs.current.forEach((d, i) => d?.classList.toggle("is-on", i === near));
+      dotRefs.current.forEach((d, i) =>
+        d?.classList.toggle("is-on", i === near),
+      );
+      hintRef.current?.classList.toggle("is-hidden", box.scrollTop > 40);
     };
     const queue = () => {
       if (!frame) frame = requestAnimationFrame(render);
@@ -99,39 +343,38 @@ export default function Team() {
 
     // Tabbing to a link in a scene brings the camera to that scene.
     const onFocus = (e: FocusEvent) => {
-      const i = sceneRefs.current.findIndex((el) => el?.contains(e.target as Node));
-      if (i >= 0) window.scrollTo({ top: restingScroll(fly, i), behavior: "instant" });
+      const i = sceneRefs.current.findIndex((el) =>
+        el?.contains(e.target as Node),
+      );
+      if (i < 0) return;
+      const u = i * (HOLD + TRAVEL) + HOLD / 2;
+      box.scrollTo({
+        top: (fly.offsetHeight - box.clientHeight) * (u / UNITS),
+        behavior: "instant",
+      });
     };
 
     fly.classList.add("is-live");
     render();
-    window.addEventListener("scroll", queue, { passive: true });
+    box.addEventListener("scroll", queue, { passive: true });
     window.addEventListener("resize", queue);
     fly.addEventListener("focusin", onFocus);
     return () => {
       cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", queue);
+      box.removeEventListener("scroll", queue);
       window.removeEventListener("resize", queue);
       fly.removeEventListener("focusin", onFocus);
     };
   }, []);
 
   return (
-    <section id="team" aria-labelledby="team-title" className="on-light pt-[88px]">
-      <div className="wrap rv mb-9 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 id="team-title" className="label mb-2">
-            THE TEAM
-          </h2>
-          <p className="headline max-w-[720px]" style={{ fontSize: "clamp(30px, 4vw, 52px)" }}>
-            The people behind the reels.
-          </p>
-        </div>
-        <p className="m-0 max-w-[300px] text-sm leading-relaxed text-ink-soft">
-          Young, quick and hands-on. The same people plan, shoot and deliver your work.
-        </p>
-      </div>
-
+    <div
+      ref={boxRef}
+      className="fly-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Team intro"
+    >
       <div ref={flyRef} className="fly">
         <div className="fly-stage">
           <div className="fly-world">
@@ -144,11 +387,12 @@ export default function Team() {
                 className={`fly-scene ${i % 2 ? "is-flip" : ""}`}
               >
                 <div className="fly-card">
-                  <Image src={CARDS[t.id]} alt={`${t.name}, ${t.role}`} sizes="(max-width: 720px) 62vw, 380px" />
-                  <span className="team-corner tl" aria-hidden="true" />
-                  <span className="team-corner tr" aria-hidden="true" />
-                  <span className="team-corner bl" aria-hidden="true" />
-                  <span className="team-corner br" aria-hidden="true" />
+                  <Image
+                    src={CARDS[t.id]}
+                    alt={`${t.name}, ${t.role}`}
+                    sizes="(max-width: 720px) 62vw, 380px"
+                  />
+                  <Corners />
                 </div>
                 <div className="fly-info">
                   <span className="fly-count">
@@ -157,7 +401,12 @@ export default function Team() {
                   <span className="team-role">{t.role}</span>
                   <strong className="fly-name">{t.name}</strong>
                   <p className="fly-line">{t.line}</p>
-                  <a className="team-handle" href={t.instagram} target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="team-handle"
+                    href={t.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {t.handle} <span aria-hidden="true">&#8599;</span>
                   </a>
                 </div>
@@ -171,6 +420,9 @@ export default function Team() {
             >
               <p className="fly-kicker">ONE TEAM</p>
               <p className="fly-story-text">{TEAM_STORY}</p>
+              <button type="button" className="fly-done" onClick={onClose}>
+                BACK TO THE SITE
+              </button>
             </div>
           </div>
           <div className="fly-rail" aria-hidden="true">
@@ -183,8 +435,27 @@ export default function Team() {
               />
             ))}
           </div>
+          <p ref={hintRef} className="fly-hint" aria-hidden="true">
+            SCROLL TO FLY THROUGH
+          </p>
+          <button
+            ref={closeRef}
+            type="button"
+            className="fly-close"
+            onClick={onClose}
+            aria-label="Close the team intro"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M5 5l14 14M19 5L5 19"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
+            </svg>
+          </button>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
