@@ -18,7 +18,7 @@ export default function Results() {
             to={r.to}
             suffix={r.suffix}
             label={r.label}
-            visual={r.visual}
+           
           />
         ))}
       </ul>

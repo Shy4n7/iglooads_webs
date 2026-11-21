@@ -2200,98 +2200,27 @@
   /* ---------- Results: stat cards ---------- */
   .stat-card {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: center;
+    gap: 14px;
     min-height: 170px;
+    text-align: center;
   }
-  .stat-visual {
-    flex: none;
-    width: 118px;
-    height: auto;
-    overflow: visible;
+  /* A short amber line under the number; it draws out once the card is seen. */
+  .stat-rule {
+    display: block;
+    width: 56px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-amber);
+    transition: width 0.9s var(--ease-out-soft) 0.2s;
   }
-  .stat-ring {
-    fill: none;
-    stroke: var(--color-amber);
-    stroke-width: 2;
-    opacity: 0.4;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .stat-ring.r2 {
-    opacity: 0.2;
-  }
-  .stat-grid {
-    fill: none;
-    stroke: rgba(238, 235, 218, 0.14);
-    stroke-width: 1;
-  }
-  .stat-line {
-    fill: none;
-    stroke: var(--color-amber);
-    stroke-width: 4;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-dasharray: 1;
-  }
-  .stat-dot {
-    fill: var(--color-amber);
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .stat-brand {
-    fill: var(--color-amber);
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  /* Before the card is seen (script on), the graphics wait in their start state. */
-  .stat-card.is-armed .stat-line {
-    stroke-dashoffset: 1;
-  }
-  .stat-card.is-armed .stat-dot,
-  .stat-card.is-armed .stat-brand {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  .stat-card.is-armed .stat-ring {
-    opacity: 0;
-    transform: scale(0.6);
-  }
-  .stat-card.is-in .stat-line {
-    stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1.5s var(--ease-out-soft) 0.15s;
-  }
-  .stat-card.is-in .stat-dot {
-    opacity: 1;
-    transform: none;
-    transition:
-      opacity 0.3s 1.4s,
-      transform 0.5s var(--ease-out-soft) 1.4s;
-  }
-  .stat-card.is-in .stat-brand {
-    opacity: 1;
-    transform: none;
-    transition:
-      opacity 0.35s calc(var(--i) * 0.14s + 0.2s),
-      transform 0.5s var(--ease-out-soft) calc(var(--i) * 0.14s + 0.2s);
-  }
-  .stat-card.is-in .stat-ring.r1 {
-    opacity: 0.4;
-    transform: none;
-    transition:
-      opacity 0.6s 0.2s,
-      transform 0.8s var(--ease-out-soft) 0.2s;
-  }
-  .stat-card.is-in .stat-ring.r2 {
-    opacity: 0.2;
-    transform: none;
-    transition:
-      opacity 0.6s 0.45s,
-      transform 0.9s var(--ease-out-soft) 0.45s;
+  .stat-card.is-armed:not(.is-in) .stat-rule {
+    width: 0;
   }
   @media (max-width: 560px) {
-    /* The three numbers stack, so the graphic has room beside each one. */
+    /* The three numbers stack full width instead of scrolling sideways. */
     .stat-list.g3 {
       display: grid;
       grid-template-columns: minmax(0, 1fr);

@@ -69,11 +69,10 @@ export const RESULTS: {
   to: number;
   suffix: string;
   label: string;
-  visual: "views" | "growth" | "brands";
 }[] = [
-  { to: 300, suffix: "K+", label: "views", visual: "views" },
-  { to: 3, suffix: "x", label: "growth", visual: "growth" },
-  { to: 6, suffix: "+", label: "brands served", visual: "brands" },
+  { to: 300, suffix: "K+", label: "views" },
+  { to: 3, suffix: "x", label: "growth" },
+  { to: 6, suffix: "+", label: "brands served" },
 ];
 
 export const REVIEWS = [
