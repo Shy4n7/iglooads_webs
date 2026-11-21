@@ -1,6 +1,6 @@
 import { RESULTS, REVIEWS } from "@/lib/content";
 
-// Placeholders only. Replace with real, verifiable numbers before launch.
+// Numbers come from RESULTS in src/lib/content.ts. Keep them real and verifiable.
 export default function Results() {
   return (
     <section aria-labelledby="results-title" className="on-light wrap pt-14 pb-10">

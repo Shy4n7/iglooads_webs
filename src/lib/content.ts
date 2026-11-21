@@ -66,9 +66,9 @@ export const STEPS = [
 ];
 
 export const RESULTS = [
-  { value: "[00M]", label: "[views on one reel]" },
-  { value: "[0X]", label: "[growth metric]" },
-  { value: "[00+]", label: "[brands served]" },
+  { value: "300K+", label: "views" },
+  { value: "3x", label: "growth" },
+  { value: "6+", label: "brands served" },
 ];
 
 export const REVIEWS = [
