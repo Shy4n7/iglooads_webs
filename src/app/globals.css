@@ -1247,6 +1247,12 @@
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
+  .team-member-line {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-ink-soft);
+  }
   .team-member-handle {
     font-size: 14px;
     font-weight: 600;
