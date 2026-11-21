@@ -84,7 +84,7 @@ metadata.
 ## Team photos
 
 The team section (`src/components/Team.tsx`; names, roles, Instagram links and the closing
-paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) shows Sudhir, Ajay and Suhail together in one frame, cut out of the group photo `assets/team/group.jpg` by `scripts/team_group.py` into `public/media/team-group-cut.webp` (column positions in `FRAME`). Hovering (or tapping) a person lights them up and shows their role, name and Instagram in the frame; on phones the details show under it. "Play the team intro" opens an
+paragraph in `TEAM` and `TEAM_STORY` in `src/lib/content.ts`) shows Suhail, Ajay and Sudhir together (the photo is mirrored) in one frame, cut out of the group photo `assets/team/group.jpg` by `scripts/team_group.py` into `public/media/team-group-cut.webp` (column positions in `FRAME`). Hovering (or tapping) a person lights them up and shows their role, name and Instagram in the frame, and a click adds their short paragraph under the name; on phones the details show under the frame. "Play the team intro" opens an
 optional full-screen fly-through: scrolling inside it moves a camera forward past each person's
 card to the next, in the order of `TEAM`, then to the paragraph. It closes with the X, Esc or the
 button at the end, and the page never pins. With reduced motion the intro's cards are stacked.

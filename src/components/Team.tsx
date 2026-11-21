@@ -14,9 +14,9 @@ const CARDS: Record<string, typeof suhail> = { suhail, sudhir, ajay, shyan };
 // ends (percent of the frame), where their name tag sits in the column, and
 // where the glow behind them is centred.
 const FRAME = [
-  { id: "sudhir", left: 0, width: 40, tag: 77, spot: 31 },
-  { id: "ajay", left: 40, width: 18.5, tag: 49, spot: 49 },
-  { id: "suhail", left: 58.5, width: 41.5, tag: 33, spot: 72 },
+  { id: "suhail", left: 0, width: 41.5, tag: 67, spot: 28 },
+  { id: "ajay", left: 41.5, width: 18.5, tag: 51, spot: 51 },
+  { id: "sudhir", left: 60, width: 40, tag: 23, spot: 69 },
 ];
 const IN_FRAME = FRAME.map((f) => ({
   ...f,
@@ -63,8 +63,12 @@ const Corners = () => (
  */
 export default function Team() {
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState<string | null>(null);
+  const [hover, setHover] = useState<string | null>(null);
+  const [picked, setPicked] = useState<string | null>(null);
   const playRef = useRef<HTMLButtonElement>(null);
+  // Whoever is under the pointer (or was clicked) is shown; a click also
+  // adds their short paragraph under the name.
+  const active = hover ?? picked;
   const spot = IN_FRAME.find((f) => f.id === active)?.spot ?? 50;
   const current = IN_FRAME.find((f) => f.id === active)?.member;
 
@@ -105,11 +109,11 @@ export default function Team() {
         <div
           className={`team-frame ${active ? "has-active" : ""}`}
           style={{ ["--spot" as string]: `${spot}%` }}
-          onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
+          onPointerLeave={(e) => e.pointerType === "mouse" && setHover(null)}
         >
           <Image
             src={group}
-            alt="Sudhir, Ajay and Suhail of Igloo Ads, laughing together at a table"
+            alt="Suhail, Ajay and Sudhir of Igloo Ads, laughing together at a table"
             className="team-photo"
             sizes="(max-width: 1100px) 92vw, 1000px"
           />
@@ -125,23 +129,24 @@ export default function Team() {
                 }}
                 onBlur={(e) => {
                   if (!e.currentTarget.contains(e.relatedTarget as Node))
-                    setActive(null);
+                    setHover(null);
                 }}
               >
                 <button
                   type="button"
                   className="team-person-hit"
                   aria-label={`${t.name}, ${t.role}`}
-                  aria-pressed={id === active}
+                  aria-pressed={id === picked}
                   onPointerEnter={(e) =>
-                    e.pointerType === "mouse" && setActive(id)
+                    e.pointerType === "mouse" && setHover(id)
                   }
-                  onFocus={() => setActive(id)}
-                  onClick={() => setActive(id)}
+                  onFocus={() => setHover(id)}
+                  onClick={() => setPicked((c) => (c === id ? null : id))}
                 />
                 <div className="team-tag">
                   <span className="team-role">{t.role}</span>
                   <strong className="team-tag-name">{t.name}</strong>
+                  {id === picked && <p className="team-tag-line">{t.line}</p>}
                   <a
                     className="team-handle"
                     href={t.instagram}
@@ -164,6 +169,9 @@ export default function Team() {
             <>
               <strong className="team-tag-name">{current.name}</strong>
               <span className="team-role">{current.role}</span>
+              {current.id === picked && (
+                <p className="team-caption-line">{current.line}</p>
+              )}
               <a
                 className="team-member-handle"
                 href={current.instagram}
