@@ -11,7 +11,7 @@ Run:   python3 scripts/team_group.py
 import math
 from pathlib import Path
 
-from PIL import Image, ImageChops, ImageFilter, ImageOps
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageOps
 from rembg import new_session, remove
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -31,11 +31,18 @@ def main():
 
     cut = remove(im, session=new_session("isnet-general-use")).convert("RGBA")
     alpha = cut.getchannel("A").point(lambda v: 0 if v < 60 else v)
-    alpha = alpha.filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.0))
 
-    # A passer-by behind the left shoulder, and the ragged table legs: clear
-    # the first, fade the bottom edge so the people dissolve into the frame.
-    alpha.paste(0, (0, 540, 425, 860))
+    # A passer-by stands behind Sudhir's left shoulder and, in white, merges
+    # with his shirt. Clear everything above his real shoulder line and left
+    # of his sleeve, before the edge is smoothed so no hard cut shows.
+    clear = Image.new("L", SIZE, 0)
+    ImageDraw.Draw(clear).polygon([(300, 480), (610, 480), (610, 582), (540, 612), (470, 655), (430, 708), (428, 880), (300, 880)], fill=255)
+    alpha = ImageChops.multiply(alpha, ImageChops.invert(clear))
+
+    # Smooth the outline: drop jagged bits, then a soft edge.
+    alpha = alpha.filter(ImageFilter.MedianFilter(7)).filter(ImageFilter.MinFilter(3)).filter(ImageFilter.GaussianBlur(1.6))
+
+    # Fade the bottom edge so the people dissolve into the frame.
     fade = Image.linear_gradient("L").rotate(180).resize((SIZE[0], 380))
     floor = Image.new("L", SIZE, 255)
     floor.paste(fade, (0, SIZE[1] - 380))

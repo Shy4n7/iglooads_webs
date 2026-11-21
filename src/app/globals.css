@@ -1283,14 +1283,20 @@
     color: var(--color-cream);
     text-align: center;
     opacity: 0;
+    visibility: hidden;
     translate: -50% 10px;
     transition:
       opacity 0.35s,
+      visibility 0.35s,
       translate 0.45s var(--ease-out-soft);
   }
   .team-person.is-on .team-tag {
     opacity: 1;
+    visibility: visible;
     translate: -50% 0;
+  }
+  .team-caption {
+    display: none;
   }
   .team-tag-name {
     font-family: var(--font-bebas);
@@ -1325,66 +1331,6 @@
     color: var(--color-orange);
     text-decoration: none;
   }
-  /* One person, full size. */
-  .team-pop {
-    position: fixed;
-    inset: 0;
-    z-index: 210;
-    display: grid;
-    place-items: center;
-    padding: 20px;
-    background: rgba(20, 21, 40, 0.82);
-    backdrop-filter: blur(6px);
-    animation: team-pop-fade 0.3s ease-out;
-  }
-  .team-pop-card {
-    position: relative;
-    display: grid;
-    grid-template-columns: minmax(0, 380px) minmax(0, 340px);
-    align-items: center;
-    gap: 40px;
-    max-width: 100%;
-    animation: team-pop-in 0.5s var(--ease-out-soft);
-  }
-  .team-pop-photo {
-    position: relative;
-    aspect-ratio: 760 / 950;
-    overflow: hidden;
-    border-radius: 18px;
-    box-shadow:
-      0 50px 100px -30px rgba(0, 0, 0, 0.85),
-      0 0 0 1px rgba(238, 235, 218, 0.1);
-  }
-  .team-pop-photo img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .team-pop-info {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding-left: 18px;
-    border-left: 3px solid var(--color-amber);
-    color: var(--color-cream);
-  }
-  .team-pop .fly-close {
-    top: -14px;
-    right: -14px;
-  }
-  @keyframes team-pop-fade {
-    from {
-      opacity: 0;
-    }
-  }
-  @keyframes team-pop-in {
-    from {
-      opacity: 0;
-      transform: translateY(24px) scale(0.92);
-    }
-  }
   .team-play {
     display: inline-flex;
     align-items: center;
@@ -1417,29 +1363,32 @@
     transform: scale(1.1);
   }
   @media (max-width: 720px) {
-    .team-pop-card {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 22px;
-      width: min(78vw, 46vh);
-    }
-    .team-pop-photo {
-      width: 100%;
-    }
-    .team-pop-info {
-      padding-left: 14px;
-    }
-    .team-pop .fly-close {
-      top: 8px;
-      right: 8px;
-    }
     .team-frame {
       border-radius: 18px;
     }
-    .team-tag-name {
-      font-size: 22px;
+    .team-tag {
+      display: none;
     }
-    .team-tag .team-role {
-      font-size: 10px;
+    .team-caption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+      min-height: 64px;
+      margin-top: 14px;
+    }
+    .team-caption .team-tag-name {
+      font-size: 34px;
+    }
+    .team-caption .team-role {
+      font-size: 12px;
+      letter-spacing: 0.06em;
+    }
+    .team-caption-empty {
+      font-family: var(--font-bebas);
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      color: var(--color-ink-mute);
     }
   }
 
