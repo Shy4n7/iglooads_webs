@@ -36,7 +36,7 @@ def main():
     # with his shirt. Clear everything above his real shoulder line and left
     # of his sleeve, before the edge is smoothed so no hard cut shows.
     clear = Image.new("L", SIZE, 0)
-    ImageDraw.Draw(clear).polygon([(300, 480), (610, 480), (610, 582), (540, 612), (470, 655), (430, 708), (428, 880), (300, 880)], fill=255)
+    ImageDraw.Draw(clear).polygon([(300, 480), (648, 480), (648, 548), (596, 584), (540, 616), (470, 660), (430, 708), (428, 880), (300, 880)], fill=255)
     alpha = ImageChops.multiply(alpha, ImageChops.invert(clear))
 
     # Smooth the outline: drop jagged bits, then a soft edge.
