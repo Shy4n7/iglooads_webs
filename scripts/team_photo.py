@@ -2,9 +2,8 @@
 
 Each person is cut out of their background (rembg), scaled so the faces
 match, turned black and white, graded to one look and set on the site's
-deep indigo with a soft light behind the head. Writes one card per person,
-public/media/team-card-<name>.jpg (760 x 950), and the same cut-out on a
-clear background, public/media/team-cut-<name>.webp, for the group frame.
+deep indigo with a soft light behind the head. Writes one card per person:
+public/media/team-card-<name>.jpg (760 x 950).
 
 Needs: pip install "rembg[cpu]" pillow pillow-heif
 Run:   python3 scripts/team_photo.py
@@ -124,8 +123,6 @@ def main():
         card = backdrop()
         card.alpha_composite(to_grey(im, None if name == REFERENCE else target))
         card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
-        # The same person on a clear background, for the group frame.
-        to_grey(im, None if name == REFERENCE else target).save(OUT / f"team-cut-{name}.webp", quality=88, method=6)
         print("card", name)
 
 

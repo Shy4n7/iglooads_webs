@@ -7,23 +7,21 @@ import suhail from "../../public/media/team-card-suhail.jpg";
 import sudhir from "../../public/media/team-card-sudhir.jpg";
 import ajay from "../../public/media/team-card-ajay.jpg";
 import shyan from "../../public/media/team-card-shyan.jpg";
-import cutSuhail from "../../public/media/team-cut-suhail.webp";
-import cutSudhir from "../../public/media/team-cut-sudhir.webp";
-import cutAjay from "../../public/media/team-cut-ajay.webp";
-import cutShyan from "../../public/media/team-cut-shyan.webp";
+import group from "../../public/media/team-group-cut.webp";
 
 const CARDS: Record<string, typeof suhail> = { suhail, sudhir, ajay, shyan };
-const CUTS: Record<string, typeof suhail> = {
-  suhail: cutSuhail,
-  sudhir: cutSudhir,
-  ajay: cutAjay,
-  shyan: cutShyan,
-};
-
-// Left to right in the group frame; the founder stands a little higher.
-const FRAME_ORDER = ["ajay", "suhail", "sudhir", "shyan"];
-const LEAD = "suhail";
-const IN_FRAME = FRAME_ORDER.map((id) => TEAM.find((t) => t.id === id)!);
+// Left to right in the group photo: where each person's column starts and
+// ends (percent of the frame), where their name tag sits in the column, and
+// where the glow behind them is centred.
+const FRAME = [
+  { id: "sudhir", left: 0, width: 40, tag: 77, spot: 31 },
+  { id: "ajay", left: 40, width: 18.5, tag: 49, spot: 49 },
+  { id: "suhail", left: 58.5, width: 41.5, tag: 33, spot: 72 },
+];
+const IN_FRAME = FRAME.map((f) => ({
+  ...f,
+  member: TEAM.find((t) => t.id === f.id)!,
+}));
 
 // Depth between scenes, and the share of scroll spent resting on a scene
 // versus flying to the next one.
@@ -66,8 +64,11 @@ const Corners = () => (
 export default function Team() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
+  const [pop, setPop] = useState<string | null>(null);
   const playRef = useRef<HTMLButtonElement>(null);
-  const current = IN_FRAME.find((t) => t.id === active);
+  const lastRef = useRef<HTMLElement | null>(null);
+  const spot = IN_FRAME.find((f) => f.id === active)?.spot ?? 50;
+  const popped = TEAM.find((t) => t.id === pop);
 
   return (
     <section
@@ -105,68 +106,64 @@ export default function Team() {
       <div className="rv">
         <div
           className={`team-frame ${active ? "has-active" : ""}`}
+          style={{ ["--spot" as string]: `${spot}%` }}
           onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
         >
+          <Image
+            src={group}
+            alt="Sudhir, Ajay and Suhail of Igloo Ads, laughing together at a table"
+            className="team-photo"
+            sizes="(max-width: 1100px) 92vw, 1000px"
+          />
           <ul className="team-people" aria-label="The Igloo Ads team">
-            {IN_FRAME.map((t) => (
+            {IN_FRAME.map(({ id, left, width, tag, member: t }) => (
               <li
-                key={t.id}
-                className={`team-person ${t.id === LEAD ? "is-lead" : ""} ${t.id === active ? "is-on" : ""}`}
-                tabIndex={0}
-                onPointerEnter={(e) => e.pointerType === "mouse" && setActive(t.id)}
-                onClick={() => setActive(t.id)}
-                onFocus={() => setActive(t.id)}
-                onBlur={(e) => {
-                  if (!e.currentTarget.contains(e.relatedTarget as Node))
-                    setActive(null);
+                key={id}
+                className={`team-person ${id === active ? "is-on" : ""}`}
+                style={{
+                  left: `${left}%`,
+                  width: `${width}%`,
+                  ["--tag" as string]: `${tag}%`,
                 }}
               >
-                <Image
-                  src={CUTS[t.id]}
-                  alt={`${t.name}, ${t.role}`}
-                  className="team-person-img"
-                  sizes="(max-width: 720px) 48vw, 460px"
+                <button
+                  type="button"
+                  className="team-person-hit"
+                  aria-haspopup="dialog"
+                  aria-label={`${t.name}, ${t.role}. Open their card`}
+                  onPointerEnter={(e) =>
+                    e.pointerType === "mouse" && setActive(id)
+                  }
+                  onFocus={() => setActive(id)}
+                  onBlur={() => setActive(null)}
+                  onClick={(e) => {
+                    lastRef.current = e.currentTarget;
+                    setPop(id);
+                  }}
                 />
-                <div className="team-tag">
+                <div className="team-tag" aria-hidden="true">
                   <span className="team-role">{t.role}</span>
                   <strong className="team-tag-name">{t.name}</strong>
-                  <a
-                    className="team-handle"
-                    href={t.instagram}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {t.handle} <span aria-hidden="true">&#8599;</span>
-                  </a>
                 </div>
               </li>
             ))}
           </ul>
           <p className="team-frame-hint" aria-hidden="true">
-            MEET THE TEAM
+            CLICK A FACE TO MEET THEM
           </p>
           <Corners />
         </div>
-        <div className="team-caption" aria-hidden="true">
-          {current ? (
-            <>
-              <strong className="team-tag-name">{current.name}</strong>
-              <span className="team-role">{current.role}</span>
-              <a
-                className="team-member-handle"
-                href={current.instagram}
-                target="_blank"
-                rel="noopener noreferrer"
-                tabIndex={-1}
-              >
-                {current.handle} <span aria-hidden="true">&#8599;</span>
-              </a>
-            </>
-          ) : (
-            <span className="team-caption-empty">TAP A FACE TO MEET THEM</span>
-          )}
-        </div>
       </div>
+
+      {popped && (
+        <TeamPop
+          member={popped}
+          onClose={() => {
+            setPop(null);
+            lastRef.current?.focus({ preventScroll: true });
+          }}
+        />
+      )}
 
       {open && (
         <TeamIntro
@@ -177,6 +174,83 @@ export default function Team() {
         />
       )}
     </section>
+  );
+}
+
+/** One person on their own: their portrait card, role, a line and Instagram. */
+function TeamPop({
+  member: t,
+  onClose,
+}: {
+  member: (typeof TEAM)[number];
+  onClose: () => void;
+}) {
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const before = html.style.overflow;
+    html.style.overflow = "hidden";
+    closeRef.current?.focus({ preventScroll: true });
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      html.style.overflow = before;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  return (
+    <div
+      className="team-pop"
+      role="dialog"
+      aria-modal="true"
+      aria-label={t.name}
+      onClick={onClose}
+    >
+      <div className="team-pop-card" onClick={(e) => e.stopPropagation()}>
+        <div className="team-pop-photo">
+          <Image
+            src={CARDS[t.id]}
+            alt={`${t.name}, ${t.role}`}
+            sizes="(max-width: 720px) 80vw, 380px"
+            priority
+          />
+          <Corners />
+        </div>
+        <div className="team-pop-info">
+          <span className="team-role">{t.role}</span>
+          <strong className="fly-name">{t.name}</strong>
+          <p className="fly-line">{t.line}</p>
+          <a
+            className="team-handle"
+            href={t.instagram}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {t.handle} <span aria-hidden="true">&#8599;</span>
+          </a>
+        </div>
+        <button
+          ref={closeRef}
+          type="button"
+          className="fly-close"
+          onClick={onClose}
+          aria-label="Close"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M5 5l14 14M19 5L5 19"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
   );
 }
 
