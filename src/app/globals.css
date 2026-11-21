@@ -1205,56 +1205,128 @@
   }
 
   /* ---------- Team ----------
-     A row of portrait cards, and an optional full-screen intro. */
-  .team-grid {
+     Everyone in one frame: four cut-outs side by side on deep indigo, the
+     founder standing a little higher. Each person is a column; hovering
+     (or tapping) one lights them up and shows their details. */
+  .team-frame {
+    position: relative;
+    aspect-ratio: 16 / 7;
+    max-height: 72vh;
+    width: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 24px;
+    background:
+      radial-gradient(60% 75% at 50% 30%, #3a3e68 0%, var(--color-deep) 72%),
+      var(--color-deep);
+    box-shadow: 0 40px 80px -40px rgba(29, 31, 56, 0.7);
+  }
+  /* A soft floor, so the cut-off bodies fade out instead of ending hard. */
+  .team-frame::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 26%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(to top, var(--color-deep) 10%, transparent);
+  }
+  .team-people {
+    position: absolute;
+    inset: 0;
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
-  .team-member {
+  .team-person {
+    position: relative;
+    outline: none;
+    cursor: pointer;
+  }
+  .team-person-img {
+    position: absolute;
+    left: 50%;
+    bottom: -14%;
+    width: 168%;
+    max-width: none;
+    height: auto;
+    translate: -50% 0;
+    pointer-events: none;
+    transition:
+      filter 0.5s var(--ease-out-soft),
+      transform 0.6s var(--ease-out-soft);
+  }
+  .team-person.is-lead .team-person-img {
+    bottom: -3%;
+  }
+  .team-frame.has-active .team-person:not(.is-on) .team-person-img {
+    filter: brightness(0.5);
+  }
+  .team-person.is-on .team-person-img {
+    transform: scale(1.03);
+  }
+  .team-tag {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    z-index: 3;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+    align-items: center;
+    gap: 6px;
+    width: max-content;
+    max-width: 96%;
+    color: var(--color-cream);
+    text-align: center;
+    opacity: 0;
+    translate: -50% 10px;
+    transition:
+      opacity 0.35s,
+      translate 0.45s var(--ease-out-soft);
   }
-  .team-member-card {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 760 / 950;
-    margin-bottom: 8px;
-    overflow: hidden;
-    border-radius: 18px;
-    box-shadow: 0 24px 50px -28px rgba(29, 31, 56, 0.6);
+  .team-person.is-on .team-tag {
+    opacity: 1;
+    translate: -50% 0;
   }
-  .team-member-card img {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s var(--ease-out-soft);
-  }
-  .team-member:hover .team-member-card img {
-    transform: scale(1.04);
-  }
-  .team-member-name {
+  .team-tag-name {
     font-family: var(--font-bebas);
-    font-size: 40px;
+    font-size: clamp(30px, 3vw, 44px);
     font-weight: 400;
     line-height: 0.9;
     letter-spacing: 0.02em;
     text-transform: uppercase;
+  }
+  .team-frame .team-corner {
+    z-index: 3;
+  }
+  .team-frame-hint {
+    position: absolute;
+    top: 18px;
+    left: 50%;
+    z-index: 3;
+    translate: -50% 0;
+    font-family: var(--font-bebas);
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    color: var(--color-cream-mute);
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .team-frame.has-active .team-frame-hint {
+    opacity: 0;
+  }
+  /* Phones: the columns are too narrow for the details, so they show in a
+     line under the frame instead. */
+  .team-caption {
+    display: none;
   }
   .team-member-handle {
     font-size: 14px;
     font-weight: 600;
     color: var(--color-orange);
     text-decoration: none;
-  }
-  .team-member-handle:hover {
-    text-decoration: underline;
   }
   .team-play {
     display: inline-flex;
@@ -1287,17 +1359,37 @@
   .team-play:hover .team-play-icon {
     transform: scale(1.1);
   }
-  @media (max-width: 900px) {
-    .team-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 32px;
+  @media (max-width: 720px) {
+    .team-frame {
+      aspect-ratio: 4 / 3;
+      border-radius: 18px;
     }
-    .team-member-name {
+    .team-person-img {
+      width: 205%;
+    }
+    .team-tag {
+      display: none;
+    }
+    .team-caption {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 12px;
+      min-height: 64px;
+      margin-top: 14px;
+    }
+    .team-caption .team-tag-name {
       font-size: 34px;
     }
-    .team-member .team-role {
+    .team-caption .team-role {
       font-size: 12px;
       letter-spacing: 0.06em;
+    }
+    .team-caption-empty {
+      font-family: var(--font-bebas);
+      font-size: 15px;
+      letter-spacing: 0.2em;
+      color: var(--color-ink-mute);
     }
   }
 

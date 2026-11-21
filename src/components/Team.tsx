@@ -7,8 +7,23 @@ import suhail from "../../public/media/team-card-suhail.jpg";
 import sudhir from "../../public/media/team-card-sudhir.jpg";
 import ajay from "../../public/media/team-card-ajay.jpg";
 import shyan from "../../public/media/team-card-shyan.jpg";
+import cutSuhail from "../../public/media/team-cut-suhail.webp";
+import cutSudhir from "../../public/media/team-cut-sudhir.webp";
+import cutAjay from "../../public/media/team-cut-ajay.webp";
+import cutShyan from "../../public/media/team-cut-shyan.webp";
 
 const CARDS: Record<string, typeof suhail> = { suhail, sudhir, ajay, shyan };
+const CUTS: Record<string, typeof suhail> = {
+  suhail: cutSuhail,
+  sudhir: cutSudhir,
+  ajay: cutAjay,
+  shyan: cutShyan,
+};
+
+// Left to right in the group frame; the founder stands a little higher.
+const FRAME_ORDER = ["ajay", "suhail", "sudhir", "shyan"];
+const LEAD = "suhail";
+const IN_FRAME = FRAME_ORDER.map((id) => TEAM.find((t) => t.id === id)!);
 
 // Depth between scenes, and the share of scroll spent resting on a scene
 // versus flying to the next one.
@@ -19,7 +34,8 @@ const SCENES = TEAM.length + 1; // everyone, then the closing paragraph
 const UNITS = SCENES * HOLD + (SCENES - 1) * TRAVEL;
 
 const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+const ease = (t: number) =>
+  t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
 /** Scroll units to camera depth: it rests on each scene, then flies to the next. */
 function camera(u: number) {
@@ -42,27 +58,41 @@ const Corners = () => (
 );
 
 /**
- * The team: a row of portrait cards with names, roles and Instagram, and an
- * optional intro. "Play the team intro" opens a full-screen fly-through that
- * the visitor scrolls (or swipes) through at their own pace and can close
- * at any time; the page itself never pins.
+ * The team: everyone in one frame, with an optional intro. Hovering a person
+ * (or tapping, or tabbing to them) lights them up and shows their role, name
+ * and Instagram. "Play the team intro" opens a full-screen fly-through that
+ * the visitor scrolls through at their own pace and can close at any time.
  */
 export default function Team() {
   const [open, setOpen] = useState(false);
+  const [active, setActive] = useState<string | null>(null);
   const playRef = useRef<HTMLButtonElement>(null);
+  const current = IN_FRAME.find((t) => t.id === active);
 
   return (
-    <section id="team" aria-labelledby="team-title" className="on-light wrap py-[88px]">
+    <section
+      id="team"
+      aria-labelledby="team-title"
+      className="on-light wrap py-[88px]"
+    >
       <div className="rv mb-9 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h2 id="team-title" className="label mb-2">
             THE TEAM
           </h2>
-          <p className="headline max-w-[720px]" style={{ fontSize: "clamp(30px, 4vw, 52px)" }}>
+          <p
+            className="headline max-w-[720px]"
+            style={{ fontSize: "clamp(30px, 4vw, 52px)" }}
+          >
             The people behind the reels.
           </p>
         </div>
-        <button ref={playRef} type="button" className="team-play" onClick={() => setOpen(true)}>
+        <button
+          ref={playRef}
+          type="button"
+          className="team-play"
+          onClick={() => setOpen(true)}
+        >
           <span className="team-play-icon" aria-hidden="true">
             <svg width="12" height="12" viewBox="0 0 12 12">
               <path d="M2 1l9 5-9 5z" fill="currentColor" />
@@ -72,21 +102,71 @@ export default function Team() {
         </button>
       </div>
 
-      <ul className="team-grid rv">
-        {TEAM.map((t) => (
-          <li key={t.id} className="team-member">
-            <div className="team-member-card">
-              <Image src={CARDS[t.id]} alt={`${t.name}, ${t.role}`} sizes="(max-width: 720px) 46vw, 280px" />
-              <Corners />
-            </div>
-            <span className="team-role">{t.role}</span>
-            <strong className="team-member-name">{t.name}</strong>
-            <a className="team-member-handle" href={t.instagram} target="_blank" rel="noopener noreferrer">
-              {t.handle} <span aria-hidden="true">&#8599;</span>
-            </a>
-          </li>
-        ))}
-      </ul>
+      <div className="rv">
+        <div
+          className={`team-frame ${active ? "has-active" : ""}`}
+          onPointerLeave={(e) => e.pointerType === "mouse" && setActive(null)}
+        >
+          <ul className="team-people" aria-label="The Igloo Ads team">
+            {IN_FRAME.map((t) => (
+              <li
+                key={t.id}
+                className={`team-person ${t.id === LEAD ? "is-lead" : ""} ${t.id === active ? "is-on" : ""}`}
+                tabIndex={0}
+                onPointerEnter={(e) => e.pointerType === "mouse" && setActive(t.id)}
+                onClick={() => setActive(t.id)}
+                onFocus={() => setActive(t.id)}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node))
+                    setActive(null);
+                }}
+              >
+                <Image
+                  src={CUTS[t.id]}
+                  alt={`${t.name}, ${t.role}`}
+                  className="team-person-img"
+                  sizes="(max-width: 720px) 48vw, 460px"
+                />
+                <div className="team-tag">
+                  <span className="team-role">{t.role}</span>
+                  <strong className="team-tag-name">{t.name}</strong>
+                  <a
+                    className="team-handle"
+                    href={t.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t.handle} <span aria-hidden="true">&#8599;</span>
+                  </a>
+                </div>
+              </li>
+            ))}
+          </ul>
+          <p className="team-frame-hint" aria-hidden="true">
+            MEET THE TEAM
+          </p>
+          <Corners />
+        </div>
+        <div className="team-caption" aria-hidden="true">
+          {current ? (
+            <>
+              <strong className="team-tag-name">{current.name}</strong>
+              <span className="team-role">{current.role}</span>
+              <a
+                className="team-member-handle"
+                href={current.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+                tabIndex={-1}
+              >
+                {current.handle} <span aria-hidden="true">&#8599;</span>
+              </a>
+            </>
+          ) : (
+            <span className="team-caption-empty">TAP A FACE TO MEET THEM</span>
+          )}
+        </div>
+      </div>
 
       {open && (
         <TeamIntro
@@ -158,20 +238,29 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
         el.style.transform = `translate(-50%, -50%) translate3d(0, 0, ${rel}px)`;
         const passed = clamp(rel / 520);
         const ahead = clamp(-rel / GAP);
-        el.style.opacity = ((1 - passed) * (1 - 0.9 * Math.sqrt(ahead))).toFixed(3);
+        el.style.opacity = (
+          (1 - passed) *
+          (1 - 0.9 * Math.sqrt(ahead))
+        ).toFixed(3);
         // Flying past, the card and the details part to their own sides.
         const card = el.querySelector<HTMLElement>(".fly-card");
         const info = el.querySelector<HTMLElement>(".fly-info");
         if (card && info) {
           const side = i % 2 === 0 ? -1 : 1;
           const away = passed * (wide ? 260 : 140);
-          card.style.transform = wide ? `translateX(${side * away}px)` : `translateY(${-away}px)`;
-          info.style.transform = wide ? `translateX(${-side * away}px)` : `translateY(${away}px)`;
+          card.style.transform = wide
+            ? `translateX(${side * away}px)`
+            : `translateY(${-away}px)`;
+          info.style.transform = wide
+            ? `translateX(${-side * away}px)`
+            : `translateY(${away}px)`;
           card.style.filter = `blur(${(passed * 4).toFixed(2)}px) brightness(${(0.45 + 0.55 * (1 - ahead)).toFixed(3)})`;
         }
       });
       const near = cam.rest >= 0 ? cam.rest : Math.round(cam.z / GAP);
-      dotRefs.current.forEach((d, i) => d?.classList.toggle("is-on", i === near));
+      dotRefs.current.forEach((d, i) =>
+        d?.classList.toggle("is-on", i === near),
+      );
       hintRef.current?.classList.toggle("is-hidden", box.scrollTop > 40);
     };
     const queue = () => {
@@ -180,10 +269,15 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
 
     // Tabbing to a link in a scene brings the camera to that scene.
     const onFocus = (e: FocusEvent) => {
-      const i = sceneRefs.current.findIndex((el) => el?.contains(e.target as Node));
+      const i = sceneRefs.current.findIndex((el) =>
+        el?.contains(e.target as Node),
+      );
       if (i < 0) return;
       const u = i * (HOLD + TRAVEL) + HOLD / 2;
-      box.scrollTo({ top: (fly.offsetHeight - box.clientHeight) * (u / UNITS), behavior: "instant" });
+      box.scrollTo({
+        top: (fly.offsetHeight - box.clientHeight) * (u / UNITS),
+        behavior: "instant",
+      });
     };
 
     fly.classList.add("is-live");
@@ -200,7 +294,13 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
   }, []);
 
   return (
-    <div ref={boxRef} className="fly-overlay" role="dialog" aria-modal="true" aria-label="Team intro">
+    <div
+      ref={boxRef}
+      className="fly-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Team intro"
+    >
       <div ref={flyRef} className="fly">
         <div className="fly-stage">
           <div className="fly-world">
@@ -213,7 +313,11 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
                 className={`fly-scene ${i % 2 ? "is-flip" : ""}`}
               >
                 <div className="fly-card">
-                  <Image src={CARDS[t.id]} alt={`${t.name}, ${t.role}`} sizes="(max-width: 720px) 62vw, 380px" />
+                  <Image
+                    src={CARDS[t.id]}
+                    alt={`${t.name}, ${t.role}`}
+                    sizes="(max-width: 720px) 62vw, 380px"
+                  />
                   <Corners />
                 </div>
                 <div className="fly-info">
@@ -223,7 +327,12 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
                   <span className="team-role">{t.role}</span>
                   <strong className="fly-name">{t.name}</strong>
                   <p className="fly-line">{t.line}</p>
-                  <a className="team-handle" href={t.instagram} target="_blank" rel="noopener noreferrer">
+                  <a
+                    className="team-handle"
+                    href={t.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     {t.handle} <span aria-hidden="true">&#8599;</span>
                   </a>
                 </div>
@@ -255,9 +364,20 @@ function TeamIntro({ onClose }: { onClose: () => void }) {
           <p ref={hintRef} className="fly-hint" aria-hidden="true">
             SCROLL TO FLY THROUGH
           </p>
-          <button ref={closeRef} type="button" className="fly-close" onClick={onClose} aria-label="Close the team intro">
+          <button
+            ref={closeRef}
+            type="button"
+            className="fly-close"
+            onClick={onClose}
+            aria-label="Close the team intro"
+          >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M5 5l14 14M19 5L5 19" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+              <path
+                d="M5 5l14 14M19 5L5 19"
+                stroke="currentColor"
+                strokeWidth="2.2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
