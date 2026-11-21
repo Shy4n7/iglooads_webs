@@ -64,11 +64,9 @@ const Corners = () => (
 export default function Team() {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState<string | null>(null);
-  const [pop, setPop] = useState<string | null>(null);
   const playRef = useRef<HTMLButtonElement>(null);
-  const lastRef = useRef<HTMLElement | null>(null);
   const spot = IN_FRAME.find((f) => f.id === active)?.spot ?? 50;
-  const popped = TEAM.find((t) => t.id === pop);
+  const current = IN_FRAME.find((f) => f.id === active)?.member;
 
   return (
     <section
@@ -125,45 +123,61 @@ export default function Team() {
                   width: `${width}%`,
                   ["--tag" as string]: `${tag}%`,
                 }}
+                onBlur={(e) => {
+                  if (!e.currentTarget.contains(e.relatedTarget as Node))
+                    setActive(null);
+                }}
               >
                 <button
                   type="button"
                   className="team-person-hit"
-                  aria-haspopup="dialog"
-                  aria-label={`${t.name}, ${t.role}. Open their card`}
+                  aria-label={`${t.name}, ${t.role}`}
+                  aria-pressed={id === active}
                   onPointerEnter={(e) =>
                     e.pointerType === "mouse" && setActive(id)
                   }
                   onFocus={() => setActive(id)}
-                  onBlur={() => setActive(null)}
-                  onClick={(e) => {
-                    lastRef.current = e.currentTarget;
-                    setPop(id);
-                  }}
+                  onClick={() => setActive(id)}
                 />
-                <div className="team-tag" aria-hidden="true">
+                <div className="team-tag">
                   <span className="team-role">{t.role}</span>
                   <strong className="team-tag-name">{t.name}</strong>
+                  <a
+                    className="team-handle"
+                    href={t.instagram}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {t.handle} <span aria-hidden="true">&#8599;</span>
+                  </a>
                 </div>
               </li>
             ))}
           </ul>
           <p className="team-frame-hint" aria-hidden="true">
-            CLICK A FACE TO MEET THEM
+            MEET THE TEAM
           </p>
           <Corners />
         </div>
+        <div className="team-caption" aria-live="polite">
+          {current ? (
+            <>
+              <strong className="team-tag-name">{current.name}</strong>
+              <span className="team-role">{current.role}</span>
+              <a
+                className="team-member-handle"
+                href={current.instagram}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {current.handle} <span aria-hidden="true">&#8599;</span>
+              </a>
+            </>
+          ) : (
+            <span className="team-caption-empty">TAP A FACE TO MEET THEM</span>
+          )}
+        </div>
       </div>
-
-      {popped && (
-        <TeamPop
-          member={popped}
-          onClose={() => {
-            setPop(null);
-            lastRef.current?.focus({ preventScroll: true });
-          }}
-        />
-      )}
 
       {open && (
         <TeamIntro
@@ -174,83 +188,6 @@ export default function Team() {
         />
       )}
     </section>
-  );
-}
-
-/** One person on their own: their portrait card, role, a line and Instagram. */
-function TeamPop({
-  member: t,
-  onClose,
-}: {
-  member: (typeof TEAM)[number];
-  onClose: () => void;
-}) {
-  const closeRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    const before = html.style.overflow;
-    html.style.overflow = "hidden";
-    closeRef.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      html.style.overflow = before;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
-
-  return (
-    <div
-      className="team-pop"
-      role="dialog"
-      aria-modal="true"
-      aria-label={t.name}
-      onClick={onClose}
-    >
-      <div className="team-pop-card" onClick={(e) => e.stopPropagation()}>
-        <div className="team-pop-photo">
-          <Image
-            src={CARDS[t.id]}
-            alt={`${t.name}, ${t.role}`}
-            sizes="(max-width: 720px) 80vw, 380px"
-            priority
-          />
-          <Corners />
-        </div>
-        <div className="team-pop-info">
-          <span className="team-role">{t.role}</span>
-          <strong className="fly-name">{t.name}</strong>
-          <p className="fly-line">{t.line}</p>
-          <a
-            className="team-handle"
-            href={t.instagram}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {t.handle} <span aria-hidden="true">&#8599;</span>
-          </a>
-        </div>
-        <button
-          ref={closeRef}
-          type="button"
-          className="fly-close"
-          onClick={onClose}
-          aria-label="Close"
-        >
-          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M5 5l14 14M19 5L5 19"
-              stroke="currentColor"
-              strokeWidth="2.2"
-              strokeLinecap="round"
-            />
-          </svg>
-        </button>
-      </div>
-    </div>
   );
 }
 
