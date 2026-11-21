@@ -1,18 +1,25 @@
 import { RESULTS, REVIEWS } from "@/lib/content";
+import StatCard from "./StatCard";
 
-// Placeholders only. Replace with real, verifiable numbers before launch.
+// Numbers come from RESULTS in src/lib/content.ts. Keep them real and verifiable.
 export default function Results() {
   return (
-    <section aria-labelledby="results-title" className="on-light wrap pt-14 pb-10">
+    <section
+      aria-labelledby="results-title"
+      className="on-light wrap pt-14 pb-10"
+    >
       <h2 id="results-title" className="label rv mb-7">
         RESULTS
       </h2>
-      <ul className="g3 m-0 list-none p-0">
+      <ul className="g3 stat-list m-0 list-none p-0">
         {RESULTS.map((r) => (
-          <li key={r.label} className="rv lift rounded-[22px] bg-indigo p-7">
-            <div className="font-anton text-[56px] leading-none text-amber">{r.value}</div>
-            <div className="mt-2 text-sm text-cream">{r.label}</div>
-          </li>
+          <StatCard
+            key={r.label}
+            to={r.to}
+            suffix={r.suffix}
+            label={r.label}
+            line={r.line}
+          />
         ))}
       </ul>
       <h3 id="reviews-title" className="label rv mt-14 mb-7">

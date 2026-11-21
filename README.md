@@ -175,5 +175,5 @@ Logos are imported straight from `assets/logos/wall/` by `next/image` (files are
 
 All in `src/lib/content.ts` unless noted.
 
-- Results `[00M]`, `[0X]`, `[00+]` and their labels: `RESULTS`. Only publish real, verifiable numbers.
+- Results (300K+ views, 3x growth, 6+ brands served): `RESULTS` (`to`, `suffix`, `label`, `line`). The centred numbers count up when the card scrolls into view, with a short line of text under each (`src/components/StatCard.tsx`). Only publish real, verifiable numbers.
 - Intro paragraph under the hero: `src/components/Intro.tsx`

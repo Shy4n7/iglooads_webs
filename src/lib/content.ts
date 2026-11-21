@@ -65,10 +65,15 @@ export const STEPS = [
   },
 ];
 
-export const RESULTS = [
-  { value: "[00M]", label: "[views on one reel]" },
-  { value: "[0X]", label: "[growth metric]" },
-  { value: "[00+]", label: "[brands served]" },
+export const RESULTS: {
+  to: number;
+  suffix: string;
+  label: string;
+  line: string;
+}[] = [
+  { to: 300, suffix: "K+", label: "views", line: "Views earned on the reels and ads we make for brands." },
+  { to: 3, suffix: "x", label: "growth", line: "Growth for the brands we post and grow for." },
+  { to: 6, suffix: "+", label: "brands served", line: "Recognizable brands we shoot, edit and post for." },
 ];
 
 export const REVIEWS = [
