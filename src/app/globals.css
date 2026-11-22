@@ -430,6 +430,9 @@
     left: 0;
     right: 0;
     bottom: 100%;
+    /* Wider letters in the strip (W next to an S) must not stick out past
+       the screen edge: hidden or not, they would make the page scroll sideways. */
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: flex-start;

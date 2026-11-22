@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Bebas_Neue, Fraunces, Outfit } from "next/font/google";
 import RevealFallback from "@/components/RevealFallback";
+import { SITE_URL } from "@/lib/site";
 import ScrollManager from "@/components/ScrollManager";
 import "./globals.css";
 
@@ -19,10 +20,9 @@ const outfit = Outfit({
   display: "swap",
 });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://iglooads.vercel.app";
-
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "/" },
   title: "Igloo Ads | Instagram reels, ads and UGC in Coimbatore",
   description:
     "Igloo Ads scripts, shoots, edits and posts short-form video for Coimbatore brands, and builds the websites it sends customers to. Social media, influencer and digital marketing, reels, UGC ads, video production, models, events and websites.",
