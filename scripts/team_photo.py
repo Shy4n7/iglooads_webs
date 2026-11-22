@@ -35,7 +35,8 @@ PEOPLE = {
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
     # A small, already black and white photo: the left and bottom edges are
     # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
-    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=265, scale=1.0, pad=(15, 70)),
+    # raw: no grading, the photo is used as it is.
+    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=265, scale=1.0, pad=(15, 70), raw=True),
 }
 # Everyone is graded to match the face in this photo: its brightness,
 # contrast and soft, deep-black look. It is only measured, never put on a card.
@@ -147,7 +148,7 @@ def main(only=None):
         if only and name not in only:
             continue
         card = backdrop()
-        card.alpha_composite(to_grey(place(cut_out(p, session), p), target))
+        card.alpha_composite(to_grey(place(cut_out(p, session), p), None if p.get("raw") else target))
         card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
         print("card", name)
 
