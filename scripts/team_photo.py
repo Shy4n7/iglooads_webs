@@ -147,6 +147,11 @@ def stats(grey, alpha):
 S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
 
 
+# How much of the others' shadow depth to add to a matched photo:
+# 1 is all of it, 0 none. Kept low so the shadows stay very subtle.
+SHADOW_STRENGTH = 0.2
+
+
 def match_to_group(rgba, refs):
     """Make a black and white cut-out look like it was shot with the others.
 
@@ -187,6 +192,7 @@ def match_to_group(rgba, refs):
             d, mine = detail(g, a, zone)
             theirs = float(np.mean([detail(rg, ra, zone)[1] for rg, ra in ref]))
             k = np.clip(theirs / max(mine, 1e-3), 0.7, top)
+            k = 1 + (k - 1) * SHADOW_STRENGTH
             g = np.where(zone, g + d * (k - 1), g)
 
     # 2. Tones: histogram matching, head and body separately, blended at the neck.
