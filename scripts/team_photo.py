@@ -6,7 +6,8 @@ deep indigo with a soft light behind the head. Writes one card per person:
 public/media/team-card-<name>.jpg (760 x 950).
 
 Needs: pip install "rembg[cpu]" pillow pillow-heif
-Run:   python3 scripts/team_photo.py
+Run:   python3 scripts/team_photo.py            (every card)
+       python3 scripts/team_photo.py shyan      (just one)
 The originals in assets/team are only read, never changed.
 """
 
@@ -32,11 +33,13 @@ PEOPLE = {
     "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0),
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
-    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0),
+    # A small, already black and white photo: the left and bottom edges are
+    # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
+    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=265, scale=1.0, pad=(15, 70)),
 }
-# Everyone is graded to match this photo's face: its brightness, contrast
-# and soft, deep-black look.
-REFERENCE = "shyan"
+# Everyone is graded to match the face in this photo: its brightness,
+# contrast and soft, deep-black look. It is only measured, never put on a card.
+LOOK = dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0)
 
 CARD = (760, 950)
 EYE_Y = 360
@@ -53,7 +56,29 @@ def cut_out(p, session):
     a = im.getchannel("A").point(lambda v: 0 if v < 60 else v)
     a = a.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.GaussianBlur(1.2))
     im.putalpha(a)
+    if "pad" in p:
+        im = pad_edges(im, *p["pad"])
     return im
+
+
+def pad_edges(im, left, bottom):
+    """Extend the left and bottom edges by repeating the outermost pixels."""
+    w, h = im.size
+    out = Image.new("RGBA", (w + left, h + bottom), (0, 0, 0, 0))
+    out.paste(im, (left, 0))
+    if left:
+        out.paste(im.crop((0, 0, 1, h)).resize((left, h), Image.NEAREST), (0, 0))
+    if bottom:
+        out.paste(out.crop((0, h - 1, w + left, h)).resize((w + left, bottom), Image.NEAREST), (0, h))
+        # Soften the join so no band shows where the extension starts.
+        seam = 60
+        box = (0, h - seam, w + left, h + bottom)
+        blurred = out.crop(box).filter(ImageFilter.GaussianBlur(14))
+        ramp = Image.linear_gradient("L").resize((w + left, seam))
+        mask = Image.new("L", (w + left, seam + bottom), 255)
+        mask.paste(ramp, (0, 0))
+        out.paste(blurred, box[:2], mask)
+    return out
 
 
 def place(im, p):
@@ -114,17 +139,20 @@ def backdrop():
     return bg.convert("RGBA")
 
 
-def main():
+def main(only=None):
     session = new_session("isnet-general-use")
-    placed = {name: place(cut_out(p, session), p) for name, p in PEOPLE.items()}
-    ref = placed[REFERENCE]
-    target = stats(ImageOps.grayscale(ref.convert("RGB")), ref.getchannel("A"))
-    for name, im in placed.items():
+    look = place(cut_out(LOOK, session), LOOK)
+    target = stats(ImageOps.grayscale(look.convert("RGB")), look.getchannel("A"))
+    for name, p in PEOPLE.items():
+        if only and name not in only:
+            continue
         card = backdrop()
-        card.alpha_composite(to_grey(im, None if name == REFERENCE else target))
+        card.alpha_composite(to_grey(place(cut_out(p, session), p), target))
         card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
         print("card", name)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    main(sys.argv[1:])
