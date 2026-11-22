@@ -4,6 +4,7 @@ import aura from "../../assets/logos/wall/aura.png";
 import havells from "../../assets/logos/wall/havells.png";
 import hyundai from "../../assets/logos/wall/hyundai.png";
 import kia from "../../assets/logos/wall/kia.png";
+import nisarga from "../../assets/logos/wall/nisarga-avenue.png";
 import royalEnfield from "../../assets/logos/wall/royal-enfield.png";
 
 // Display heights in CSS px. Source files are 2x.
@@ -13,6 +14,7 @@ const LOGOS: { alt: string; src: StaticImageData; h: number }[] = [
   { alt: "Havells", src: havells, h: 36 },
   { alt: "Hyundai", src: hyundai, h: 64 },
   { alt: "Kia", src: kia, h: 41 },
+  { alt: "Nisarga Avenue III", src: nisarga, h: 60 },
   { alt: "Royal Enfield", src: royalEnfield, h: 60 },
 ];
 

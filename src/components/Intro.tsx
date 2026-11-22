@@ -20,9 +20,8 @@ export default function Intro() {
             className="intro-step m-0 max-w-[480px] text-base leading-[1.75] text-ink-soft"
             style={{ ["--d" as string]: "0.12s" }}
           >
-            Igloo Ads is a Coimbatore studio for social media and influencer marketing, reels, UGC ads, video
-            production, models, events and websites. We script, shoot, edit and post, then build the fast, mobile-first
-            website your new customers land on. One team, from the first hook to the booking.
+            Igloo Ads is a Coimbatore digital marketing and video production company. We help brands tell their story
+            with content that is thoughtfully made, professionally produced and built to be remembered.
           </p>
           <div className="intro-step flex flex-wrap gap-3" style={{ ["--d" as string]: "0.24s" }}>
             <a
