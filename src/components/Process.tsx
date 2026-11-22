@@ -17,12 +17,12 @@ export default function Process() {
             <h2 id="process-title" className="label mb-2 text-cream">
               HOW IT WORKS
             </h2>
-            <p className="headline text-cream" style={{ fontSize: "clamp(30px, 4vw, 52px)" }}>
-              Three steps. No guesswork.
+            <p className="headline text-cream" style={{ fontSize: "clamp(28px, 3.6vw, 46px)" }}>
+              Three simple steps.
             </p>
           </div>
-          <p className="m-0 max-w-[340px] text-sm leading-[1.7] text-cream-soft">
-            From the first call to a feed that keeps growing, one team runs the whole loop.
+          <p className="m-0 max-w-[340px] text-[15px] leading-[1.47] text-cream-soft">
+            One team, from first call to final post.
           </p>
         </div>
 
@@ -41,7 +41,7 @@ export default function Process() {
                   <span className="sr-only">Step {Number(s.n)}: </span>
                   {s.title}
                 </h3>
-                <p className="m-0 max-w-[300px] text-sm leading-[1.65] text-cream-soft">{s.body}</p>
+                <p className="m-0 max-w-[300px] text-[15px] leading-[1.47] text-cream-soft">{s.body}</p>
               </div>
             </li>
           ))}

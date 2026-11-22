@@ -11,17 +11,16 @@ export default function Intro() {
         <h2
           id="intro-title"
           className="headline rv intro-step"
-          style={{ fontSize: "clamp(30px, 4.2vw, 56px)", lineHeight: 1.05, ["--d" as string]: "0s" }}
+          style={{ fontSize: "clamp(30px, 4vw, 52px)", lineHeight: 1.08, ["--d" as string]: "0s" }}
         >
-          Reels and ads people actually watch, and websites that turn those views into customers.
+          Content people watch. Websites that convert.
         </h2>
         <div className="rv flex flex-col gap-6">
           <p
-            className="intro-step m-0 max-w-[480px] text-base leading-[1.75] text-ink-soft"
+            className="intro-step m-0 max-w-[420px] text-[17px] leading-[1.47] text-ink-soft"
             style={{ ["--d" as string]: "0.12s" }}
           >
-            Igloo Ads is a Coimbatore digital marketing and video production company. We help brands tell their story
-            with content that is thoughtfully made, professionally produced and built to be remembered.
+            Igloo Ads is a Coimbatore digital marketing and video production company.
           </p>
           <div className="intro-step flex flex-wrap gap-3" style={{ ["--d" as string]: "0.24s" }}>
             <a

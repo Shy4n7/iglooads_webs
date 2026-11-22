@@ -1,17 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Anton, Bebas_Neue, Bricolage_Grotesque, Fraunces, Poppins } from "next/font/google";
+import { Anton, Bebas_Neue, Fraunces, Outfit } from "next/font/google";
 import RevealFallback from "@/components/RevealFallback";
 import ScrollManager from "@/components/ScrollManager";
 import "./globals.css";
 
 const bebas = Bebas_Neue({ weight: "400", subsets: ["latin"], variable: "--font-bebas-neue", display: "swap" });
 const anton = Anton({ weight: "400", subsets: ["latin"], variable: "--font-anton-face", display: "swap", preload: false });
-const bricolage = Bricolage_Grotesque({
-  weight: "800",
-  subsets: ["latin"],
-  variable: "--font-bricolage",
-  display: "swap",
-});
 const fraunces = Fraunces({
   subsets: ["latin"],
   axes: ["SOFT"],
@@ -19,13 +13,10 @@ const fraunces = Fraunces({
   display: "swap",
   preload: false,
 });
-const poppins = Poppins({
-  weight: ["400", "500"],
+const outfit = Outfit({
   subsets: ["latin"],
-  variable: "--font-poppins-face",
+  variable: "--font-outfit",
   display: "swap",
-  // Body text renders in a metric-matched fallback first, so the heading fonts load sooner.
-  preload: false,
 });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://iglooads.vercel.app";
@@ -55,7 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html
       lang="en"
-      className={`${bebas.variable} ${anton.variable} ${bricolage.variable} ${fraunces.variable} ${poppins.variable}`}
+      className={`${bebas.variable} ${anton.variable} ${fraunces.variable} ${outfit.variable}`}
     >
       <head>
         {/* Runs before the page paints: always start at the top on load or refresh. */}
