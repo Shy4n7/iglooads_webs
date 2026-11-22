@@ -37,9 +37,11 @@ PEOPLE = {
     # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
     # raw: not graded like the others. match: instead, measured against the
     # other three cards and matched to them (see match_to_group).
-    # raw on its own: the photo is used as it is. tilt: degrees to turn the
+    # raw on its own: the photo is used as it is (background removed only).
+    # fill_bottom: the photo sits on the card's bottom edge, so the shirt
+    # reaches it without being extended. tilt: degrees to turn the
     # person, counter-clockwise, to match the others' relaxed poses.
-    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=310, scale=1.0, pad=(60, 260), raw=True, tilt=5, match=True),
+    "shyan": dict(file="shyan-5.png", eye=412, chin=695, cx=625, scale=1.1, raw=True, fill_bottom=True),
 }
 # Everyone is graded to match the face in this photo: its brightness,
 # contrast and soft, deep-black look. It is only measured, never put on a card.
@@ -67,6 +69,8 @@ def cut_out(p, session):
 
 def pad_edges(im, left, bottom):
     """Extend the left and bottom edges by repeating the outermost pixels."""
+    import numpy as np
+
     w, h = im.size
     # Where the cut-out fades out, its colour is still the old (light) wall;
     # take it towards the dark shirt first, so none of it spreads.
@@ -93,14 +97,32 @@ def pad_edges(im, left, bottom):
             arr[:, i, 3] = np.concatenate([np.zeros(drop, a.dtype), a[: h - drop, i]])
         out.paste(Image.fromarray(arr, "RGBA"), (0, 0))
     if bottom:
-        out.paste(out.crop((0, h - 1, w + left, h)).resize((w + left, bottom), Image.NEAREST), (0, h))
+        # The shirt's last rows, averaged and smoothed sideways, then given
+        # the same fine fabric grain, so the extension reads as more shirt.
+        W = w + left
+        row = out.crop((0, h - 30, W, h)).resize((W, 1), Image.BOX)
+        row = row.resize((max(2, W // 16), 1), Image.BOX).resize((W, 1), Image.BICUBIC)
+        ext = np.array(row.resize((W, bottom), Image.NEAREST)).astype(np.float32)
+        band = np.asarray(ImageOps.grayscale(out.crop((0, h - 120, W, h)).convert("RGB")), dtype=np.float32)
+        band_a = np.asarray(out.crop((0, h - 120, W, h)).getchannel("A")) > 200
+        smooth = np.asarray(
+            ImageOps.grayscale(out.crop((0, h - 120, W, h)).convert("RGB")).filter(ImageFilter.GaussianBlur(3)),
+            dtype=np.float32,
+        )
+        texture = float((band - smooth)[band_a].std()) if band_a.any() else 0.0
+        noise = np.random.default_rng(11).normal(0, texture, (bottom, W)).astype(np.float32)
+        noise = np.asarray(Image.fromarray((noise + 128).clip(0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6)), dtype=np.float32) - 128
+        ext[:, :, :3] = (ext[:, :, :3] + noise[:, :, None]).clip(0, 255)
+        out.paste(Image.fromarray(ext.astype(np.uint8), "RGBA"), (0, h))
         # Soften the join so no band shows where the extension starts.
         seam = 60
         box = (0, h - seam, w + left, h + bottom)
-        blurred = out.crop(box).filter(ImageFilter.GaussianBlur(14))
-        ramp = Image.linear_gradient("L").resize((w + left, seam))
-        mask = Image.new("L", (w + left, seam + bottom), 255)
-        mask.paste(ramp, (0, 0))
+        blurred = out.crop(box).filter(ImageFilter.GaussianBlur(4))
+        # Blur only across the join (fading in above it and out below it),
+        # so the grain of the extension stays.
+        mask = Image.new("L", (w + left, seam + bottom), 0)
+        mask.paste(Image.linear_gradient("L").resize((w + left, seam)), (0, 0))
+        mask.paste(Image.linear_gradient("L").rotate(180).resize((w + left, 40)), (0, seam))
         out.paste(blurred, box[:2], mask)
     return out
 
@@ -115,6 +137,8 @@ def place(im, p):
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
     x = round(CARD[0] / 2 - p["cx"] * s)
     y = round(EYE_Y - (p["eye"] - y0) * s)
+    if p.get("fill_bottom"):
+        y = CARD[1] - im.height
     # A little extra room all round, so a tilt never leaves empty corners.
     m = 260 if p.get("tilt") else 0
     canvas = Image.new("RGBA", (CARD[0] + 2 * m, CARD[1] + 2 * m), (0, 0, 0, 0))
