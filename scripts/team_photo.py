@@ -26,6 +26,10 @@ OUT = ROOT / "public" / "media"
 DEEP = (29, 31, 56)
 LIGHT = (58, 62, 104)
 
+# Shyan's tones, as (in, out) points: the darkest tones (hair, shirt) are
+# lifted and the mid-tones (skin) pulled down a little.
+SHYAN_CURVE = [(0, 6), (20, 36), (45, 62), (90, 98), (130, 128), (170, 156), (210, 200), (255, 254)]
+
 # Measured on the photos after they are shrunk to fit 2400px: the eye line,
 # the chin and the face centre. Faces are scaled so eye-to-chin matches,
 # times scale where a face still reads smaller than the others.
@@ -37,7 +41,7 @@ PEOPLE = {
     # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
     # raw: no grading, the photo is used as it is. tilt: degrees to turn the
     # person, counter-clockwise, to match the others' relaxed poses.
-    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=310, scale=1.0, pad=(60, 260), raw=True, tilt=5),
+    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=310, scale=1.0, pad=(60, 260), raw=True, tilt=5, curve=SHYAN_CURVE),
 }
 # Everyone is graded to match the face in this photo: its brightness,
 # contrast and soft, deep-black look. It is only measured, never put on a card.
@@ -129,6 +133,16 @@ def stats(grey, alpha):
 S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
 
 
+def apply_curve(rgba, points):
+    """Remap the brightness with a smooth curve through the given points."""
+    import numpy as np
+
+    xs, ys = zip(*points)
+    lut = [int(round(v)) for v in np.interp(range(256), xs, ys)]
+    r, g, b, a = rgba.split()
+    return Image.merge("RGBA", (r.point(lut), g.point(lut), b.point(lut), a))
+
+
 def to_grey(rgba, target=None):
     """Black and white. With a target (mean, std), the face is graded to
     match it and polished: a touch of smoothing, the S-curve, then crisp
@@ -161,7 +175,10 @@ def main(only=None):
         if only and name not in only:
             continue
         card = backdrop()
-        card.alpha_composite(to_grey(place(cut_out(p, session), p), None if p.get("raw") else target))
+        grey = to_grey(place(cut_out(p, session), p), None if p.get("raw") else target)
+        if p.get("curve"):
+            grey = apply_curve(grey, p["curve"])
+        card.alpha_composite(grey)
         card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
         print("card", name)
 
