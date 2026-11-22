@@ -35,8 +35,9 @@ PEOPLE = {
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
     # A small, already black and white photo: the left and bottom edges are
     # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
-    # raw: no grading, the photo is used as it is.
-    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=265, scale=1.0, pad=(15, 70), raw=True),
+    # raw: no grading, the photo is used as it is. tilt: degrees to turn the
+    # person, counter-clockwise, to match the others' relaxed poses.
+    "shyan": dict(file="shyan-4.jpg", eye=165, chin=278, cx=310, scale=1.0, pad=(60, 260), raw=True, tilt=5),
 }
 # Everyone is graded to match the face in this photo: its brightness,
 # contrast and soft, deep-black look. It is only measured, never put on a card.
@@ -68,7 +69,11 @@ def pad_edges(im, left, bottom):
     out = Image.new("RGBA", (w + left, h + bottom), (0, 0, 0, 0))
     out.paste(im, (left, 0))
     if left:
-        out.paste(im.crop((0, 0, 1, h)).resize((left, h), Image.NEAREST), (0, 0))
+        # The edge column, averaged and smoothed top to bottom so the
+        # extension is smooth cloth with no streaks.
+        col = im.crop((0, 0, 6, h)).resize((1, h), Image.BOX)
+        col = col.resize((1, max(2, h // 24)), Image.BOX).resize((left, h), Image.BICUBIC)
+        out.paste(col, (0, 0))
     if bottom:
         out.paste(out.crop((0, h - 1, w + left, h)).resize((w + left, bottom), Image.NEAREST), (0, h))
         # Soften the join so no band shows where the extension starts.
@@ -92,8 +97,16 @@ def place(im, p):
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
     x = round(CARD[0] / 2 - p["cx"] * s)
     y = round(EYE_Y - (p["eye"] - y0) * s)
-    canvas = Image.new("RGBA", CARD, (0, 0, 0, 0))
+    # A little extra room all round, so a tilt never leaves empty corners.
+    m = 260 if p.get("tilt") else 0
+    canvas = Image.new("RGBA", (CARD[0] + 2 * m, CARD[1] + 2 * m), (0, 0, 0, 0))
+    x, y = x + m, y + m
     canvas.alpha_composite(im, (max(0, x), max(0, y)), (max(0, -x), max(0, -y)))
+    if p.get("tilt"):
+        # Turn the person about the middle of the face (degrees, counter-clockwise).
+        pivot = (CARD[0] / 2 + m, EYE_Y + EYE_TO_CHIN / 2 + m)
+        canvas = canvas.rotate(p["tilt"], resample=Image.BICUBIC, center=pivot)
+        canvas = canvas.crop((m, m, m + CARD[0], m + CARD[1]))
     return canvas
 
 
