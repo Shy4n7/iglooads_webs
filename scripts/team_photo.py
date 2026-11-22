@@ -41,7 +41,7 @@ PEOPLE = {
     # fill_bottom: the photo sits on the card's bottom edge, so the shirt
     # reaches it without being extended. tilt: degrees to turn the
     # person, counter-clockwise, to match the others' relaxed poses.
-    "shyan": dict(file="shyan-6.png", eye=420, chin=700, cx=645, scale=1.1, raw=True, fill_bottom=True),
+    "shyan": dict(file="shyan-5.png", eye=412, chin=695, cx=625, scale=1.1, raw=True, fill_bottom=True),
 }
 # Everyone is graded to match the face in this photo: its brightness,
 # contrast and soft, deep-black look. It is only measured, never put on a card.
