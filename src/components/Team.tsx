@@ -65,7 +65,7 @@ export default function Team() {
           </h2>
           <p
             className="headline max-w-[720px]"
-            style={{ fontSize: "clamp(30px, 4vw, 52px)" }}
+            style={{ fontSize: "clamp(28px, 3.6vw, 46px)" }}
           >
             The people behind the reels.
           </p>

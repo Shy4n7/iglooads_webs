@@ -49,19 +49,19 @@ export const STEPS = [
     n: "01",
     kicker: "TALK",
     title: "Discovery call",
-    body: "We learn your brand, audience and what you want people to do.",
+    body: "We learn your brand and your goals.",
   },
   {
     n: "02",
     kicker: "CREATE",
     title: "Shoot and edit",
-    body: "Scripts, a planned shoot day and fast, thumb-stopping edits.",
+    body: "Scripts, a planned shoot and fast edits.",
   },
   {
     n: "03",
     kicker: "GROW",
     title: "Post and grow",
-    body: "We post, track views and leads, and double down on what works.",
+    body: "We post, track results and refine.",
   },
 ];
 
@@ -71,9 +71,9 @@ export const RESULTS: {
   label: string;
   line: string;
 }[] = [
-  { to: 300, suffix: "K+", label: "views", line: "Views earned on the reels and ads we make for brands." },
-  { to: 3, suffix: "x", label: "growth", line: "Growth for the brands we post and grow for." },
-  { to: 6, suffix: "+", label: "brands served", line: "Recognizable brands we shoot, edit and post for." },
+  { to: 300, suffix: "K+", label: "views", line: "Earned on reels and ads for brands." },
+  { to: 3, suffix: "x", label: "growth", line: "Growth for the brands we post for." },
+  { to: 6, suffix: "+", label: "brands served", line: "Recognised brands, shot and posted." },
 ];
 
 export const REVIEWS = [

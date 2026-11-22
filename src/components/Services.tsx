@@ -22,26 +22,26 @@ const GROUPS: Group[] = [
   {
     label: "CREATE",
     items: [
-      { name: "Reels that go viral", img: reels, pos: "45% 35%", body: "Hooks, scripts, shoots and edits built for the first three seconds." },
-      { name: "UGC ads", img: ugc, pos: "32% 45%", body: "Creator-style ads that feel like a customer talking, not a brand." },
-      { name: "Video production", img: video, pos: "45% 50%", body: "Ad films, brand films and product videos, from script and casting to the final edit." },
-      { name: "Brand shoots", img: shoots, pos: "50% 50%", body: "Photos and B-roll for your feed, website and ads in one shoot day." },
-      { name: "Models and talent", img: models, pos: "50% 30%", body: "Models and on-camera talent for your shoots, reels and ads, cast to fit your brand." },
+      { name: "Reels that go viral", img: reels, pos: "45% 35%", body: "Scripted, shot and edited to hold attention." },
+      { name: "UGC ads", img: ugc, pos: "32% 45%", body: "Creator-style ads that feel real." },
+      { name: "Video production", img: video, pos: "45% 50%", body: "Ad films, brand films and product videos." },
+      { name: "Brand shoots", img: shoots, pos: "50% 50%", body: "Photos and B-roll in a single shoot day." },
+      { name: "Models and talent", img: models, pos: "50% 30%", body: "On-camera talent, cast to fit your brand." },
     ],
   },
   {
     label: "GROW",
     items: [
-      { name: "Social media marketing", img: social, pos: "50% 40%", body: "Content calendars, posting and community management that keep your page growing every week." },
-      { name: "Influencer marketing", img: influencer, pos: "50% 50%", body: "Local creators and influencers who put your product in front of the right people." },
-      { name: "Digital marketing", img: digital, pos: "60% 50%", body: "Paid ads, search and performance tracking that turn views into leads you can count." },
+      { name: "Social media marketing", img: social, pos: "50% 40%", body: "Content, posting and community, handled weekly." },
+      { name: "Influencer marketing", img: influencer, pos: "50% 50%", body: "Local creators who reach the right audience." },
+      { name: "Digital marketing", img: digital, pos: "60% 50%", body: "Paid ads and tracking that turn views into leads." },
     ],
   },
   {
     label: "BUILD",
     items: [
-      { name: "Websites that convert", img: websites, pos: "55% 50%", body: "Fast, mobile-first sites that turn reel views into calls, bookings and sales." },
-      { name: "Brand events", img: events, pos: "50% 50%", body: "Launches, store openings and brand events, planned, run and filmed for your socials." },
+      { name: "Websites that convert", img: websites, pos: "55% 50%", body: "Fast, mobile-first sites that turn views into bookings." },
+      { name: "Brand events", img: events, pos: "50% 50%", body: "Launches and openings, planned, run and filmed." },
     ],
   },
 ];
@@ -95,12 +95,12 @@ export default function Services() {
           <h2 id="services-title" className="label mb-2">
             WHAT WE DO
           </h2>
-          <p className="headline max-w-[720px]" style={{ fontSize: "clamp(30px, 4vw, 52px)" }}>
-            Everything your brand needs to show up on the feed, and a site to send them to.
+          <p className="headline max-w-[720px]" style={{ fontSize: "clamp(28px, 3.6vw, 46px)" }}>
+            Everything your brand needs to stand out.
           </p>
         </div>
-        <p className="m-0 max-w-[280px] text-sm leading-relaxed text-ink-soft">
-          Pick a service to start an enquiry. Most brands mix two or three.
+        <p className="m-0 max-w-[280px] text-[15px] leading-[1.47] text-ink-soft">
+          Pick a service to enquire.
         </p>
       </div>
 
@@ -160,7 +160,7 @@ export default function Services() {
                         <div className="svc-body-img">
                           <Image src={s.img} alt="" fill sizes="(max-width: 720px) 90vw, 1px" className="object-cover" style={{ objectPosition: s.pos }} />
                         </div>
-                        <p className="m-0 text-[15px] leading-[1.6] text-ink-soft">{s.body}</p>
+                        <p className="m-0 text-[15px] leading-[1.47] text-ink-soft">{s.body}</p>
                         <button
                           type="button"
                           className="btn btn-ink inline-flex min-h-11 items-center rounded-full px-5 py-2.5 font-bebas text-[17px] tracking-[0.06em]"
