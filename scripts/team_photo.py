@@ -6,7 +6,8 @@ deep indigo with a soft light behind the head. Writes one card per person:
 public/media/team-card-<name>.jpg (760 x 950).
 
 Needs: pip install "rembg[cpu]" pillow pillow-heif
-Run:   python3 scripts/team_photo.py
+Run:   python3 scripts/team_photo.py            (every card)
+       python3 scripts/team_photo.py shyan      (just one)
 The originals in assets/team are only read, never changed.
 """
 
@@ -32,11 +33,19 @@ PEOPLE = {
     "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0),
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
-    "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0),
+    # A small, already black and white photo: the left and bottom edges are
+    # extended (pad = left, bottom) so the shirt fills the card. cx includes it.
+    # raw: not graded like the others. match: instead, measured against the
+    # other three cards and matched to them (see match_to_group).
+    # raw on its own: the photo is used as it is (background removed only).
+    # fill_bottom: the photo sits on the card's bottom edge, so the shirt
+    # reaches it without being extended. tilt: degrees to turn the
+    # person, counter-clockwise, to match the others' relaxed poses.
+    "shyan": dict(file="shyan-7.png", eye=412, chin=692, cx=628, scale=1.16, raw=True, fill_bottom=True),
 }
-# Everyone is graded to match this photo's face: its brightness, contrast
-# and soft, deep-black look.
-REFERENCE = "shyan"
+# Everyone is graded to match the face in this photo: its brightness,
+# contrast and soft, deep-black look. It is only measured, never put on a card.
+LOOK = dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0)
 
 CARD = (760, 950)
 EYE_Y = 360
@@ -53,7 +62,69 @@ def cut_out(p, session):
     a = im.getchannel("A").point(lambda v: 0 if v < 60 else v)
     a = a.filter(ImageFilter.MinFilter(5)).filter(ImageFilter.GaussianBlur(1.2))
     im.putalpha(a)
+    if "pad" in p:
+        im = pad_edges(im, *p["pad"])
     return im
+
+
+def pad_edges(im, left, bottom):
+    """Extend the left and bottom edges by repeating the outermost pixels."""
+    import numpy as np
+
+    w, h = im.size
+    # Where the cut-out fades out, its colour is still the old (light) wall;
+    # take it towards the dark shirt first, so none of it spreads.
+    alpha = im.getchannel("A")
+    flat = Image.new("RGB", im.size, (24, 24, 24))
+    flat.paste(im.convert("RGB"), (0, 0), alpha)
+    im = flat.convert("RGBA")
+    im.putalpha(alpha)
+    out = Image.new("RGBA", (w + left, h + bottom), (0, 0, 0, 0))
+    out.paste(im, (left, 0))
+    if left:
+        # The edge column, averaged and smoothed top to bottom so the
+        # extension is smooth cloth with no streaks.
+        col = im.crop((8, 0, 20, h)).resize((1, h), Image.BOX)  # a little inside the edge
+        col = col.resize((1, max(2, h // 24)), Image.BOX).resize((left, h), Image.BICUBIC)
+        # Keep following the slope of the shoulder outwards: each column
+        # of the extension starts a little lower than the one inside it.
+        import numpy as np
+
+        arr = np.array(col)
+        a = arr[:, :, 3].copy()
+        for i in range(left):
+            drop = int(round((left - i) * 1.6))
+            arr[:, i, 3] = np.concatenate([np.zeros(drop, a.dtype), a[: h - drop, i]])
+        out.paste(Image.fromarray(arr, "RGBA"), (0, 0))
+    if bottom:
+        # The shirt's last rows, averaged and smoothed sideways, then given
+        # the same fine fabric grain, so the extension reads as more shirt.
+        W = w + left
+        row = out.crop((0, h - 30, W, h)).resize((W, 1), Image.BOX)
+        row = row.resize((max(2, W // 16), 1), Image.BOX).resize((W, 1), Image.BICUBIC)
+        ext = np.array(row.resize((W, bottom), Image.NEAREST)).astype(np.float32)
+        band = np.asarray(ImageOps.grayscale(out.crop((0, h - 120, W, h)).convert("RGB")), dtype=np.float32)
+        band_a = np.asarray(out.crop((0, h - 120, W, h)).getchannel("A")) > 200
+        smooth = np.asarray(
+            ImageOps.grayscale(out.crop((0, h - 120, W, h)).convert("RGB")).filter(ImageFilter.GaussianBlur(3)),
+            dtype=np.float32,
+        )
+        texture = float((band - smooth)[band_a].std()) if band_a.any() else 0.0
+        noise = np.random.default_rng(11).normal(0, texture, (bottom, W)).astype(np.float32)
+        noise = np.asarray(Image.fromarray((noise + 128).clip(0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(0.6)), dtype=np.float32) - 128
+        ext[:, :, :3] = (ext[:, :, :3] + noise[:, :, None]).clip(0, 255)
+        out.paste(Image.fromarray(ext.astype(np.uint8), "RGBA"), (0, h))
+        # Soften the join so no band shows where the extension starts.
+        seam = 60
+        box = (0, h - seam, w + left, h + bottom)
+        blurred = out.crop(box).filter(ImageFilter.GaussianBlur(4))
+        # Blur only across the join (fading in above it and out below it),
+        # so the grain of the extension stays.
+        mask = Image.new("L", (w + left, seam + bottom), 0)
+        mask.paste(Image.linear_gradient("L").resize((w + left, seam)), (0, 0))
+        mask.paste(Image.linear_gradient("L").rotate(180).resize((w + left, 40)), (0, seam))
+        out.paste(blurred, box[:2], mask)
+    return out
 
 
 def place(im, p):
@@ -66,8 +137,18 @@ def place(im, p):
     im = im.resize((round(im.width * s), round(im.height * s)), Image.LANCZOS)
     x = round(CARD[0] / 2 - p["cx"] * s)
     y = round(EYE_Y - (p["eye"] - y0) * s)
-    canvas = Image.new("RGBA", CARD, (0, 0, 0, 0))
+    if p.get("fill_bottom"):
+        y = CARD[1] - im.height
+    # A little extra room all round, so a tilt never leaves empty corners.
+    m = 260 if p.get("tilt") else 0
+    canvas = Image.new("RGBA", (CARD[0] + 2 * m, CARD[1] + 2 * m), (0, 0, 0, 0))
+    x, y = x + m, y + m
     canvas.alpha_composite(im, (max(0, x), max(0, y)), (max(0, -x), max(0, -y)))
+    if p.get("tilt"):
+        # Turn the person about the middle of the face (degrees, counter-clockwise).
+        pivot = (CARD[0] / 2 + m, EYE_Y + EYE_TO_CHIN / 2 + m)
+        canvas = canvas.rotate(p["tilt"], resample=Image.BICUBIC, center=pivot)
+        canvas = canvas.crop((m, m, m + CARD[0], m + CARD[1]))
     return canvas
 
 
@@ -88,6 +169,88 @@ def stats(grey, alpha):
 
 # A gentle S-curve: deeper blacks and brighter highlights, mid-tones kept.
 S_CURVE = [round(255 * (0.5 + 0.5 * math.tanh(1.8 * (g / 255 - 0.5)) / math.tanh(0.9))) for g in range(256)]
+
+
+# How much of the others' shadow depth to add to a matched photo:
+# 1 is all of it, 0 none. Kept low so the shadows stay very subtle.
+SHADOW_STRENGTH = 0.2
+
+
+def match_to_group(rgba, refs):
+    """Make a black and white cut-out look like it was shot with the others.
+
+    Measured on the reference cut-outs (same card layout, so the head and the
+    body sit in the same place on every card), and applied in three steps:
+    local contrast (how deep the shadows in the face and clothes are), tones
+    (head and body matched separately, so a dark shirt is compared with
+    shirts and a face with faces) and fine grain.
+    """
+    import numpy as np
+
+    def arrays(im):
+        g = np.asarray(ImageOps.grayscale(im.convert("RGB")), dtype=np.float32)
+        a = np.asarray(im.getchannel("A"), dtype=np.float32)
+        return g, a
+
+    def blur(g, r):
+        return np.asarray(Image.fromarray(g.clip(0, 255).astype(np.uint8)).filter(ImageFilter.GaussianBlur(r)), dtype=np.float32)
+
+    h, w = CARD[1], CARD[0]
+    split = EYE_Y + EYE_TO_CHIN + 80  # from the collar down: clothes
+    rows = np.arange(h)[:, None] * np.ones((1, w))
+    head_zone = rows < split
+    g, a = arrays(rgba)
+    ref = [arrays(r) for r in refs]
+    person = a > 200
+
+    # 1. Local contrast: the strength of shadow and texture at two sizes.
+    for radius in (8, 2):
+        def detail(gg, aa, zone):
+            d = gg - blur(gg, radius)
+            m = (aa > 200) & zone
+            return d, float(d[m].std())
+        # Not the very bottom, where the shirt was extended to fill the card.
+        for zone, top in ((head_zone, 2.2), (~head_zone & (rows < CARD[1] - 110), 1.15)):
+            # Clothes get only a little: a plain dark shirt has almost no
+            # texture, and boosting it only brings out noise.
+            d, mine = detail(g, a, zone)
+            theirs = float(np.mean([detail(rg, ra, zone)[1] for rg, ra in ref]))
+            k = np.clip(theirs / max(mine, 1e-3), 0.7, top)
+            k = 1 + (k - 1) * SHADOW_STRENGTH
+            g = np.where(zone, g + d * (k - 1), g)
+
+    # 2. Tones: histogram matching, head and body separately, blended at the neck.
+    def lut(zone):
+        mine = np.sort(g[person & zone].ravel())
+        theirs = np.sort(np.concatenate([rg[(ra > 200) & zone].ravel() for rg, ra in ref]))
+        q = np.linspace(0, 1, 257)
+        return np.quantile(mine, q), np.quantile(theirs, q)
+
+    src_h, dst_h = lut(head_zone)
+    head = np.interp(g, src_h, dst_h)
+    # Clothes: match their average brightness, and their spread only part of
+    # the way, so a plain shirt is lifted to their level without blotches.
+    bm = person & ~head_zone
+    mine_m, mine_s = float(g[bm].mean()), float(g[bm].std())
+    their_vals = np.concatenate([rg[(ra > 200) & ~head_zone].ravel() for rg, ra in ref])
+    k = min(float(their_vals.std()) / max(mine_s, 1e-3), 1.25)
+    body = float(their_vals.mean()) + (g - mine_m) * k
+    t = np.clip((rows - (split - 40)) / 80, 0, 1)
+    g = head * (1 - t) + body * t
+
+    # 3. Grain: add only what is missing to reach their fine noise.
+    def grain(gg, aa):
+        m = (aa > 200) & head_zone
+        return float((gg - blur(gg, 1))[m].std())
+
+    mine = grain(g, a)
+    theirs = float(np.mean([grain(rg, ra) for rg, ra in ref]))
+    extra = np.sqrt(max(theirs**2 - mine**2, 0))
+    if extra > 0:
+        g = g + np.random.default_rng(7).normal(0, extra, g.shape)
+
+    out = Image.fromarray(g.clip(0, 255).astype(np.uint8))
+    return Image.merge("RGBA", (out, out, out, rgba.getchannel("A")))
 
 
 def to_grey(rgba, target=None):
@@ -114,17 +277,30 @@ def backdrop():
     return bg.convert("RGBA")
 
 
-def main():
+def main(only=None):
     session = new_session("isnet-general-use")
-    placed = {name: place(cut_out(p, session), p) for name, p in PEOPLE.items()}
-    ref = placed[REFERENCE]
-    target = stats(ImageOps.grayscale(ref.convert("RGB")), ref.getchannel("A"))
-    for name, im in placed.items():
+    look = place(cut_out(LOOK, session), LOOK)
+    target = stats(ImageOps.grayscale(look.convert("RGB")), look.getchannel("A"))
+    greys = {}
+    for name, p in PEOPLE.items():
+        if not p.get("raw"):
+            greys[name] = to_grey(place(cut_out(p, session), p), target)
+    for name, p in PEOPLE.items():
+        if p.get("raw"):
+            grey = to_grey(place(cut_out(p, session), p))
+            if p.get("match"):
+                grey = match_to_group(grey, list(greys.values()))
+            greys[name] = grey
+    for name, grey in greys.items():
+        if only and name not in only:
+            continue
         card = backdrop()
-        card.alpha_composite(to_grey(im, None if name == REFERENCE else target))
+        card.alpha_composite(grey)
         card.convert("RGB").save(OUT / f"team-card-{name}.jpg", quality=86, optimize=True, progressive=True)
         print("card", name)
 
 
 if __name__ == "__main__":
-    main()
+    import sys
+
+    main(sys.argv[1:])
