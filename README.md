@@ -60,7 +60,8 @@ script), and the cache headers in `next.config.ts` are not applied.
 4. Optionally, under Environment Variables add `NEXT_PUBLIC_SITE_URL`.
 5. Click Deploy. You get a `*.vercel.app` URL in about a minute.
 6. Custom domain: Project Settings, Domains, add your domain and create the DNS records Vercel shows
-   at your domain registrar. Then set `NEXT_PUBLIC_SITE_URL` to that domain and redeploy.
+   at your domain registrar. The site address defaults to `https://iglooads.in` (`src/lib/site.ts`);
+   for a different domain, set `NEXT_PUBLIC_SITE_URL` and redeploy.
 
 After that, every push to the production branch deploys automatically, and other branches get preview
 URLs. `NEXT_PUBLIC_*` values are baked in at build time, so redeploy (Deployments, Redeploy) after
@@ -78,7 +79,7 @@ open it and click the activation link once, after which every enquiry arrives as
 test enquiry from the live site right after deploying to do this. If sending fails, the form asks
 the visitor to try again or use WhatsApp.
 
-Optional: `NEXT_PUBLIC_SITE_URL` (for example `https://iglooads.in`) sets the base URL for social share
+Optional: `NEXT_PUBLIC_SITE_URL` (default `https://iglooads.in`, set in `src/lib/site.ts`) sets the base URL for social share
 metadata.
 
 ## Team photos
