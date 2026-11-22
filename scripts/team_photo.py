@@ -29,7 +29,7 @@ LIGHT = (58, 62, 104)
 # the chin and the face centre. Faces are scaled so eye-to-chin matches,
 # times scale where a face still reads smaller than the others.
 PEOPLE = {
-    "suhail": dict(file="suhail.heic", eye=1130, chin=1250, cx=650, scale=1.0),
+    "suhail": dict(file="suhail-2.jpg", eye=1037, chin=1162, cx=730, scale=1.0),
     "sudhir": dict(file="sudhir.jpg", eye=890, chin=998, cx=846, scale=1.0),
     "ajay": dict(file="ajay.heic", eye=1030, chin=1165, cx=1092, scale=1.0),
     "shyan": dict(file="shyan-3.jpg", eye=372, chin=498, cx=563, scale=1.0),
