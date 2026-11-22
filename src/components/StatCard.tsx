@@ -47,10 +47,12 @@ export default function StatCard({ to, suffix, label, line }: Props) {
 
   return (
     <li ref={ref} className="rv lift stat-card rounded-[22px] bg-indigo p-7">
-      <div
-        className="font-anton text-[64px] leading-none text-amber"
-        aria-label={`${to}${suffix}`}
-      >
+      <div className="font-anton text-[64px] leading-none text-amber">
+        {/* Screen readers hear the final number, not the count. */}
+        <span className="sr-only">
+          {to}
+          {suffix}
+        </span>
         <span aria-hidden="true">
           {n}
           {suffix}
